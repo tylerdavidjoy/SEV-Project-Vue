@@ -10,83 +10,55 @@
       <v-icon>mdi-triangle</v-icon>
     </v-system-bar>
 
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+      <v-toolbar-title>Application</v-toolbar-title>
+    </v-app-bar>
+
     <v-navigation-drawer
       v-model="drawer"
-      app
+      fixed
+      temporary
     >
-      <v-sheet
-        color="grey lighten-4"
-        class="pa-4"
-      >
-        <v-avatar
-          class="mb-4"
-          color="grey darken-1"
-          size="64"
-        ></v-avatar>
-
-        <div>Johnny D with the thick Back</div>
-      </v-sheet>
-
-      <v-divider></v-divider>
-
-      <v-list>
+    <v-list>
         <v-list-item
-          v-for="[icon, text] in links"
-          :key="icon"
-          link
-        >
+          v-for="tab in tabs"
+          v-bind:key="tab.icon"
+          link>
           <v-list-item-icon>
-            <v-icon>{{ icon }}</v-icon>
+            <v-icon>{{ tab.icon }}</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ text }}</v-list-item-title>
+            <router-link :to="tab.path"> {{ tab.text }} </router-link>
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <!--  -->
     </v-navigation-drawer>
 
-    <v-main>
-      <v-container
-        class="py-8 px-6"
-        fluid
-      >
+    <v-main class="grey lighten-2">
+      <v-container>
         <v-row>
-          <v-col
-            v-for="card in cards"
-            :key="card"
-            cols="12"
-          >
-            <v-card>
-              <v-subheader>{{ card }}</v-subheader>
+          <template v-for="n in 4">
+            <v-col
+              :key="n"
+              class="mt-2"
+              cols="12"
+            >
+              <strong>Category {{ n }}</strong>
+            </v-col>
 
-              <v-list two-line>
-                <template v-for="n in 6">
-                  <v-list-item
-
-                    :key="n"
-                  >
-                    <v-list-item-avatar color="grey darken-1">
-                    </v-list-item-avatar>
-
-                    <v-list-item-content>
-                      <v-list-item-title>Message {{ n }}</v-list-item-title>
-
-                      <v-list-item-subtitle>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil repellendus distinctio similique
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-divider
-                    v-if="n !== 6"
-                    :key="`divider-${n}`"
-                    inset
-                  ></v-divider>
-                </template>
-              </v-list>
-            </v-card>
-          </v-col>
+            <v-col
+              v-for="j in 6"
+              :key="`${n}${j}`"
+              cols="6"
+              md="2"
+            >
+              <v-sheet height="150"></v-sheet>
+            </v-col>
+          </template>
         </v-row>
       </v-container>
     </v-main>
@@ -95,15 +67,18 @@
 
 <script>
   export default {
-    data: () => ({
-      cards: ['Today', 'Yesterday'],
-      drawer: null,
-      links: [
-        ['mdi-inbox-arrow-down', 'Inbox'],
-        ['mdi-send', 'Send'],
-        ['mdi-delete', 'Trash'],
-        ['mdi-alert-octagon', 'Spam'],
-      ],
+    data: () => ({ 
+    drawer: null,
+    tabs:[
+    {icon:'mdi-inbox-arrow-down',text:'Home', path:'/'},
+    {icon:'mdi-inbox-arrow-down',text:'Account', path:'/account'},
+    {icon:'mdi-inbox-arrow-down',text:'HouseHold', path:'/household'},
+    {icon:'mdi-inbox-arrow-down',text:'Groups', path:'/groups'},
+    {icon:'mdi-inbox-arrow-down',text:'Events', path:'/events'},
+    {icon:'mdi-inbox-arrow-down',text:'Directory', path:'/directory'},
+
+    ],
+
     }),
   }
 </script>
