@@ -2,16 +2,12 @@
   <div id="app">
     <div id="nav">
         <v-app-bar app>
-          <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+          <!-- <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon> -->
 
-          <v-toolbar-title>Application</v-toolbar-title>
+          <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
         </v-app-bar>
 
-        <v-navigation-drawer
-          v-model="drawer"
-          fixed
-          temporary
-        >
+        <v-navigation-drawer expand-on-hover="expandOnHover" mini-variant="miniVariant" app>
         <v-list>
             <v-list-item
               v-for="tab in tabs"
@@ -38,23 +34,23 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: maroon;
 }
 
 #nav {
   padding: 30px;
-
+  background-color: darkslategrey;
   a {
     font-weight: bold;
     color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+    // &.router-link-exact-active {
+    //   color: #42b983;
+    // }
   }
 }
 </style>
 <script>
+
   export default {
     data: () => ({ 
     drawer: null,
