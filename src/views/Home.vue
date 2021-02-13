@@ -1,36 +1,23 @@
 <template>
   <v-app id="inspire">
-    <!-- <v-system-bar app>
+    <v-system-bar app>
       <v-spacer></v-spacer>
 
-      <v-icon>mdi-square</v-icon>
-
-      <v-icon>mdi-circle</v-icon>
-
-      <v-icon>mdi-triangle</v-icon>
-    </v-system-bar> -->
+      <v-icon>mdi-logout</v-icon>
+    </v-system-bar>
 
     <v-main class="grey lighten-2">
       <v-container>
         <v-row>
-          <template v-for="n in 4">
-            <v-col
-              :key="n"
-              class="mt-2"
-              cols="12"
-            >
-              <strong>Category {{ n }}</strong>
-            </v-col>
-
-            <v-col
-              v-for="j in 6"
-              :key="`${n}${j}`"
-              cols="6"
-              md="2"
-            >
-              <v-sheet height="150"></v-sheet>
-            </v-col>
-          </template>
+              <v-col v-for="tab in tabs" v-bind:key="tab.icon" :link="tab.path" cols="auto" md="4" lg="4" xl="4">
+                  <button @click="$router.push(tab.path)">
+                    <v-sheet  height="250" width="250">
+                      <div style="margin-top:5%; background-color:white;"><v-icon size="800%">{{tab.icon}}</v-icon></div>
+                      <div style="font-size:300%">{{tab.text}}</div>
+                    </v-sheet>
+                  </button>
+                  
+              </v-col>
         </v-row>
       </v-container>
     </v-main>
@@ -42,14 +29,13 @@
     data: () => ({ 
     drawer: null,
     tabs:[
-    {icon:'mdi-inbox-arrow-down',text:'Home', path:'/'},
-    {icon:'mdi-inbox-arrow-down',text:'Account', path:'/account'},
-    {icon:'mdi-inbox-arrow-down',text:'HouseHold', path:'/household'},
-    {icon:'mdi-inbox-arrow-down',text:'Groups', path:'/groups'},
-    {icon:'mdi-inbox-arrow-down',text:'Events', path:'/events'},
-    {icon:'mdi-inbox-arrow-down',text:'Directory', path:'/directory'}
+    {icon:'mdi-account',text:'Account', path:'/account'},
+    {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
+    {icon:'mdi-account-group',text:'Groups', path:'/groups'},
+    {icon:'mdi-calendar',text:'Events', path:'/events'},
+    {icon:'mdi-church',text:'Directory', path:'/directory'},
+    {icon:'mdi-logout',text:'Logout', path:'/logout'},
     ],
-
     }),
   }
 </script>

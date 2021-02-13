@@ -12,13 +12,13 @@
             <v-list-item
               v-for="tab in tabs"
               v-bind:key="tab.icon"
-              link>
+              router :to="tab.path">
               <v-list-item-icon>
                 <v-icon>{{ tab.icon }}</v-icon>
               </v-list-item-icon>
 
               <v-list-item-content>
-                <router-link :to="tab.path"> {{ tab.text }} </router-link>
+                <v-list-item-title>{{ tab.text }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -55,12 +55,12 @@
     data: () => ({ 
     drawer: null,
     tabs:[
-    {icon:'mdi-inbox-arrow-down',text:'Home', path:'/'},
-    {icon:'mdi-inbox-arrow-down',text:'Account', path:'/account'},
-    {icon:'mdi-inbox-arrow-down',text:'HouseHold', path:'/household'},
-    {icon:'mdi-inbox-arrow-down',text:'Groups', path:'/groups'},
-    {icon:'mdi-inbox-arrow-down',text:'Events', path:'/events'},
-    {icon:'mdi-inbox-arrow-down',text:'Directory', path:'/directory'},
+    {icon:'mdi-home',text:'Home', path:'/'},
+    {icon:'mdi-account',text:'Account', path:'/account'},
+    {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
+    {icon:'mdi-account-group',text:'Groups', path:'/groups'},
+    {icon:'mdi-calendar',text:'Events', path:'/events'},
+    {icon:'mdi-church',text:'Directory', path:'/directory'},
 
     ],
 
