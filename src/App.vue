@@ -7,7 +7,7 @@
           <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
         </v-app-bar>
 
-        <v-navigation-drawer expand-on-hover="expandOnHover" mini-variant="miniVariant" app>
+        <v-navigation-drawer v-if="this.$route.name != 'Login'" expand-on-hover="expandOnHover" mini-variant="miniVariant" app>
         <v-list>
             <v-list-item
               v-for="tab in tabs"
