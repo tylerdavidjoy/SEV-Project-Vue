@@ -5,7 +5,7 @@
         <v-app-bar app>
           <!-- <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon> -->   
           <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
-          <button v-if="$route.name != 'Login'" v-on:click="signOut()" class="btn btn-dark btn-lg"  ><v-icon>{{ logoutIcon.icon }}</v-icon>Logout</button> 
+          <button v-if="['Login', 'Logout'].includes($route.name) != true" v-on:click="signOut()" class="btn btn-dark btn-lg"><v-icon>{{ logoutIcon.icon }}</v-icon>Logout</button> 
         </v-app-bar>
         <div class="g-signin2" data-onsuccess="onSignIn" data-onfailure="failed" style="height:0px;"></div> <!--***LEAVE ALONE ITS HIDDEN BUT MAKES LOGOUT WORK***-->
         <v-navigation-drawer v-if="['Login', 'Logout'].includes($route.name) != true" expand-on-hover="expandOnHover" mini-variant="miniVariant" app>
@@ -54,11 +54,12 @@ export default {
       signOut: function() {
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(function () {
+          window.user = null;
           console.log('User signed out.');
             });
         
         if(process.env.NODE_ENV === 'development'){
-          window.location.href = 'http://localhost:8080/#/logout';
+          window.location.href = 'http://localhost:8080/#/login';
         }
         else
         {
@@ -66,22 +67,6 @@ export default {
         }
       }
     },
-  mounted(){
-      let recaptchaScript = document.createElement('script')
-      recaptchaScript.setAttribute('src', 'https://apis.google.com/js/platform.js')
-      document.head.appendChild(recaptchaScript)
-      
-      this.polling = setInterval(() => {
-      if(window.user){
-        this.user = window.user;
-        this.$router.push("/list");
-      }
-    }, 1000)
-  },
-
-  beforeDestroy() {
-    clearInterval(this.polling);
-  }
 };
 </script>
 
