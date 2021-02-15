@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
+import Logout from '../views/Logout.vue'
 import Home from '../views/Home.vue'
 import Account from '../views/Account.vue'
 import HouseHold from '../views/HouseHold.vue'
@@ -26,6 +27,15 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
     component: Login
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: Logout
   },
   {
     path: '/account',

@@ -34,7 +34,7 @@
     {icon:'mdi-account-group',text:'Groups', path:'/groups'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'},
-    {icon:'mdi-logout',text:'Logout', path:'/login'},
+    {icon:'mdi-logout',text:'Logout', path:'/logout'},
     ],
     }),
   }

@@ -1,5 +1,8 @@
 <template>
-  <div>
-    <h1>Wercome to Log-in</h1>
-  </div>
+  <v-app>
+    <v-main class="grey lighten-2">
+      <v-container>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
