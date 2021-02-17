@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     login: function() {
-      this.$router.push("/");
+      this.$router.push("/home");
     }
   },
    mounted(){
@@ -71,7 +71,7 @@ export default {
       this.polling = setInterval(() => {
       if(window.user){
         this.user = window.user;
-        this.$router.push("/");
+        this.$router.push("/home");
       }
     }, 1000)
   },
