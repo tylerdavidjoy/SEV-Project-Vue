@@ -8,7 +8,7 @@
           <button v-if="['Login', 'Logout'].includes($route.name) != true" v-on:click="signOut()" class="btn btn-dark btn-lg"><v-icon>{{ logoutIcon.icon }}</v-icon>Logout</button> 
         </v-app-bar>
         <div class="g-signin2" data-onsuccess="onSignIn" data-onfailure="failed" style="height:0px;"></div> <!--***LEAVE ALONE ITS HIDDEN BUT MAKES LOGOUT WORK***-->
-        <v-navigation-drawer v-if="['Login', 'Logout'].includes($route.name) != true" expand-on-hover="expandOnHover" mini-variant="miniVariant" app>
+        <v-navigation-drawer v-if="['Login', 'Logout'].includes($route.name) != true" :expand-on-hover="true" :mini-variant="true" app>
         <v-list>
             <v-list-item
               v-for="tab in tabs"
