@@ -63,7 +63,7 @@ export default {
         }
         else
         {
-          window.location.href = 'http://team2.eaglesoftwareteam.com/';
+          window.location.href = 'http://team2.eaglesoftwareteam.com/#/login';
         }
       }
     },
