@@ -41,7 +41,7 @@ export default {
     polling: null,
     drawer: null,
     tabs:[
-    {icon:'mdi-home',text:'Home', path:'/'},
+    {icon:'mdi-home',text:'Home', path:'/home'},
     {icon:'mdi-account',text:'Account', path:'/account'},
     {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
     {icon:'mdi-account-group',text:'Groups', path:'/groups'},
