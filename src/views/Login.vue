@@ -29,7 +29,7 @@
           <v-btn
               elevation="2"
               text
-              v-on:click="$router.push('/')"
+              v-on:click="login()"
             >Submit</v-btn>
           </v-col>
           <v-col>
