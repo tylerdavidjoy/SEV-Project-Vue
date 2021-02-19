@@ -1,11 +1,5 @@
 <template>
   <v-app id="inspire">
-    <v-system-bar app>
-      <v-spacer></v-spacer>
-
-      <v-icon>mdi-logout</v-icon>
-    </v-system-bar>
-
     <v-main class="grey lighten-2">
       <v-container>
         <v-row>
@@ -16,7 +10,6 @@
                       <div style="font-size:300%">{{tab.text}}</div>
                     </v-sheet>
                   </button>
-                  
               </v-col>
         </v-row>
       </v-container>
@@ -34,7 +27,6 @@
     {icon:'mdi-account-group',text:'Groups', path:'/groups'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'},
-    {icon:'mdi-logout',text:'Logout', path:'/logout'},
     ],
     }),
   }
