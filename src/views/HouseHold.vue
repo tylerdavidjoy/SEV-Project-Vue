@@ -46,9 +46,12 @@
 
 <script>
 
+import axios from 'axios'
+
   export default {
   // components: { Directory },
-    data: () => ({ 
+    data() { 
+      return {
     // members:[
     // {icon:'mdi-home',text:'Home', path:'/'},
     // {icon:'mdi-account',text:'Account', path:'/account'},
@@ -58,16 +61,48 @@
     // {icon:'mdi-church',text:'Directory', path:'/directory'},
 
     // ],
-    members:[
-      {name: 'Billy Bob jr.'},
-      {name: 'Billy Bob sr.'},
-      {name: 'Sally Bob jr.'},
-      {name: 'Sally Bob sr.'},
-      {name: 'Junior Bob jr.'},
-    ],
+        baseURL: "http://team2.eaglesoftwareteam.com/#/",
+        members:[
+          {name: 'Billy Bob jr.'},
+          {name: 'Billy Bob sr.'},
+          {name: 'Sally Bob jr.'},
+          {name: 'Sally Bob sr.'},
+          {name: 'Junior Bob jr.'},
+        ],
+        familyMembers: [],
+        userId: 1,
+      }
 
+    
+    
+    },
+    created() {
+      console.log("Hello there :)");
+      console.log(this.baseURL);
+      console.log(this.userId);
+      var url = this.baseURL + "family?person_ID=" + this.userId;
+      console.log(url);
+        // axios
+        // .get(url)
+        // .then(response => {
+        //   console.log(response.data)
+        //   this.familyMembers = response.data;
+        // })
+        axios({
+          method: 'get',
+          url: this.baseURL + "family?person_ID=" + this.userId
+        })
+        .then(function (response) {
+          console.log(response.data),
+          this.familyMembers = response.data
+        });
+    },
+
+    methods: {
+      getFamily: function() {
+        
+      }
     }
-    ),
   }
 </script>
 
