@@ -35,14 +35,14 @@
                   <br />
                   <v-list class="list">
                     <v-list-item
-                      v-for="member in members"
+                      v-for="member in familyMembers"
                       v-bind:key="member" class="list">
                       <v-list-item-icon>
                         <img src="../assets/dog.jpg" class="smallUserImg">
                       </v-list-item-icon>
 
                       <v-list-item-content class="large">
-                        <v-list-item-title class="large">{{ member.f_name }}</v-list-item-title>
+                        <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
@@ -64,15 +64,6 @@ import axios from 'axios'
   // components: { Directory },
     data() { 
       return {
-    // members:[
-    // {icon:'mdi-home',text:'Home', path:'/'},
-    // {icon:'mdi-account',text:'Account', path:'/account'},
-    // {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
-    // {icon:'mdi-account-group',text:'Groups', path:'/groups'},
-    // {icon:'mdi-calendar',text:'Events', path:'/events'},
-    // {icon:'mdi-church',text:'Directory', path:'/directory'},
-
-    // ],
         address: "",
         phone: "",
         email: "",
@@ -98,25 +89,17 @@ import axios from 'axios'
       console.log(this.userId);
       var myUrl = this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1";
       console.log(myUrl);
-        // axios
-        // .get(url)
-        // .then(response => {
-        //   console.log(response.data)
-        //   this.familyMembers = response.data;
-        // })
-        axios({
-          method: 'get',
-          url: 'http://localhost:3000/family?id=2&isGetPersons=1',
-          headers: {
-          }
+        axios
+        .get("http://localhost:3000/family?id=2&isGetPersons=1")
+        .then(response => {
+          console.log(response.data)
+          this.familyMembers = response.data;
+          console.log(this.familyMembers)
         })
-        .then(function (response) {
-          console.log(response.data),
-          this.familyMembers = response.data
+        .catch(error => {
+          console.log("ERROR: " + error.response)
         })
-        .catch((error) => {
-          console.log("ERROR: " + error.response);
-        });
+          
     },
 
     methods: {
