@@ -1,46 +1,58 @@
 <template>
-  <v-app>
-    <v-container>
-      <div class="flex-container">
-      <div class="flex-child-small">
-        <img src="../assets/dog.jpg" class="familyImg">
-        <br />
-        <h1>HouseHold Information</h1>
-        <br />
-        <label>Address</label>
-        <v-text-field label="Family Address" disabled></v-text-field>
-        <label>Phone Number</label>
-        <v-text-field label="Family Phone Number" disabled></v-text-field>
-        <label>Email</label>
-        <v-text-field label="Family Email" disabled></v-text-field>
-        <v-btn class="ma-2" outlined large fab color="indigo">
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn class="ma-2" outlined large fab color="indigo">
-          <v-icon>mdi-content-save</v-icon>
-        </v-btn>
-      </div>
-      <div class="flex-child">
-        <img src="../assets/dog.jpg" class="userImg">
-        <br />
-        <h1>Family Members</h1>
-        <br />
-        <v-list class="list">
-            <v-list-item
-              v-for="member in members"
-              v-bind:key="member" class="list">
-              <v-list-item-icon>
-                <img src="../assets/dog.jpg" class="smallUserImg">
-              </v-list-item-icon>
+  <v-app id="inspire">
+    <div>
+      <v-main class="grey lighten-2">
+        <v-container>
+          <v-row>
+            <v-col cols="6">
+              <v-container>
+                <v-sheet width="600">
+                  <img src="../assets/dog.jpg" class="familyImg">
+                  <br />
+                  <h1>HouseHold Information</h1>
+                  <br />
+                  <label>Address</label>
+                  <v-text-field v-model="address" label="Family Address" disabled></v-text-field>
+                  <label>Phone Number</label>
+                  <v-text-field v-model="phone" label="Family Phone Number" disabled></v-text-field>
+                  <label>Email</label>
+                  <v-text-field v-model="email" label="Family Email" disabled></v-text-field>
+                  <v-btn class="ma-2" outlined large fab color="indigo">
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn class="ma-2" outlined large fab color="indigo">
+                    <v-icon>mdi-content-save</v-icon>
+                  </v-btn>
+                </v-sheet>
+              </v-container>
+            </v-col>
+            <v-col cols="auto">
+              <v-container>
+                <v-sheet width="600">
+                  <img src="../assets/dog.jpg" class="userImg">
+                  <br />
+                  <h1>Family Members</h1>
+                  <br />
+                  <v-list class="list">
+                    <v-list-item
+                      v-for="member in members"
+                      v-bind:key="member" class="list">
+                      <v-list-item-icon>
+                        <img src="../assets/dog.jpg" class="smallUserImg">
+                      </v-list-item-icon>
 
-              <v-list-item-content class="large">
-                <v-list-item-title class="large">{{ member.name }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-      </div>
-      </div>
-    </v-container>
+                      <v-list-item-content class="large">
+                        <v-list-item-title class="large">{{ member.f_name }}</v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-sheet>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-main>
+    </div>
   </v-app>
 </template>
 
@@ -61,7 +73,10 @@ import axios from 'axios'
     // {icon:'mdi-church',text:'Directory', path:'/directory'},
 
     // ],
-        baseURL: "http://team2.eaglesoftwareteam.com/#/",
+        address: "",
+        phone: "",
+        email: "",
+        baseURL: "http://localhost:3000/",
         members:[
           {name: 'Billy Bob jr.'},
           {name: 'Billy Bob sr.'},
@@ -71,6 +86,7 @@ import axios from 'axios'
         ],
         familyMembers: [],
         userId: 1,
+        familyId: 2
       }
 
     
@@ -80,8 +96,8 @@ import axios from 'axios'
       console.log("Hello there :)");
       console.log(this.baseURL);
       console.log(this.userId);
-      var url = this.baseURL + "family?person_ID=" + this.userId;
-      console.log(url);
+      var myUrl = this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1";
+      console.log(myUrl);
         // axios
         // .get(url)
         // .then(response => {
@@ -90,11 +106,16 @@ import axios from 'axios'
         // })
         axios({
           method: 'get',
-          url: this.baseURL + "family?person_ID=" + this.userId
+          url: 'http://localhost:3000/family?id=2&isGetPersons=1',
+          headers: {
+          }
         })
         .then(function (response) {
           console.log(response.data),
           this.familyMembers = response.data
+        })
+        .catch((error) => {
+          console.log("ERROR: " + error.response);
         });
     },
 
