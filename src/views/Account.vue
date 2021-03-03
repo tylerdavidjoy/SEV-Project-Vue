@@ -262,7 +262,6 @@
                                                 <v-autocomplete
                                                   v-model="editedEvent.person_id"
                                                   :items="people"
-                                                  :filter="customFilter"
                                                   clearable
                                                   solo
                                                   item-text="name"
@@ -333,7 +332,7 @@
                                       v-bind:key="Relation">
                                       <v-list-item-content>
                                         <v-list-item-title>Relationship: {{Relation.type}}</v-list-item-title>
-                                        <v-list-item-subtitle>Person ID: {{Relation.person_id.id}}</v-list-item-subtitle>
+                                        <v-list-item-subtitle>Person ID: {{Relation.id}}</v-list-item-subtitle>
                                       </v-list-item-content>
                                       <v-list-item-content>
                                         <v-btn icon v-on:click="editEvent(Relation,1)">
@@ -612,10 +611,10 @@
                             v-for="phone in form.phones"
                             v-bind:key="phone">
                             <v-list-item-content>
-                              <template v-if="phone.type == 'Work'">
+                              <template v-if="phone.type == '1'">
                                 <v-icon>mdi-toolbox</v-icon>
                               </template>
-                              <template v-else-if="phone.type == 'Home'">
+                              <template v-else-if="phone.type == '2'">
                                 <v-icon>mdi-phone</v-icon>
                               </template>
                               <template v-else>
@@ -698,19 +697,19 @@
   </v-app>
 </template>
 <script>
-// import axios from "axios";
+import axios from "axios";
 export default {
   mounted() {
     //axios call to get phones
 
-    // axios.get("http://team2.eaglesoftwareteam.com/phone_number")
-    // .then(response => {
-    //   this.user.phones = response.data;
-    // })
-    // .catch(error => {
-    //   console.log(error);
-    // })
-    // .finally(() => console.log("Done Loading"));
+    axios.get("http://team2.eaglesoftwareteam.com/phone_number")
+    .then(response => {
+      this.form.phones = response.data;
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    .finally(() => console.log("Done Loading: " + this.form.phones));
 
     //Axios call for all users for Relationships
 
@@ -812,7 +811,7 @@ export default {
       Relations:[],
       family_ID: 0,
       image:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.b4uniHhcS-RBvCuV7__9XQHaHd%26pid%3DApi&f=1",
+        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1",
     },
     //Test Data for searching for People
     people:[
@@ -1040,10 +1039,15 @@ export default {
       }
     },
     customFilter (item, queryText) {
-      const textOne = item.name.toLowerCase()
-      const searchText = queryText.toLowerCase()
-
-      return textOne.indexOf(searchText) > -1
+      const textOne = item.name.toLowerCase();
+      const searchText = queryText.toLowerCase();
+      if(this.people[textOne.indexOf(searchText)] > -1)
+      {
+        const returnValue = this.people[textOne.indexOf(searchText)];
+        console.log(returnValue.name + " " + returnValue.id);
+        Object.assign(this.editedEvent.person_id, returnValue);
+      }
+      console.log("After assignment if not Null: " + this.editedEvent.person_id.name + " " + this.editedEvent.person_id.id);
     },
     //Function for making axios calls for the phones
 
