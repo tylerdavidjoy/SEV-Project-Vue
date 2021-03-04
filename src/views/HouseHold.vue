@@ -12,15 +12,15 @@
                   <h1>HouseHold Information</h1>
                   <br />
                   <label>Address</label>
-                  <v-text-field v-model="address" label="Family Address" disabled></v-text-field>
+                  <v-text-field v-model="address" label="Family Address" id="address_field" :readonly="!editable"></v-text-field>
                   <label>Phone Number</label>
-                  <v-text-field v-model="phone" label="Family Phone Number" disabled></v-text-field>
+                  <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
-                  <v-text-field v-model="email" label="Family Email" disabled></v-text-field>
-                  <v-btn class="ma-2" outlined large fab color="indigo">
+                  <v-text-field v-model="email" label="Family Email" :readonly="!editable"></v-text-field>
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn class="ma-2" outlined large fab color="indigo">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="indigo">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -77,7 +77,9 @@ import axios from 'axios'
         ],
         familyMembers: [],
         userId: 1,
-        familyId: 2
+        familyId: 2,
+        address_ID: "",
+        editable: false
       }
 
     
@@ -90,7 +92,7 @@ import axios from 'axios'
       var myUrl = this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1";
       console.log(myUrl);
         axios
-        .get("http://localhost:3000/family?id=2&isGetPersons=1")
+        .get("http://localhost:3000/family?id=2&isGetPersons=1&isGetHeadOfFamily=0")
         .then(response => {
           console.log(response.data)
           this.familyMembers = response.data;
@@ -99,12 +101,35 @@ import axios from 'axios'
         .catch(error => {
           console.log("ERROR: " + error.response)
         })
+
+        axios
+        .get("http://localhost:3000/address?person_ID=" + this.userId)
+        .then(response => {
+          console.log(response.data)
+          this.address = response.data[0].address;
+          this.address_ID = response.data[0].ID;
+          console.log(this.address + " " + this.address_ID)
+        })
           
     },
 
     methods: {
       getFamily: function() {
         
+      },
+      onEdit: function() {
+        this.editable = true;
+      },
+      onSave: function() {
+        this.editable = false;
+
+        axios
+        .put(this.baseURL + "address?id=" + this.address_ID, {
+          address: this.address,
+          type: 7
+        })
+
+        console.log(this.address)
       }
     }
   }
