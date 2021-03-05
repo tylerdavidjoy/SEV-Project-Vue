@@ -61,12 +61,18 @@
 import axios from 'axios'
 
   export default {
-  // components: { Directory },
     data() { 
       return {
         address: "",
         phone: "",
         email: "",
+        headOfFamilyID: "",
+        phoneNumberID: "",
+        congregationID: "",
+        f_name: "",
+        l_name: "",
+        occupation: "",
+        employer: "",
         baseURL: "http://localhost:3000/",
         members:[
           {name: 'Billy Bob jr.'},
@@ -76,7 +82,7 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
-        userId: 1,
+        userId: 2,
         familyId: 2,
         address_ID: "",
         editable: false
@@ -86,125 +92,141 @@ import axios from 'axios'
     
     },
     created() {
-      console.log("Hello there :)");
-      console.log(this.baseURL);
-      console.log(this.userId);
-      var myUrl = this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1";
-      console.log(myUrl);
+
+      // Get family members of the currently logged in user
         axios
         .get("http://localhost:3000/family?id=2&isGetPersons=1&isGetHeadOfFamily=0")
         .then(response => {
-          console.log(response.data)
           this.familyMembers = response.data;
-          console.log(this.familyMembers)
         })
         .catch(error => {
           console.log("ERROR: " + error.response)
         })
 
+
+      // Get the household address
         axios
         .get("http://localhost:3000/address?person_ID=" + this.userId)
         .then(response => {
-          console.log(response.data)
           this.address = response.data[0].address;
           this.address_ID = response.data[0].ID;
-          console.log(this.address + " " + this.address_ID)
+        })
+
+
+      // Find the head of the family
+        axios
+        .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+        .then(response => {
+          this.headOfFamilyID = response.data.ID;
+          console.log(this.headOfFamilyID)
+          return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
+        })
+
+        
+      // Get the family email and store information for updating a person
+        .then(response => {
+          console.log(response.data)
+          this.email = response.data[0].email;
+          this.congregationID = response.data[0].congregation_ID;
+          this.f_name = response.data[0].f_name;
+          this.l_name = response.data[0].l_name;
+          this.occupation = response.data[0].occupation;
+          this.employer = response.data[0].employer;
+          console.log(this.email)
+          return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
+        })
+
+
+      // Get the family phone number
+        .then(response => {
+          console.log(response.data)
+          this.phone = response.data[0].number;
+          this.phoneNumberID = response.data[0].ID;
+          console.log(this.phone)
+          console.log(this.phoneNumberID)
         })
           
     },
 
     methods: {
-      getFamily: function() {
-        
-      },
       onEdit: function() {
-        this.editable = true;
+
+        // If the head of household is logged in give edit permission
+        if(this.userId == this.headOfFamilyID) {
+          this.editable = true;
+        }
+
+        // If the head of household is not logged in do not allow edit permission
+        else {
+          alert("You are not head of household. You do not have permission to edit.")
+        }
       },
       onSave: function() {
         this.editable = false;
 
+
+      // Update family address
         axios
         .put(this.baseURL + "address?id=" + this.address_ID, {
           address: this.address,
           type: 7
         })
 
-        console.log(this.address)
+
+      // Update family phone number
+        axios
+        .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
+          number: this.phone,
+          can_publish: false,
+          type: 1
+        })
+
+
+      // Update family email
+        axios
+        .put(this.baseURL + "person?id=" + this.headOfFamilyID, {
+          congregation_ID: this.congregationID,
+          f_name: this.f_name,
+          l_name: this.l_name,
+          occupation: this.occupation,
+          employer: this.employer,
+          family_ID: this.familyId,
+          email: this.email
+        })
       }
     }
   }
 </script>
 
-<style lang="scss">
-
-.flex-container {
-    display: flex;
-}
-
-.flex-child {
-    flex: 1;
-    padding: 15px;
-}  
-
-.flex-child-small{
-    flex: 0.4;
-    width: 30%;
-    padding: 15px;
-}  
+<style lang="scss"> 
 
 .large {
   font-size: 1.3em;
 }
-// div.rightDiv {
-// float: left;
-// text-align: left;
-// width: 49%;
-// margin: 5px;
-// height: 100vh;
-// color: darkblue;
-// background-color: slategray;
-// border-radius: 10px;
-// }
-
-// div.leftDiv {
-//  float: left;
-//  text-align: left;
-//  width: 49%;
-//  margin: 5px;
-//  height: 100vh;
-//  color: darkblue;
-//  background-color: slategray;
-//  border-radius: 10px;
-// }
 
 .list {
-  // background-color: darkslategray;
   color: white;
 }
 
 img.userImg {
   margin: 20px;
-  // width: 10%;
   height: 10%;
   size: auto
 }
 
 img.smallUserImg {
-  // width: 50px;
   height: 80px;
   size: auto
 }
 
 img.familyImg {
   margin: 20px;
-  // width: 40%;
   height: 40%;
   size: auto
 }
 
 h1 {
   color: maroon;
-  // background-color: slategray;
   padding: 10px;
   text-decoration: underline;
 }
