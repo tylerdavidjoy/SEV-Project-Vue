@@ -85,6 +85,8 @@ import axios from 'axios'
         userId: 3,
         familyId: 3,
         address_ID: "",
+        address_Type: "",
+        phoneNumber_Type: "",
         editable: false,
         isHeadOfFamily: false
       }
@@ -109,9 +111,12 @@ import axios from 'axios'
         axios
         .get("http://localhost:3000/address?person_ID=" + this.userId)
         .then(response => {
-          console.log(response.data)
+          console.log("Household address " + response.data)
           this.address = response.data[0].address;
           this.address_ID = response.data[0].ID;
+          this.address_Type = response.data[0].type;
+          console.log("Address Type: " + this.address_Type)
+          console.log("Address ID: " + this.address_ID)
         })
 
 
@@ -120,7 +125,8 @@ import axios from 'axios'
         .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
         .then(response => {
           this.headOfFamilyID = response.data[0].ID;
-          console.log(this.headOfFamilyID)
+          console.log("Head of family ID" + this.headOfFamilyID)
+          this.isHeadOfHousehold();
           return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
         })
 
@@ -144,11 +150,12 @@ import axios from 'axios'
           console.log(response.data)
           this.phone = response.data[0].number;
           this.phoneNumberID = response.data[0].ID;
+          this.phoneNumber_Type = response.data[0].type;
           console.log(this.phone)
           console.log(this.phoneNumberID)
         })
 
-        this.isHeadOfHousehold();
+        
           
     },
 
@@ -173,7 +180,7 @@ import axios from 'axios'
         axios
         .put(this.baseURL + "address?id=" + this.address_ID, {
           address: this.address,
-          type: 7
+          type: this.address_Type
         })
 
 
@@ -182,7 +189,7 @@ import axios from 'axios'
         .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
           number: this.phone,
           can_publish: false,
-          type: 1
+          type: this.phoneNumber_Type
         })
 
 
@@ -201,7 +208,7 @@ import axios from 'axios'
 
       isHeadOfHousehold: function() {
         console.log("isHeadOfHousehold function")
-        if(this.userId == this.headOfFamilyID) {
+        if(this.userId === this.headOfFamilyID) {
           this.isHeadOfFamily = true;
         }
         // return this.isHeadOfFamily;
