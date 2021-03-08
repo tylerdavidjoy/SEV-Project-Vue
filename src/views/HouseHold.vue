@@ -17,10 +17,10 @@
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
                   <v-text-field v-model="email" label="Family Email" :readonly="!editable"></v-text-field>
-                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo">
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn @click="onSave" class="ma-2" outlined large fab color="indigo">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -82,10 +82,11 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
-        userId: 2,
-        familyId: 2,
+        userId: 3,
+        familyId: 3,
         address_ID: "",
-        editable: false
+        editable: false,
+        isHeadOfFamily: false
       }
 
     
@@ -95,7 +96,7 @@ import axios from 'axios'
 
       // Get family members of the currently logged in user
         axios
-        .get("http://localhost:3000/family?id=2&isGetPersons=1&isGetHeadOfFamily=0")
+        .get("http://localhost:3000/family?id=3&isGetPersons=1&isGetHeadOfFamily=0")
         .then(response => {
           this.familyMembers = response.data;
         })
@@ -108,6 +109,7 @@ import axios from 'axios'
         axios
         .get("http://localhost:3000/address?person_ID=" + this.userId)
         .then(response => {
+          console.log(response.data)
           this.address = response.data[0].address;
           this.address_ID = response.data[0].ID;
         })
@@ -117,7 +119,7 @@ import axios from 'axios'
         axios
         .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
         .then(response => {
-          this.headOfFamilyID = response.data.ID;
+          this.headOfFamilyID = response.data[0].ID;
           console.log(this.headOfFamilyID)
           return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
         })
@@ -145,6 +147,8 @@ import axios from 'axios'
           console.log(this.phone)
           console.log(this.phoneNumberID)
         })
+
+        this.isHeadOfHousehold();
           
     },
 
@@ -193,6 +197,14 @@ import axios from 'axios'
           family_ID: this.familyId,
           email: this.email
         })
+      },
+
+      isHeadOfHousehold: function() {
+        console.log("isHeadOfHousehold function")
+        if(this.userId == this.headOfFamilyID) {
+          this.isHeadOfFamily = true;
+        }
+        // return this.isHeadOfFamily;
       }
     }
   }
