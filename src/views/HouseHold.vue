@@ -83,10 +83,11 @@ import axios from 'axios'
         ],
         familyMembers: [],
         userId: 3,
-        familyId: 3,
+        familyId: "",
         address_ID: "",
         address_Type: "",
         phoneNumber_Type: "",
+        can_publish: "",
         editable: false,
         isHeadOfFamily: false
       }
@@ -96,20 +97,31 @@ import axios from 'axios'
     },
     created() {
 
-      // Get family members of the currently logged in user
+      // Get family ID of the currently logged in user
         axios
-        .get("http://localhost:3000/family?id=3&isGetPersons=1&isGetHeadOfFamily=0")
+        .get(this.baseURL + "family?person_ID=" + this.userId)
+        .then(response => {
+          this.familyId = response.data[0].ID;
+          console.log(response.data);
+          console.log("Family ID: " + this.familyId)
+          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        })
+        // .catch(error => {
+        //   console.log("ERROR: " + error.response)
+        // })
+
+      // Get family members of the currently logged in user
         .then(response => {
           this.familyMembers = response.data;
-        })
-        .catch(error => {
-          console.log("ERROR: " + error.response)
+          console.log(response.data)
+          console.log(this.familyMembers)
+          return axios.get(this.baseURL + "address?person_ID=" + this.userId)
         })
 
 
       // Get the household address
-        axios
-        .get("http://localhost:3000/address?person_ID=" + this.userId)
+        // axios
+        // .get(this.baseURL + "address?person_ID=" + this.userId)
         .then(response => {
           console.log("Household address " + response.data)
           this.address = response.data[0].address;
@@ -117,12 +129,13 @@ import axios from 'axios'
           this.address_Type = response.data[0].type;
           console.log("Address Type: " + this.address_Type)
           console.log("Address ID: " + this.address_ID)
+          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
         })
 
 
       // Find the head of the family
-        axios
-        .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+        // axios
+        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
         .then(response => {
           this.headOfFamilyID = response.data[0].ID;
           console.log("Head of family ID" + this.headOfFamilyID)
@@ -151,8 +164,10 @@ import axios from 'axios'
           this.phone = response.data[0].number;
           this.phoneNumberID = response.data[0].ID;
           this.phoneNumber_Type = response.data[0].type;
+          this.can_publish = response.data[0].can_publish;
           console.log(this.phone)
           console.log(this.phoneNumberID)
+          console.log(this.can_publish)
         })
 
         
@@ -188,7 +203,7 @@ import axios from 'axios'
         axios
         .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
           number: this.phone,
-          can_publish: false,
+          can_publish: this.can_publish,
           type: this.phoneNumber_Type
         })
 
