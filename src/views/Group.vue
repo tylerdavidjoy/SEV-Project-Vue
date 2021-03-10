@@ -211,8 +211,8 @@ export default {
   beforeCreate()
   {
     axios.all([
-      axios.get(`${apiBaseUrl}/group?id=4`),
-      axios.get(`${apiBaseUrl}/group?id=4&get_members=1`),
+      axios.get(`${apiBaseUrl}/group?id=1`),
+      axios.get(`${apiBaseUrl}/group?id=1get_members=1`),
       axios.get(`${apiBaseUrl}/phone_number?person_ID=1`),
       axios.get(`${apiBaseUrl}/address?person_ID=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
