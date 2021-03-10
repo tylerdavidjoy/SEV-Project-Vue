@@ -212,7 +212,7 @@ export default {
   {
     axios.all([
       axios.get(`${apiBaseUrl}/group?id=1`),
-      axios.get(`${apiBaseUrl}/group?id=1get_members=1`),
+      axios.get(`${apiBaseUrl}/group?id=1&get_members=1`),
       axios.get(`${apiBaseUrl}/phone_number?person_ID=1`),
       axios.get(`${apiBaseUrl}/address?person_ID=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
