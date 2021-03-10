@@ -24,7 +24,7 @@
     tabs:[
     {icon:'mdi-account',text:'Account', path:'/account'},
     {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
-    {icon:'mdi-account-group',text:'Groups', path:'/groups'},
+    {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'},
     ],
