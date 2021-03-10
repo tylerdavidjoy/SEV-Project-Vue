@@ -73,7 +73,7 @@ import axios from 'axios'
         l_name: "",
         occupation: "",
         employer: "",
-        baseURL: "http://localhost:3000/",
+        baseURL: "http://team2.eaglesoftwareteam.com/",
         members:[
           {name: 'Billy Bob jr.'},
           {name: 'Billy Bob sr.'},
@@ -82,7 +82,7 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
-        userId: 3,
+        userId: 1,
         familyId: "",
         address_ID: "",
         address_Type: "",
@@ -129,7 +129,8 @@ import axios from 'axios'
           this.address_Type = response.data[0].type;
           console.log("Address Type: " + this.address_Type)
           console.log("Address ID: " + this.address_ID)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+          // return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+          return axios.get(this.baseURL + "person?id=" + this.userId)
         })
 
 
