@@ -163,7 +163,7 @@
 <script>
 import axios from 'axios'
 
-const apiBaseUrl = "http://team2.eaglesoftwareteam.com/";
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 
 export default {
   name: "GroupMembers",
