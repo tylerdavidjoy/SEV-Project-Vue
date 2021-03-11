@@ -41,10 +41,10 @@ export default {
     polling: null,
     drawer: null,
     tabs:[
-    {icon:'mdi-home',text:'Home', path:'/'},
+    {icon:'mdi-home',text:'Home', path:'/home'},
     {icon:'mdi-account',text:'Account', path:'/account'},
     {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
-    {icon:'mdi-account-group',text:'Groups', path:'/groups'},
+    {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'}],
     logoutIcon : {icon:'mdi-logout',text:'Logout', path:'/logout'}
@@ -59,11 +59,11 @@ export default {
             });
         
         if(process.env.NODE_ENV === 'development'){
-          window.location.href = 'http://localhost:8080/#/login';
+          window.location.href = 'http://localhost:8080/#/';
         }
         else
         {
-          window.location.href = 'http://team2.eaglesoftwareteam.com/';
+          window.location.href = 'http://team2.eaglesoftwareteam.com/#/';
         }
       }
     },

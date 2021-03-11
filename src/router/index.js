@@ -4,7 +4,8 @@ import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
 import Account from '../views/Account.vue'
 import HouseHold from '../views/HouseHold.vue'
-import Groups from '../views/Groups.vue'
+import GroupList from '../views/GroupList.vue'
+import Group from '../views/Group.vue'
 import Events from '../views/Events.vue'
 import Directory from '../views/Directory.vue'
 
@@ -14,12 +15,12 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -46,13 +47,22 @@ const routes = [
     component: HouseHold
   },
   {
-    path: '/groups',
-    name: 'Groups',
+    path: '/group',
+    name: 'Group',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-    component: Groups
+    component: Group
+  },
+  {
+    path: '/grouplist',
+    name: 'GroupList',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: GroupList
   },
   {
     path: '/events',
