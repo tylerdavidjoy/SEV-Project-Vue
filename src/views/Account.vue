@@ -700,6 +700,8 @@
 import axios from "axios";
 export default {
   mounted() {
+    //Get User Info
+    
     //axios call to get phones
 
     axios.get("http://team2.eaglesoftwareteam.com/phone_number")
