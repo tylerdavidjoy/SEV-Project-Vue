@@ -3,8 +3,14 @@
     <meta name="google-signin-client_id" content="761915308223-ua9pjnk2765b2qd88dda10htmhlu64js.apps.googleusercontent.com">
     <div id="nav">
         <v-app-bar app>
-          <!-- <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon> -->   
-          <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
+          <!-- <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon> -->
+          <template v-if="$route.name == 'Home'">
+            <!-- <v-toolbar-title class="flex text-center" style="color:maroon;">Welcome {{window.person.f_name}} {{window.person.l_name}}</v-toolbar-title> -->
+            <v-toolbar-title class="flex text-center" style="color:maroon;">Welcome John Cena</v-toolbar-title>
+          </template> 
+          <template v-else>  
+            <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
+          </template>
           <button v-if="['Login', 'Logout'].includes($route.name) != true" v-on:click="signOut()" class="btn btn-dark btn-lg"><v-icon>{{ logoutIcon.icon }}</v-icon>Logout</button> 
         </v-app-bar>
         <div class="g-signin2" data-onsuccess="onSignIn" data-onfailure="failed" style="height:0px;"></div> <!--***LEAVE ALONE ITS HIDDEN BUT MAKES LOGOUT WORK***-->
@@ -32,6 +38,9 @@
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 <script>
 export default {
+  mounted(){
+    console.log(window.person);
+  },
   data() {
     return {
     login: true,

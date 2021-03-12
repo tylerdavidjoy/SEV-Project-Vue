@@ -3,14 +3,14 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify';
 import router from './router'
 import store from './store'
-import MenuTile from './components/MenuTile.vue'
+import CardList from './components/CardList.js'
 import axios from 'axios'
 
 Vue.config.productionTip = false
 
 new Vue({
   components: {
-    'Menu-Tile' : MenuTile,
+    'Card-List' : CardList,
   },
   vuetify,
   router,
@@ -57,4 +57,12 @@ window.onSignIn = function (googleUser) {
       console.log(error)
       this.errored = true
       })
+    .finally(() => {
+      if(window.person == null)
+      console.log("Not a Valid Congregation Member");
+      //Set Flag that loads home page if the member is in the congregation.
+
+    });
+
+  
 }

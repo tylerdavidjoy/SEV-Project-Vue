@@ -496,7 +496,7 @@
 
                       <v-divider></v-divider>
 
-                      <div :class="'px-6'">
+                      <div :class="'px-0'" class="mx-0">
                         <v-list>
                           <v-list-item
                             v-for="n in 1"
@@ -555,8 +555,9 @@
                                           md="4"
                                         >
                                           <v-checkbox
-                                            v-model="editedItem.isPublic"
-                                            label="Public Phone?"
+                                            v-model="editedItem.can_publish"
+                                            label="Include in Directory?"
+                                            hint="This phone will be used public information for things like Events, or Directory listings."
                                           ></v-checkbox>
                                         </v-col>
                                       </v-row>
@@ -611,44 +612,54 @@
                             v-for="phone in form.phones"
                             v-bind:key="phone">
                             <v-list-item-content>
-                              <template v-if="phone.type == '1'">
-                                <v-icon>mdi-toolbox</v-icon>
-                              </template>
-                              <template v-else-if="phone.type == '2'">
-                                <v-icon>mdi-phone</v-icon>
-                              </template>
-                              <template v-else>
-                                <v-icon>mdi-cellphone</v-icon>
-                              </template>
+                              <div>
+                                <template v-if="phone.type == '1'">
+                                  <v-icon>mdi-toolbox</v-icon>
+                                  <div>Work</div>
+                                </template>
+                                <template v-else-if="phone.type == '2'">
+                                  <v-icon>mdi-phone</v-icon>
+                                  <div>Home</div>
+                                </template>
+                                <template v-else>
+                                  <v-icon>mdi-cellphone</v-icon>
+                                  <div>Cell</div>
+                                </template>
+                              </div>
                             </v-list-item-content>
                             <v-list-item-content>
-                              <v-list-item-title>{{phone.number}}</v-list-item-title>
+                              <div :class="'mx-0'">
+                                <v-list-item-title>{{phone.number}}</v-list-item-title>
+                              </div>
                             </v-list-item-content>
-                            <v-spacer></v-spacer>
                             <v-list-item-content>
-                              <template v-if="phone.isPublic == true">
-                                <v-checkbox
-                                  input-value="true"
-                                  value
-                                  disabled
-                                ></v-checkbox>
-                              </template>
-                              <template v-else>
-                                <v-checkbox
-                                  value
-                                  disabled
-                                ></v-checkbox>
-                              </template>
+                              <div :class="'px-0'">
+                                <template v-if="phone.can_publish == true">
+                                  <v-checkbox
+                                    input-value="true"
+                                    value
+                                    disabled
+                                    label="Include in Directory?"
+                                  ></v-checkbox>
+                                </template>
+                                <template v-else>
+                                  <v-checkbox
+                                    value
+                                    disabled
+                                    label="Include in Directory?"
+                                  ></v-checkbox>
+                                </template>
+                              </div>
                             </v-list-item-content>
 
                             <v-list-item-content>
-                                <v-btn icon v-on:click="editItem(phone)">
+                                <v-btn fab icon tile v-on:click="editItem(phone)">
                                   <v-icon dark>
                                     mdi-pencil-outline
                                   </v-icon>
                                 </v-btn>
 
-                                <v-btn icon v-on:click="deleteItem(phone)">
+                                <v-btn fab icon tile v-on:click="deleteItem(phone)">
                                   <v-icon dark>
                                     mdi-trash-can-outline
                                   </v-icon>
@@ -665,6 +676,36 @@
                         <v-combobox
                           v-model="form.hobbies"
                           label="Hobbies and Interests"
+                          dense
+                          filled
+                          clearable
+                          multiple
+                          small chips
+                        ></v-combobox>
+                      </div>
+
+                      <v-divider></v-divider>
+
+                      <div :class="'px-6'">
+                        <v-combobox
+                          v-model="form.involment"
+                          label="Involment in the Church"
+                          :items="form.InvolmentTypes"
+                          dense
+                          filled
+                          clearable
+                          multiple
+                          small chips
+                        ></v-combobox>
+                      </div>
+
+                      <v-divider></v-divider>
+
+                      <div :class="'px-6'">
+                        <v-combobox
+                          v-model="form.ministry"
+                          label="Ministry Interests"
+                          :items="form.MinistryTypes"
                           dense
                           filled
                           clearable
@@ -700,8 +741,12 @@
 import axios from "axios";
 export default {
   mounted() {
-    //Get User Info
-    
+    //Get User Info from window.user
+    // axios.get("http://team2.eagelsoftwareteam.com/")
+    // .then(response => {
+
+    // })
+    // .catch()
     //axios call to get phones
 
     axios.get("http://team2.eaglesoftwareteam.com/phone_number")
@@ -711,13 +756,13 @@ export default {
     .catch(error => {
       console.log(error);
     })
-    .finally(() => console.log("Done Loading: " + this.form.phones));
+    .finally(() => console.log("Done Loading: " + JSON.parse(this.form.phones)));
 
     //Axios call for all users for Relationships
 
     //Axios calls for Life Events
 
-    
+    //Sectino for setting Form data from user data
     this.form.f_name = this.user.f_name;
     this.form.l_name = this.user.l_name;
     this.form.email = this.user.email;
@@ -725,8 +770,9 @@ export default {
     this.form.birthday = this.user.birthday;
     this.form.occupation = this.user.occupation;
     this.form.employer = this.user.employer;
+    this.form.ministry = this.user.ministry;
+    this.form.involment = this.user.involment;
     this.form.phones = this.user.phones;
-    this.form.isPublic = this.user.isPublic;
     this.form.workPhone = this.user.workPhone;
     this.form.hobbies = this.user.hobbies;
     this.editedItem = this.defaultItem;
@@ -740,12 +786,12 @@ export default {
     editedItem: {
       type: "",
       number: "",
-      isPublic: false,
+      can_publish: false,
     },
     defaultItem: {
       type: "",
       number: "000-000-0000",
-      isPublic: false,
+      can_publish: false,
     },
     //Variables for the Life Events and relationships
     menuDate: false,
@@ -791,6 +837,10 @@ export default {
       cellPhoneTypes: ["Work","Home","Mobile"],
       LifeEventTypes: ["Marriage","Baptizemal","Birthday","Death","Divorce","Birth of family member","Other"],
       RelationType: ["Parent","Spouse","Sibling","Child","Extended-Family"],
+      InvolmentTypes:["Adult Education","College Education","Youth Group (6th-12th Grade)","Primary Education (1st-5th Grade)","Children's Education (Nursery - K)","Rainbow Village","Nursrey","Vacation Bible School","Family Life Groups","Visitation","Communion Preparation","Worship Leadership"],
+      MinistryTypes:["Men's Ministry","Women's Ministry","College Ministry","Youth Ministry","Personal Evangelism","World Bible School","Radio Ministry","Transportation","Building and Grounds","Advertising","Door Greeters"],
+      ministry:[],
+      involment:[],
       phones: [],
       hobbies:[], //Should be comma seperating to keep it all in one field
       LifeEvents:[],
@@ -798,21 +848,23 @@ export default {
     },
     //User Info Class
     user: {
-      id: 0,
-      congregation_id: 0,
-      f_name: "John",
-      l_name: "Smith",
-      email: "John.Smith@AOL.com",
+      id: null,
+      congregation_id: null,
+      f_name: "",
+      l_name: "",
+      email: "",
       immersed: true,
       data_Immersed: "",
       birthday: "",
-      occupation: "IT Specialist",
-      employer: "Ron Pearlman",
+      occupation: "",
+      employer: "",
+      ministry:[],
+      involment:[],
       phones: [],
-      hobbies:["AutoMechanics","Carpentry","Children's Ministry"], //Should be comma seperating to keep it all in one field
+      hobbies:[], //Should be comma seperating to keep it all in one field
       LifeEvents:[],
       Relations:[],
-      family_ID: 0,
+      family_ID: null,
       image:
         "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.wKCOPiWXFnsPQdoYbNlZowHaHi%26pid%3DApi&f=1",
     },
@@ -885,9 +937,14 @@ export default {
         this.user.birthday = this.form.birthday;
         this.user.occupation = this.form.occupation;
         this.user.employer = this.form.employer;
-        this.user.cellPhones = this.form.cellPhones;
-        this.user.workPhone = this.form.workPhone;
-        this.user.Hobbies_Interests = this.form.Hobbies_Interests;
+        this.user.ministry = this.form.ministry;
+        this.user.involment = this.form.involment;
+        this.user.phones = this.form.phones;
+        this.user.hobbies = this.form.hobbies;
+        this.user.LifeEvents = this.form.LifeEvents;
+        this.user.Relations = this.form.Relations;
+        
+
       }
     },
     reset() {
