@@ -36,7 +36,7 @@
                   <v-list class="list">
                     <v-list-item
                       v-for="member in familyMembers"
-                      v-bind:key="member" class="list">
+                      v-bind:key="member" class="list" @click="navToAccountPage">
                       <v-list-item-icon>
                         <img src="../assets/dog.jpg" class="smallUserImg">
                       </v-list-item-icon>
@@ -228,6 +228,11 @@ import axios from 'axios'
           this.isHeadOfFamily = true;
         }
         // return this.isHeadOfFamily;
+      },
+
+      navToAccountPage: function() {
+        console.log("Navigate to account page!")
+
       }
     }
   }
