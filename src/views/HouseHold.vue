@@ -9,6 +9,13 @@
                 <v-sheet width="600">
                   <img src="../assets/dog.jpg" class="familyImg">
                   <br />
+                  <input style="display: none"
+                    type="file"
+                    @change="onFileSelected"
+                    ref="fileInput">
+                  <v-btn @click="$refs.fileInput.click()">Pick File</v-btn>
+                  <v-btn @click="onUpload">Upload</v-btn>
+                  <br />
                   <h1>HouseHold Information</h1>
                   <br />
                   <label>Address</label>
@@ -36,7 +43,7 @@
                   <v-list class="list">
                     <v-list-item
                       v-for="member in familyMembers"
-                      v-bind:key="member" class="list" @click="navToAccountPage">
+                      v-bind:key="member" class="list" @click="navToAccountPage(member.ID)">
                       <v-list-item-icon>
                         <img src="../assets/dog.jpg" class="smallUserImg">
                       </v-list-item-icon>
@@ -63,6 +70,7 @@ import axios from 'axios'
   export default {
     data() { 
       return {
+        selectedFile: null,
         address: "",
         phone: "",
         email: "",
@@ -176,6 +184,13 @@ import axios from 'axios'
     },
 
     methods: {
+      onFileSelected(event) {
+        console.log(event)
+        this.selectedFile = event.target.files[0]
+      },
+      onUpload() {
+
+      },
       onEdit: function() {
 
         // If the head of household is logged in give edit permission
@@ -230,9 +245,10 @@ import axios from 'axios'
         // return this.isHeadOfFamily;
       },
 
-      navToAccountPage: function() {
+      navToAccountPage: function(param) {
         console.log("Navigate to account page!")
-
+        console.log(param)
+        this.$router.push({ path: '/account', params: { id: param }})
       }
     }
   }
