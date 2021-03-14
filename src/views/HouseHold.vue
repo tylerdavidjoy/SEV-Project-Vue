@@ -23,7 +23,7 @@
                   <label>Phone Number</label>
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
-                  <v-text-field v-model="email" label="Family Email" :readonly="!editable"></v-text-field>
+                  <v-text-field v-model="email" label="Family Email" :readonly="true"></v-text-field>
                   <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
