@@ -13,13 +13,13 @@
                     type="file"
                     @change="onFileSelected"
                     ref="fileInput">
-                  <v-btn @click="$refs.fileInput.click()">Pick File</v-btn>
-                  <v-btn @click="onUpload">Upload</v-btn>
+                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick File</v-btn>
+                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn>
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
                   <label>Address</label>
-                  <v-text-field v-model="address" label="Family Address" id="address_field" :readonly="!editable"></v-text-field>
+                  <v-text-field v-model="address" label="Family Address" :readonly="!editable"></v-text-field>
                   <label>Phone Number</label>
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
