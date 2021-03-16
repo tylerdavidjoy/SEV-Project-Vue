@@ -4,7 +4,7 @@
       <v-main class="grey lighten-2">
         <v-container>
             <v-banner>
-              {{this.groupName}}
+              {{group.name}}
             </v-banner>
           <v-row>
                 <v-col>
@@ -16,12 +16,12 @@
                         Group Leader
                       </v-card-title>
                       <v-card-subtitle>
-                        {{this.leader.f_name + " " + this.leader.l_name}}
+                        {{leader.f_name + " " + leader.l_name}}
                       </v-card-subtitle>
                       <v-card-text>
-                        {{this.leader.address}}
+                        {{leader.address}}
                       </v-card-text>
-                        <v-card-text v-for="phone in this.leader.phone" :key="phone.ID">
+                        <v-card-text v-for="phone in leader.phone" :key="phone.ID">
                           <div v-if="phone.type === 3"><v-icon>mdi-cellphone</v-icon>{{" " + phone.number}}</div>
                           <div v-else-if="phone.type === 4"><v-icon>mdi-briefcase</v-icon>{{" " + phone.number}}</div>
                           <div v-else-if="phone.type === 5"><v-icon>mdi-home</v-icon>{{" " + phone.number}}</div>
@@ -64,7 +64,7 @@
                         </v-img>
                       </v-avatar>
                     </v-card>
-                    <v-row justify="center">
+                    <v-row justify="center" v-if="userHasPerms">
                       <v-dialog
                         v-model="dialog2"
                         scrollable
@@ -76,6 +76,7 @@
                             dark
                             v-bind="attrs"
                             v-on="on"
+                            
                           >
                             Change Leader
                           </v-btn>
@@ -89,7 +90,7 @@
                               column
                             >
                               <v-radio
-                              v-for="changePerson in this.possibleLeaderList"
+                              v-for="changePerson in possibleLeaderList"
                               :key="changePerson.ID"
                               :label="changePerson.f_name + ' ' + changePerson.l_name + ' ' + changePerson.email"
                               :value="changePerson"
@@ -126,7 +127,7 @@
               elevation="2">
                 <v-list>
                     <div v-if="renderMembers">
-                      <v-card v-for="(member, index) in this.groupMembers" :key="member.ID" >
+                      <v-card v-for="(member, index) in groupMembers" :key="member.ID" >
                         <v-card-subtitle>
                           {{member.f_name + " " + member.l_name}}
                         </v-card-subtitle>
@@ -140,13 +141,13 @@
                           {{member.email}}
                         </v-card-text>
                         <v-card-actions>
-                        <v-btn v-on:click="removeGroupMember(member.ID, index)">
+                        <v-btn v-on:click="removeGroupMember(member.ID, index)" v-if="userHasPerms">
                           Remove Member
                         </v-btn>
                       </v-card-actions>
                       </v-card>
                     </div>
-                    <div v-else-if="this.groupMembers.length > 1">
+                    <div v-else-if="this.groupMembers.length > 0">
                       <v-card>
                         <v-card-subtitle>
                           <v-progress-circular
@@ -174,7 +175,7 @@
               </v-sheet>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row justify="center" v-if="userHasPerms">
             <v-dialog
               v-model="dialog"
               scrollable
@@ -199,7 +200,7 @@
                     column
                   >
                     <v-checkbox
-                    v-for="addPerson in this.possibleAddList"
+                    v-for="addPerson in possibleAddList"
                     :key="addPerson.ID"
                     multiple
                     :value="addPerson"
@@ -246,8 +247,9 @@ export default {
         possibleAddList: [],
         addList: [],
         possibleLeaderList: [],
+        user: this.$person,
+        userHasPerms: false,
         group: {},
-        groupName: "",
         leader: {},
         groupMembers: [],
         renderMembers: false,
@@ -327,8 +329,6 @@ export default {
       .then(axios.spread((group, groupMembers, types, churchMembers) => {
       // Setting the currentAddress id for grabbing a member's current address later.
       let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
-      let tempGroupName = types.data.find(x => x.ID === group.data.type).value;
-      this.groupName = tempGroupName.charAt(0).toUpperCase() + tempGroupName.slice(1)
       
       // Get the valid values for phone to put the type with the number later.
       let phoneTypes = types.data;
@@ -339,6 +339,11 @@ export default {
 
       // Setting the view's leader variable with the leader in groupMembers
       this.leader = this.groupMembers.find(x => x.ID === this.group.leader);
+
+      this.$nextTick(()=>{
+        if(this.user.ID === this.leader.ID)
+          this.userHasPerms = true;
+      });
 
       // Set list of possible members to add to group to everyone, remove current members
       this.possibleAddList = churchMembers.data;

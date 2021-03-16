@@ -40,7 +40,7 @@ window.onSignIn = function (googleUser) {
     .then(response => {
       if(response.data[0].f_name)
       {
-        window.person = {
+        Vue.prototype.$person = window.person = {
           id: response.data[0].ID,
           congregation_id: response.data[0].congregation_ID,
           f_name: response.data[0].f_name,
@@ -48,7 +48,9 @@ window.onSignIn = function (googleUser) {
           occupation: response.data[0].occupation,
           employer: response.data[0].employer,
           family_id: response.data[0].family_id,
-          email: response.data[0].email
+          email: response.data[0].email,
+          gender: response.data[0].gender,
+          preferred_name: response.data[0].preferred_name,
         };
         console.log(window.person);
       }
