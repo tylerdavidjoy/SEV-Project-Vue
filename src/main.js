@@ -3,14 +3,14 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify';
 import router from './router'
 import store from './store'
-import CardList from './components/CardList.js'
+import cardlist from './components/card-list.vue'
 import axios from 'axios'
 
 Vue.config.productionTip = false
 
 new Vue({
   components: {
-    'Card-List' : CardList,
+    'card-list':cardlist,
   },
   vuetify,
   router,
@@ -66,3 +66,4 @@ window.onSignIn = function (googleUser) {
 
   
 }
+
