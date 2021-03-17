@@ -2,15 +2,8 @@
   <div id="app">
     <meta name="google-signin-client_id" content="761915308223-ua9pjnk2765b2qd88dda10htmhlu64js.apps.googleusercontent.com">
     <div id="nav">
-        <v-app-bar app>
-          <!-- <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon> -->
-          <template v-if="$route.name == 'Home'">
-            <!-- <v-toolbar-title class="flex text-center" style="color:maroon;">Welcome {{window.person.f_name}} {{window.person.l_name}}</v-toolbar-title> -->
-            <v-toolbar-title class="flex text-center" style="color:maroon;">Welcome John Cena</v-toolbar-title>
-          </template> 
-          <template v-else>  
-            <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }}</v-toolbar-title>
-          </template>
+        <v-app-bar app> 
+          <v-toolbar-title class="flex text-center" style="color:maroon;">{{ $route.name }} Page</v-toolbar-title>
           <button v-if="['Login', 'Logout'].includes($route.name) != true" v-on:click="signOut()" class="btn btn-dark btn-lg"><v-icon>{{ logoutIcon.icon }}</v-icon>Logout</button> 
         </v-app-bar>
         <div class="g-signin2" data-onsuccess="onSignIn" data-onfailure="failed" style="height:0px;"></div> <!--***LEAVE ALONE ITS HIDDEN BUT MAKES LOGOUT WORK***-->
@@ -39,7 +32,6 @@
 <script>
 export default {
   mounted(){
-    console.log(window.person);
   },
   data() {
     return {
@@ -55,7 +47,8 @@ export default {
     {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
     {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
-    {icon:'mdi-church',text:'Directory', path:'/directory'}],
+    {icon:'mdi-church',text:'Directory', path:'/directory'},
+    {icon:'mdi-help',text:'Help', path:'/help'},],
     logoutIcon : {icon:'mdi-logout',text:'Logout', path:'/logout'}
     }
   },
@@ -64,6 +57,7 @@ export default {
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(function () {
           window.user = null;
+          window.person = null;
           console.log('User signed out.');
             });
         

@@ -8,6 +8,8 @@ import GroupList from '../views/GroupList.vue'
 import Group from '../views/Group.vue'
 import Events from '../views/Events.vue'
 import Directory from '../views/Directory.vue'
+import Help from '../views/Help.vue'
+
 
 
 
@@ -81,6 +83,15 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
     component: Directory
+  },
+  {
+    path: '/help',
+    name: 'Help',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: Help
   }
 ]
 

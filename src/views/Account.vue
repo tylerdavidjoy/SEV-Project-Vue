@@ -1,12 +1,6 @@
 <template>
   <v-app id="inspire">
     <div class="account">
-      <v-system-bar app>
-        <v-spacer></v-spacer>
-
-        <v-icon>mdi-logout</v-icon>
-      </v-system-bar>
-
       <v-main class="grey lighten-2">
         <v-container>
           <v-row>
@@ -442,20 +436,23 @@
                                               <v-select
                                                 v-model="editedEvent.type"
                                                 :items="form.RelationType"
+                                                item-text="type"
                                                 label="Relationship Type"
                                                 menu-props="auto"
+                                                return-object
                                                 single-line
                                               ></v-select>
                                             </v-col>
                                             <v-col cols="12" sm="6" md="4">
-                                              <v-autocomplete
-                                                v-model="editedEvent.person_id"
+                                              <v-select
+                                                v-model="editedEvent.person"
                                                 :items="people"
-                                                clearable
-                                                solo
-                                                item-text="name"
+                                                item-text="f_name"
+                                                menu-props="auto"
                                                 label="Person"
-                                              ></v-autocomplete>
+                                                return-object
+                                                single-line
+                                              ></v-select>
                                             </v-col>
                                             <v-col cols="12" sm="6" md="4">
                                             </v-col>
@@ -519,12 +516,16 @@
                                   >
                                     <v-list-item-content>
                                       <v-list-item-title
-                                        >Relationship:
+                                        >Relationship Type:
                                         {{ Relation.type }}</v-list-item-title
                                       >
-                                      <v-list-item-subtitle
+                                      <!-- <v-list-item-subtitle
                                         >Person ID:
-                                        {{ Relation.id }}</v-list-item-subtitle
+                                        {{ Relation.person.id }}</v-list-item-subtitle
+                                      > -->
+                                      <v-list-item-subtitle
+                                        >Relationship With:
+                                        {{ Relation.person.name }}</v-list-item-subtitle
                                       >
                                     </v-list-item-content>
                                     <v-list-item-content>
@@ -565,6 +566,7 @@
                     <v-form ref="form" v-model="valid" lazy-validation>
                       <div :class="'px-6'" class="pt-6">
                         <v-text-field
+                          :disabled="!editflag"
                           v-model="form.f_name"
                           :counter="15"
                           :rules="nameRules"
@@ -577,6 +579,7 @@
 
                       <div :class="'px-6'">
                         <v-text-field
+                          :disabled="!editflag"
                           v-model="form.l_name"
                           :counter="15"
                           :rules="nameRules"
@@ -590,89 +593,16 @@
                       <div :class="'px-6'">
                         <v-text-field
                           v-model="form.email"
-                          :rules="emailRules"
                           :label="'E-mail: ' + user.email"
-                          required
+                          disabled
                         ></v-text-field>
                       </div>
 
                       <v-divider></v-divider>
 
                       <div :class="'px-6'">
-                        <v-checkbox
-                          v-model="immersionFlag"
-                          label="Are you immersed in the church?"
-                        ></v-checkbox>
-
-                        <v-menu
-                          ref="menu"
-                          v-model="menu"
-                          :close-on-content-click="true"
-                          transition="scale-transition"
-                          offset-y
-                          min-width="290px"
-                          :disabled="!immersionFlag"
-                        >
-                          <template
-                            v-slot:activator="{ on, attrs }"
-                            :disabled="!immersionFlag"
-                          >
-                            <v-text-field
-                              v-model="form.data_Immersed"
-                              :label="'Immersion Date: ' + user.data_Immersed"
-                              prepend-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                              :disabled="!immersionFlag"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            ref="picker"
-                            v-model="form.data_Immersed"
-                            :max="new Date().toISOString().substr(0, 10)"
-                            min="1950-01-01"
-                            @change="saveImmersion"
-                            :disabled="!immersionFlag"
-                          ></v-date-picker>
-                        </v-menu>
-                      </div>
-
-                      <v-divider></v-divider>
-
-                      <div :class="'px-6'">
-                        <v-menu
-                          ref="menu"
-                          v-model="menuBirthday"
-                          :close-on-content-click="true"
-                          transition="scale-transition"
-                          offset-y
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              v-model="form.birthday"
-                              :label="'Birthday: ' + user.birthday"
-                              prepend-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            ref="picker"
-                            v-model="form.birthday"
-                            :max="new Date().toISOString().substr(0, 10)"
-                            min="1950-01-01"
-                            @change="savebirthday"
-                          ></v-date-picker>
-                        </v-menu>
-                      </div>
-
-                      <v-divider></v-divider>
-
-                      <div :class="'px-6'">
                         <v-text-field
+                          :disabled="!editflag"
                           v-model="form.occupation"
                           :counter="30"
                           :rules="nameRules"
@@ -685,6 +615,7 @@
 
                       <div :class="'px-6'">
                         <v-text-field
+                          :disabled="!editflag"
                           v-model="form.employer"
                           :counter="30"
                           :rules="nameRules"
@@ -696,7 +627,7 @@
                       <v-divider></v-divider>
 
                       <div :class="'px-0'" class="mx-0">
-                        <v-list>
+                        <v-list >
                           <v-list-item v-for="n in 1" v-bind:key="n">
                             <v-list-item-content>
                               <v-icon>mdi-phone</v-icon>
@@ -710,6 +641,7 @@
                               <v-dialog v-model="dialog" max-width="500px">
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-btn
+                                    :disabled="!editflag"
                                     color="primary"
                                     dark
                                     class="mb-2"
@@ -844,11 +776,12 @@
                             </v-list-item-content>
 
                             <v-list-item-content>
-                              <v-btn fab icon tile v-on:click="editItem(phone)">
+                              <v-btn :disabled="!editflag" fab icon tile v-on:click="editItem(phone)">
                                 <v-icon dark> mdi-pencil-outline </v-icon>
                               </v-btn>
 
                               <v-btn
+                                :disabled="!editflag"
                                 fab
                                 icon
                                 tile
@@ -866,6 +799,7 @@
 
                       <div :class="'px-6'">
                         <v-combobox
+                          :disabled="!editflag"
                           v-model="form.hobbies"
                           label="Hobbies and Interests"
                           dense
@@ -881,6 +815,7 @@
 
                       <div :class="'px-6'">
                         <v-combobox
+                          :disabled="!editflag"
                           v-model="form.involment"
                           label="Involment in the Church"
                           :items="form.InvolmentTypes"
@@ -893,10 +828,17 @@
                         ></v-combobox>
                       </div>
 
+                      <template v-if="isAdmin">
+                        <div :class="'px-6'">
+
+                        </div>
+                      </template>
+
                       <v-divider></v-divider>
 
                       <div :class="'px-6'">
                         <v-combobox
+                          :disabled="!editflag"
                           v-model="form.ministry"
                           label="Ministry Interests"
                           :items="form.MinistryTypes"
@@ -913,7 +855,15 @@
 
                       <div :class="'px-6'">
                         <v-btn
-                          :disabled="!valid"
+                          color="primary"
+                          class="mr-4"
+                          v-on:click="editflag = !editflag"
+                        >
+                          Edit Info
+                        </v-btn>
+
+                        <v-btn
+                          :disabled="!valid || !editflag"
                           type="submit"
                           color="primary"
                           class="mr-4"
@@ -922,10 +872,18 @@
                           Save
                         </v-btn>
 
-                        <v-btn color="secondary" class="mr-4" @click="reset">
+                        <v-btn 
+                          :disabled="!editflag"
+                          color="secondary" 
+                          class="mr-4" 
+                          @click="reset">
                           Reset
                         </v-btn>
                       </div>
+
+                      <!-- <div id="phone">
+                        <card-list></card-list>
+                      </div> -->
                     </v-form>
                   </div>
                 </v-sheet>
@@ -941,33 +899,65 @@
 import axios from "axios";
 export default {
   mounted() {
-    //Get User Info from window.user
-    // axios.get("http://team2.eagelsoftwareteam.com/")
-    // .then(response => {
-
-    // })
-    // .catch()
+    //Get User Info from window.person
+    this.user.id = window.person.id;
+    axios
+    .get('http://team2.eaglesoftwareteam.com/person?email='+ window.user.email)
+    .then(response => {
+      if(response.data[0].f_name)
+      {
+        //Section for setting Form data from user data
+        this.user.f_name = response.data[0].f_name;
+        this.user.l_name = response.data[0].l_name;
+        this.user.gender = response.data[0].gender;
+        this.user.preferred_name = response.data[0].preferred_name;
+        this.user.email = response.data[0].email;
+        this.user.occupation = response.data[0].occupation;
+        this.user.employer = response.data[0].employer;
+      }
+      })
+    .catch(error => {
+      console.log("User Fetch Error: " + error);
+      this.errored = true;
+      })
+    .finally(() => {
+      //Set the name variable that will load on the Home page to greet the user
+      console.log("Finished Loading User for Account Page");
+    });
     //axios call to get phones
 
     axios
       .get("http://team2.eaglesoftwareteam.com/phone_number")
       .then((response) => {
         this.form.phones = response.data;
+        console.log("Loading Phones...");
+        console.log(JSON.parse(this.form.phones));
       })
       .catch((error) => {
         console.log(error);
-      })
-      .finally(() =>
-        console.log("Done Loading: " + JSON.parse(this.form.phones))
-      );
-
+      });
+      
     //Axios call for all users for Relationships
 
     //Axios calls for Life Events
 
-    //Sectino for setting Form data from user data
+    //Axios Call for Getting everyone in the congregation
+    axios
+      .get("http://team2.eaglesoftwareteam.com/person")
+      .then((response) => {
+        this.people = response.data;
+        console.log("Loading Congregation Members...");
+        console.log("Done Loading: " + JSON.parse(this.people));
+      })
+      .catch((error) => {
+        console.log("Congregation Fetch: " + error);
+      });
+
+    //Section for setting Form data from user data
     this.form.f_name = this.user.f_name;
     this.form.l_name = this.user.l_name;
+    this.form.gender = this.user.gender;
+    this.form.preferred_name = this.user.preferred_name;
     this.form.email = this.user.email;
     this.form.data_Immersed = this.user.data_Immersed;
     this.form.birthday = this.user.birthday;
@@ -1023,20 +1013,22 @@ export default {
     },
     defaultRelationship: {
       id: 0, //id of user
-      person_id: null, //Id of the person that you have a relationship with
+      person: {}, //Id of the person that you have a relationship with
       type: "", //relationship type that you can have with the person
     },
     defaultEvent: {
       type: "",
     },
+    //Variables for the Date picker for the Life Events
     menu: false,
     menuBirthday: false,
-    immersionFlag: false,
     //Variables for the Form
     form: {
       id: 0,
       f_name: "",
       l_name: "",
+      gender:'',
+      preferred_name:'',
       email: "",
       immersed: false,
       data_Immersed: "",
@@ -1088,12 +1080,16 @@ export default {
       LifeEvents: [],
       Relations: [],
     },
+    //Variable for making form editable
+    editflag:false,
     //User Info Class
     user: {
       id: null,
       congregation_id: null,
       f_name: "",
       l_name: "",
+      gender:'',
+      preferred_name:'',
       email: "",
       immersed: true,
       data_Immersed: "",
@@ -1112,11 +1108,11 @@ export default {
     },
     //Test Data for searching for People
     people: [
-      { id: 0, name: "Sarah Conner" },
-      { id: 1, name: "John Conner" },
-      { id: 2, name: "Kate Brewster" },
-      { id: 3, name: "Terminator" },
-      { id: 4, name: "T-X" },
+      // { id: 0, name: "Sarah Conner" },
+      // { id: 1, name: "John Conner" },
+      // { id: 2, name: "Kate Brewster" },
+      // { id: 3, name: "Terminator" },
+      // { id: 4, name: "T-X" },
     ],
     newFile: {},
     nameRules: [
@@ -1182,6 +1178,8 @@ export default {
       if (this.$refs.form.validate()) {
         this.user.f_name = this.form.f_name;
         this.user.l_name = this.form.l_name;
+        this.user.gender = this.form.gender;
+        this.user.preferred_name = this.form.preferred_name;
         this.user.email = this.form.email;
         this.user.data_Immersed = this.form.data_Immersed;
         this.user.immersed = this.form.immersed;
