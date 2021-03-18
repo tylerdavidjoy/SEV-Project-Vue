@@ -172,24 +172,19 @@
                                         <v-card-text>
                                           <v-container>
                                             <v-row>
-                                              <v-col cols="12" sm="6" md="4">
+                                              <v-col cols="12">
                                                 <v-list>
                                                   <v-list-item
                                                     v-for="EventType in form.LifeEventTypes"
                                                     v-bind:key="EventType"
                                                   >
                                                     <v-list-item-content>
-                                                      <div>
-                                                        <v-text-field
-                                                          :label="EventType.type"
-                                                          disabled
-                                                        >
-                                                        </v-text-field>
-                                                      </div>
+                                                      <v-list-item-title v-text="EventType.type"></v-list-item-title>
                                                     </v-list-item-content>
-                                                    <v-list-item-content>
+                                                    <v-list-item-action>
                                                       <div>
                                                         <v-btn
+                                                          fab
                                                           icon
                                                           v-on:click="editEvent(EventType,2)"
                                                         >
@@ -197,8 +192,10 @@
                                                             mdi-pencil-outline
                                                           </v-icon>
                                                         </v-btn>
-
+                                                      </div>
+                                                      <div>
                                                         <v-btn
+                                                          fab
                                                           icon
                                                           v-on:click="deleteEvent(EventType,2)"
                                                         >
@@ -207,7 +204,7 @@
                                                           </v-icon>
                                                         </v-btn>
                                                       </div>
-                                                    </v-list-item-content>
+                                                    </v-list-item-action>
                                                   </v-list-item>
                                                 </v-list>
                                               </v-col>
@@ -447,7 +444,7 @@
                                               <v-select
                                                 v-model="editedEvent.person"
                                                 :items="people"
-                                                item-text="f_name"
+                                                item-text="FullName"
                                                 menu-props="auto"
                                                 label="Person"
                                                 return-object
@@ -525,7 +522,7 @@
                                       > -->
                                       <v-list-item-subtitle
                                         >Relationship With:
-                                        {{ Relation.person.name }}</v-list-item-subtitle
+                                        {{ Relation.person.FullName }}</v-list-item-subtitle
                                       >
                                     </v-list-item-content>
                                     <v-list-item-content>
@@ -876,14 +873,10 @@
                                           <v-row>
                                             <v-col
                                               cols="12"
-                                              sm="6"
-                                              md="4"
                                             >
-                                              <div :class="'text-justify'" class="ma-16">
+                                              <div :class="'px-16'" class="mr-16">
                                                 <v-text-field
-                                                  v-model="
-                                                    editedEvent.type
-                                                  "
+                                                  v-model="editedEvent.type"
                                                   :label="'Involment Type Name:'"
                                                 ></v-text-field>
                                               </div>
@@ -946,22 +939,17 @@
                               <v-card-text>
                                 <v-container>
                                   <v-row>
-                                    <v-col cols="12" sm="6" md="4">
+                                    <v-col cols="12">
                                       <v-list>
                                         <v-list-item
                                           v-for="InvolvmentType in form.InvolmentTypes"
                                           v-bind:key="InvolvmentType"
                                         >
                                           <v-list-item-content>
-                                            <div>
-                                              <v-text-field
-                                                :label="InvolvmentType.type"
-                                                disabled
-                                              >
-                                              </v-text-field>
-                                            </div>
+                                            <v-list-item-title v-text="InvolvmentType.type">
+                                            </v-list-item-title>
                                           </v-list-item-content>
-                                          <v-list-item-content>
+                                          <v-list-item-action>
                                             <div>
                                               <v-btn
                                                 icon
@@ -971,7 +959,8 @@
                                                   mdi-pencil-outline
                                                 </v-icon>
                                               </v-btn>
-
+                                            </div>
+                                            <div>
                                               <v-btn
                                                 icon
                                                 v-on:click="deleteEvent(InvolvmentType,3)"
@@ -981,7 +970,7 @@
                                                 </v-icon>
                                               </v-btn>
                                             </div>
-                                          </v-list-item-content>
+                                          </v-list-item-action>
                                         </v-list-item>
                                       </v-list>
                                     </v-col>
@@ -1067,10 +1056,8 @@
                                           <v-row>
                                             <v-col
                                               cols="12"
-                                              sm="6"
-                                              md="4"
                                             >
-                                              <div>
+                                              <div :class="'px-16'" class="mr-16">
                                                 <v-text-field
                                                   v-model="editedEvent.type"
                                                   :label="'Ministry Area Name:'"
@@ -1135,18 +1122,15 @@
                               <v-card-text>
                                 <v-container>
                                   <v-row>
-                                    <v-col cols="12" sm="6" md="4">
+                                    <v-col cols="12">
                                       <v-list>
                                         <v-list-item
                                           v-for="MinistryType in form.MinistryTypes"
                                           v-bind:key="MinistryType"
                                         >
-                                          <v-list-item-title
-                                          v-text="MinistryType.type"
-                                          >
-                                          </v-list-item-title>
                                           <v-list-item-content>
-
+                                            <v-list-item-title v-text="MinistryType.type">
+                                            </v-list-item-title>
                                           </v-list-item-content>
                                           <v-list-item-action>
                                             <div>
@@ -1286,9 +1270,19 @@ export default {
     axios
       .get("http://team2.eaglesoftwareteam.com/person")
       .then((response) => {
-        this.people = response.data;
+        //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
+        for( var i = 0; i < response.data.length; i++)
+        {
+          var temp = {
+              ID: response.data[i].ID,
+              FullName: response.data[i].f_name + " " + response.data[i].l_name,
+          };
+          // console.log("temp: " + temp.ID + " " + temp.FullName);
+          this.people.push(temp);
+          // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
+        }
+        // this.people = response.data;
         console.log("Loading Congregation Members...");
-        console.log("Done Loading: " + JSON.parse(this.people));
       })
       .catch((error) => {
         console.log("Congregation Fetch: " + error);
