@@ -817,8 +817,9 @@
                         <v-combobox
                           :disabled="!editflag"
                           v-model="form.involment"
-                          label="Involment in the Church"
+                          label="Involvment in the Church"
                           :items="form.InvolmentTypes"
+                          item-text="type"
                           dense
                           filled
                           clearable
@@ -828,11 +829,179 @@
                         ></v-combobox>
                       </div>
 
-                      <template v-if="isAdmin">
-                        <div :class="'px-6'">
+                      <!-- Admin Button for Involment Types -->
+                      <div :class="'px-6'">
+                        <template v-if="isAdmin">
+                          <v-dialog
+                            v-model="dialogInvolvmentType"
+                            max-width="600px"
+                            min-height="600px"
+                          >
+                            <template
+                              v-slot:activator="{ on, attrs }"
+                            >
+                              <v-btn
+                                dark
+                                class="mb-2"
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                Open Involment Types
+                              </v-btn>
+                            </template>
+                            <v-card>
+                              <v-card-title>
+                                Involment types
+                                <v-list-item-content>
+                                  <v-dialog
+                                    v-model="dialogAdminInvolvment"
+                                    max-width="550px"
+                                    min-height="600px"
+                                  >
+                                    <template
+                                      v-slot:activator="{ on, attrs }"
+                                    >
+                                      <v-btn
+                                        dark
+                                        class="mb-2"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                      >
+                                        Add Event Type
+                                      </v-btn>
+                                    </template>
+                                    <v-card>
+                                      <v-card-text class="ma-10">
+                                        <v-container>
+                                          <v-row>
+                                            <v-col
+                                              cols="12"
+                                              sm="6"
+                                              md="4"
+                                            >
+                                              <div :class="'text-justify'" class="ma-16">
+                                                <v-text-field
+                                                  v-model="
+                                                    editedEvent.type
+                                                  "
+                                                  :label="'Involment Type Name:'"
+                                                ></v-text-field>
+                                              </div>
+                                            </v-col>
+                                          </v-row>
+                                        </v-container>
+                                      </v-card-text>
+                                      <v-card-actions>
+                                        <div>
+                                          <v-btn
+                                            color="blue darken-1"
+                                            text
+                                            @click="closeEvent(3)"
+                                          >
+                                            Cancel
+                                          </v-btn>
+                                          <v-btn
+                                            color="blue darken-1"
+                                            text
+                                            @click="saveEvent(3)"
+                                          >
+                                            Save
+                                          </v-btn>
+                                        </div>
+                                      </v-card-actions>
+                                    </v-card>
+                                  </v-dialog>
 
-                        </div>
-                      </template>
+                                  <!-- Delete Section -->
+                                  <v-dialog
+                                    v-model="dialogDeleteAdminInvolvment"
+                                    max-width="550px"
+                                  >
+                                    <v-card>
+                                      <v-card-title class="headline"
+                                        >Are you sure you want to
+                                        delete this Involment
+                                        Type?</v-card-title
+                                      >
+                                      <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                          color="blue darken-1"
+                                          text
+                                          @click="closeDeleteEvent(3)"
+                                          >Cancel</v-btn
+                                        >
+                                        <v-btn
+                                          color="blue darken-1"
+                                          text
+                                          v-on:click="deleteEventConfirm(3)"
+                                          >OK</v-btn
+                                        >
+                                        <v-spacer></v-spacer>
+                                      </v-card-actions>
+                                    </v-card>
+                                  </v-dialog>
+                                </v-list-item-content>
+                              </v-card-title>
+                              <v-card-text>
+                                <v-container>
+                                  <v-row>
+                                    <v-col cols="12" sm="6" md="4">
+                                      <v-list>
+                                        <v-list-item
+                                          v-for="InvolvmentType in form.InvolmentTypes"
+                                          v-bind:key="InvolvmentType"
+                                        >
+                                          <v-list-item-content>
+                                            <div>
+                                              <v-text-field
+                                                :label="InvolvmentType.type"
+                                                disabled
+                                              >
+                                              </v-text-field>
+                                            </div>
+                                          </v-list-item-content>
+                                          <v-list-item-content>
+                                            <div>
+                                              <v-btn
+                                                icon
+                                                v-on:click="editEvent(InvolvmentType,3)"
+                                              >
+                                                <v-icon dark>
+                                                  mdi-pencil-outline
+                                                </v-icon>
+                                              </v-btn>
+
+                                              <v-btn
+                                                icon
+                                                v-on:click="deleteEvent(InvolvmentType,3)"
+                                              >
+                                                <v-icon dark>
+                                                  mdi-trash-can-outline
+                                                </v-icon>
+                                              </v-btn>
+                                            </div>
+                                          </v-list-item-content>
+                                        </v-list-item>
+                                      </v-list>
+                                    </v-col>
+                                  </v-row>
+                                </v-container>
+                              </v-card-text>
+                              <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                  color="blue darken-1"
+                                  text
+                                  v-on:click="dialogInvolvmentType = false"
+                                >
+                                  Close
+                                </v-btn>
+                              </v-card-actions>
+                            </v-card>
+                          </v-dialog>
+                        </template>
+                      </div>
 
                       <v-divider></v-divider>
 
@@ -842,6 +1011,7 @@
                           v-model="form.ministry"
                           label="Ministry Interests"
                           :items="form.MinistryTypes"
+                          item-text="type"
                           dense
                           filled
                           clearable
@@ -849,6 +1019,177 @@
                           small
                           chips
                         ></v-combobox>
+                      </div>
+
+                      <div :class="'px-6'">
+                        <template v-if="isAdmin">
+                          <v-dialog
+                            v-model="dialogMinistryType"
+                            max-width="600px"
+                            min-height="600px"
+                          >
+                            <template
+                              v-slot:activator="{ on, attrs }"
+                            >
+                              <v-btn
+                                dark
+                                class="mb-2"
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                Open Ministry Areas
+                              </v-btn>
+                            </template>
+                            <v-card>
+                              <v-card-title>
+                                Ministry Areas
+                                <v-list-item-content>
+                                  <v-dialog
+                                    v-model="dialogAdminMinistry"
+                                    max-width="550px"
+                                    min-height="600px"
+                                  >
+                                    <template
+                                      v-slot:activator="{ on, attrs }"
+                                    >
+                                      <v-btn
+                                        dark
+                                        class="mb-2"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                      >
+                                        Add Ministry Area
+                                      </v-btn>
+                                    </template>
+                                    <v-card>
+                                      <v-card-text>
+                                        <v-container>
+                                          <v-row>
+                                            <v-col
+                                              cols="12"
+                                              sm="6"
+                                              md="4"
+                                            >
+                                              <div>
+                                                <v-text-field
+                                                  v-model="editedEvent.type"
+                                                  :label="'Ministry Area Name:'"
+                                                ></v-text-field>
+                                              </div>
+                                            </v-col>
+                                          </v-row>
+                                        </v-container>
+                                      </v-card-text>
+                                      <v-card-actions>
+                                        <div>
+                                          <v-btn
+                                            color="blue darken-1"
+                                            text
+                                            @click="closeEvent(4)"
+                                          >
+                                            Cancel
+                                          </v-btn>
+                                          <v-btn
+                                            color="blue darken-1"
+                                            text
+                                            @click="saveEvent(4)"
+                                          >
+                                            Save
+                                          </v-btn>
+                                        </div>
+                                      </v-card-actions>
+                                    </v-card>
+                                  </v-dialog>
+
+                                  <!-- Delete Section -->
+                                  <v-dialog
+                                    v-model="dialogDeleteAdminMinistry"
+                                    max-width="550px"
+                                  >
+                                    <v-card>
+                                      <v-card-title class="headline"
+                                        >Are you sure you want to
+                                        delete this Involment
+                                        Type?</v-card-title
+                                      >
+                                      <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                          color="blue darken-1"
+                                          text
+                                          @click="closeDeleteEvent(4)"
+                                          >Cancel</v-btn
+                                        >
+                                        <v-btn
+                                          color="blue darken-1"
+                                          text
+                                          v-on:click="deleteEventConfirm(4)"
+                                          >OK</v-btn
+                                        >
+                                        <v-spacer></v-spacer>
+                                      </v-card-actions>
+                                    </v-card>
+                                  </v-dialog>
+                                </v-list-item-content>
+                              </v-card-title>
+                              <v-card-text>
+                                <v-container>
+                                  <v-row>
+                                    <v-col cols="12" sm="6" md="4">
+                                      <v-list>
+                                        <v-list-item
+                                          v-for="MinistryType in form.MinistryTypes"
+                                          v-bind:key="MinistryType"
+                                        >
+                                          <v-list-item-title
+                                          v-text="MinistryType.type"
+                                          >
+                                          </v-list-item-title>
+                                          <v-list-item-content>
+
+                                          </v-list-item-content>
+                                          <v-list-item-action>
+                                            <div>
+                                              <v-btn
+                                                icon
+                                                v-on:click="editEvent(MinistryType,4)"
+                                              >
+                                                <v-icon dark>
+                                                  mdi-pencil-outline
+                                                </v-icon>
+                                              </v-btn>
+                                            </div>
+
+                                            <div>
+                                              <v-btn
+                                                icon
+                                                v-on:click="deleteEvent(MinistryType,4)"
+                                              >
+                                                <v-icon dark>
+                                                  mdi-trash-can-outline
+                                                </v-icon>
+                                              </v-btn>
+                                            </div>
+                                          </v-list-item-action>
+                                        </v-list-item>
+                                      </v-list>
+                                    </v-col>
+                                  </v-row>
+                                </v-container>
+                              </v-card-text>
+                              <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                  color="blue darken-1"
+                                  text
+                                  v-on:click="dialogMinistryType = false"
+                                >
+                                  Close
+                                </v-btn>
+                              </v-card-actions>
+                            </v-card>
+                          </v-dialog>
+                        </template>
                       </div>
 
                       <v-divider></v-divider>
@@ -1001,6 +1342,15 @@ export default {
     dialogAdminEvent: false,
     dialogDeleteAdminEvent: false,
 
+    //Variables for the opening of Involvment types, along with the variables for the Involvments
+    dialogInvolvmentType: false,
+    dialogAdminInvolvment: false,
+    dialogDeleteAdminInvolvment: false,
+
+    //Variables for the opening of Ministry types, along with the variables for the Ministry
+    dialogMinistryType: false,
+    dialogAdminMinistry: false,
+    dialogDeleteAdminMinistry: false,
     EventsIndex: -1,
     //Life Events
     editedEvent: {},
@@ -1016,7 +1366,7 @@ export default {
       person: {}, //Id of the person that you have a relationship with
       type: "", //relationship type that you can have with the person
     },
-    defaultEvent: {
+    defaultEvent: { //Used for Event Types, Involvment Types, and Ministery Types
       type: "",
     },
     //Variables for the Date picker for the Life Events
@@ -1047,31 +1397,31 @@ export default {
       ],
       RelationType: ["Parent", "Spouse", "Sibling", "Child", "Extended-Family"],
       InvolmentTypes: [
-        "Adult Education",
-        "College Education",
-        "Youth Group (6th-12th Grade)",
-        "Primary Education (1st-5th Grade)",
-        "Children's Education (Nursery - K)",
-        "Rainbow Village",
-        "Nursrey",
-        "Vacation Bible School",
-        "Family Life Groups",
-        "Visitation",
-        "Communion Preparation",
-        "Worship Leadership",
+        {type:"Adult Education"},
+        {type:"College Education"},
+        {type:"Youth Group (6th-12th Grade)"},
+        {type:"Primary Education (1st-5th Grade)"},
+        {type:"Children's Education (Nursery - K)"},
+        {type:"Rainbow Village"},
+        {type:"Nursery"},
+        {type:"Vacation Bible School"},
+        {type:"Family Life Groups"},
+        {type:"Visitation"},
+        {type:"Communion Preparation"},
+        {type:"Worship Leadership"},
       ],
       MinistryTypes: [
-        "Men's Ministry",
-        "Women's Ministry",
-        "College Ministry",
-        "Youth Ministry",
-        "Personal Evangelism",
-        "World Bible School",
-        "Radio Ministry",
-        "Transportation",
-        "Building and Grounds",
-        "Advertising",
-        "Door Greeters",
+        {type:"Men's Ministry"},
+        {type:"Women's Ministry"},
+        {type:"College Ministry"},
+        {type:"Youth Ministry"},
+        {type:"Personal Evangelism"},
+        {type:"World Bible School"},
+        {type:"Radio Ministry"},
+        {type:"Transportation"},
+        {type:"Building and Grounds"},
+        {type:"Advertising"},
+        {type:"Door Greeters"},
       ],
       ministry: [],
       involment: [],
@@ -1151,6 +1501,20 @@ export default {
     },
     dialogDeleteAdminEvent(val) {
       val || this.closeDeleteEvent(2);
+    },
+    //For Admins to add new Involvment Types
+    dialogAdminInvolvment(val) {
+      val || this.closeEvent(3);
+    },
+    dialogDeleteAdminInvolvment(val) {
+      val || this.closeDeleteEvent(3);
+    },
+    //For Admins to add new Ministry Areas
+    dialogAdminMinistry(val) {
+      val || this.closeEvent(4);
+    },
+    dialogDeleteAdminMinistry(val) {
+      val || this.closeDeleteEvent(4);
     },
   },
   methods: {
@@ -1263,10 +1627,18 @@ export default {
         this.EventsIndex = this.form.Relations.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogRelationship = true;
-      } else{
+      } else if(type == 2){ //Event Types
         this.EventsIndex = this.form.LifeEventTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogAdminEvent = true;
+      } else if (type == 3){ //Involvment Types
+        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.editedEvent = Object.assign({}, Event);
+        this.dialogAdminInvolvment = true;
+      } else{ //Ministery Areas
+        this.EventsIndex = this.form.MinistryTypes.indexOf(Event);
+        this.editedEvent = Object.assign({}, Event);
+        this.dialogAdminMinistry = true;
       }
     },
 
@@ -1281,12 +1653,22 @@ export default {
         this.EventsIndex = this.form.Relations.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogDeleteRelationship = true;
-      } else {
-        console.log("DeleteEvent" + this.EventsIndex);
+      } else if(type == 2) {
         //Else the Event is a EventType
         this.EventsIndex = this.form.LifeEventTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogDeleteAdminEvent = true;
+      } else if(type == 3){
+        //Else the Event is a EventType
+        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.editedEvent = Object.assign({}, Event);
+        this.dialogDeleteAdminInvolvment = true;
+      } else {
+        //Else the Event is a EventType
+        this.EventsIndex = this.form.MinistryTypes.indexOf(Event);
+        this.editedEvent = Object.assign({}, Event);
+        this.dialogDeleteAdminMinistry = true;
+        print();
       }
     },
 
@@ -1295,9 +1677,12 @@ export default {
         this.form.LifeEvents.splice(this.EventsIndex, 1);
       } else if (type == 1) {
         this.form.Relations.splice(this.EventsIndex, 1);
-      } else {
+      } else if (type == 2) {
         this.form.LifeEventTypes.splice(this.EventsIndex, 1);
-        console.log("DeleteEventConfirm" + this.EventsIndex);
+      } else if (type == 3) {
+        this.form.InvolmentTypes.splice(this.EventsIndex, 1);
+      } else {
+        this.form.MinistryTypes.splice(this.EventsIndex, 1);
       }
       this.closeDeleteEvent(type);
     },
@@ -1315,8 +1700,20 @@ export default {
           this.editedEvent = Object.assign({}, this.defaultRelationship);
           this.EventsIndex = -1;
         });
-      } else {
+      } else if (type == 2){
         this.dialogAdminEvent = false;
+        this.$nextTick(() => {
+          this.editedEvent = Object.assign({}, this.defaultEvent);
+          this.EventsIndex = -1;
+        });
+      } else if (type == 3){
+        this.dialogAdminInvolvment = false;
+        this.$nextTick(() => {
+          this.editedEvent = Object.assign({}, this.defaultEvent);
+          this.EventsIndex = -1;
+        });
+      } else {
+        this.dialogAdminMinistry = false;
         this.$nextTick(() => {
           this.editedEvent = Object.assign({}, this.defaultEvent);
           this.EventsIndex = -1;
@@ -1337,9 +1734,20 @@ export default {
           this.editedEvent = Object.assign({}, this.defaultRelationship);
           this.EventsIndex = -1;
         });
-      } else {
-        console.log("CloseDeleteEvent" + this.EventsIndex);
+      } else if (type == 2){
         this.dialogDeleteAdminEvent = false;
+        this.$nextTick(() => {
+          this.editedEvent = Object.assign({}, this.defaultEvent);
+          this.EventsIndex = -1;
+        });
+      } else if (type == 3){
+        this.dialogDeleteAdminInvolvment = false;
+        this.$nextTick(() => {
+          this.editedEvent = Object.assign({}, this.defaultEvent);
+          this.EventsIndex = -1;
+        });
+      } else {
+        this.dialogDeleteAdminMinistry = false;
         this.$nextTick(() => {
           this.editedEvent = Object.assign({}, this.defaultEvent);
           this.EventsIndex = -1;
@@ -1367,7 +1775,7 @@ export default {
           this.form.Relations.push(this.editedEvent);
         }
         this.closeEvent(type);
-      } else {
+      } else if(type == 2){
         if (this.EventsIndex > -1) {
           Object.assign(
             this.form.LifeEventTypes[this.EventsIndex],
@@ -1375,6 +1783,26 @@ export default {
           );
         } else {
           this.form.LifeEventTypes.push(this.editedEvent);
+        }
+        this.closeEvent(type);
+      } else if (type == 3){
+        if (this.EventsIndex > -1) {
+          Object.assign(
+            this.form.InvolmentTypes[this.EventsIndex],
+            this.editedEvent
+          );
+        } else {
+          this.form.InvolmentTypes.push(this.editedEvent);
+        }
+        this.closeEvent(type);
+      } else {
+        if (this.EventsIndex > -1) {
+          Object.assign(
+            this.form.MinistryTypes[this.EventsIndex],
+            this.editedEvent
+          );
+        } else {
+          this.form.MinistryTypes.push(this.editedEvent);
         }
         this.closeEvent(type);
       }
