@@ -13,7 +13,7 @@
                     type="file"
                     @change="onFileSelected"
                     ref="fileInput">
-                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick File</v-btn>
+                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick Photo</v-btn>
                   <v-btn @click="onUpload" class="ma-2">Upload</v-btn>
                   <br />
                   <h1>HouseHold Information</h1>
@@ -24,10 +24,10 @@
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
                   <v-text-field v-model="email" label="Family Email" :readonly="true"></v-text-field>
-                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn @click="onSave" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -53,6 +53,62 @@
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
+                  <v-dialog
+                    v-model="dialog"
+                    scrollable
+                    max-width="300px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn @click="addMember"
+                        class="ma-2"
+                        outlined
+                        large
+                        fab
+                        color="red darken-4"
+                        v-if="isAdmin"
+                        v-on="on"
+                        v-bind="attrs"
+                      >
+                        <v-icon>mdi-account-plus</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>Select Person</v-card-title>
+                      <v-divider></v-divider>
+                      <v-card-text style="height: 300px;">
+                        <v-list class="list">
+                          <v-list-item
+                            v-for="member in churchMembers"
+                            v-bind:key="member" class="list">
+                            <!-- <v-list-item-icon>
+                              <img src="../assets/dog.jpg" class="smallUserImg">
+                            </v-list-item-icon> -->
+
+                            <v-list-item-content class="large">
+                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                      <v-card-actions>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialog = false"
+                        >
+                          Close
+                        </v-btn>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialog = false"
+                        >
+                          Save
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
                 </v-sheet>
               </v-container>
             </v-col>
@@ -90,6 +146,7 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
+        churchMembers: [],
         userId: 1,
         familyId: "",
         address_ID: "",
@@ -97,7 +154,9 @@ import axios from 'axios'
         phoneNumber_Type: "",
         can_publish: "",
         editable: false,
-        isHeadOfFamily: false
+        isHeadOfFamily: false,
+        isAdmin: true,
+        dialog: false
       }
 
     
@@ -225,16 +284,16 @@ import axios from 'axios'
 
 
       // Update family email
-        axios
-        .put(this.baseURL + "person?id=" + this.headOfFamilyID, {
-          congregation_ID: this.congregationID,
-          f_name: this.f_name,
-          l_name: this.l_name,
-          occupation: this.occupation,
-          employer: this.employer,
-          family_ID: this.familyId,
-          email: this.email
-        })
+        // axios
+        // .put(this.baseURL + "person?id=" + this.headOfFamilyID, {
+        //   congregation_ID: this.congregationID,
+        //   f_name: this.f_name,
+        //   l_name: this.l_name,
+        //   occupation: this.occupation,
+        //   employer: this.employer,
+        //   family_ID: this.familyId,
+        //   email: this.email
+        // })
       },
 
       isHeadOfHousehold: function() {
@@ -249,6 +308,11 @@ import axios from 'axios'
         console.log("Navigate to account page!")
         console.log(param)
         this.$router.push({ path: '/account', params: { id: param }})
+      },
+
+      addMember: function() {
+        console.log("member added")
+
       }
     }
   }
