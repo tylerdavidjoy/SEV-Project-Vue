@@ -51,6 +51,7 @@ window.onSignIn = function (googleUser) {
           email: response.data[0].email,
           gender: response.data[0].gender,
           preferred_name: response.data[0].preferred_name,
+          role: response.data[0].role,
         };
         console.log(window.person);
       }

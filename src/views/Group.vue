@@ -22,9 +22,10 @@
                         {{leader.address}}
                       </v-card-text>
                         <v-card-text v-for="phone in leader.phone" :key="phone.ID">
-                          <div v-if="phone.type === 3"><v-icon>mdi-cellphone</v-icon>{{" " + phone.number}}</div>
-                          <div v-else-if="phone.type === 4"><v-icon>mdi-briefcase</v-icon>{{" " + phone.number}}</div>
-                          <div v-else-if="phone.type === 5"><v-icon>mdi-home</v-icon>{{" " + phone.number}}</div>
+                          <v-icon v-if="phone.type === 'mobile'">mdi-cellphone</v-icon> 
+                          <v-icon v-else-if="phone.type === 'work'">mdi-toolbox</v-icon>
+                          <v-icon v-else>mdi-phone</v-icon>
+                          {{phone.number}}
                         </v-card-text>
                       <v-card-text>
                         {{this.leader.email}}
@@ -135,7 +136,10 @@
                           {{member.address}}
                         </v-card-text>
                         <v-card-text v-for="p in member.phone" :key="p.ID">
-                          {{p.type + ": " + p.number}}
+                          <v-icon v-if="p.type === 'mobile'">mdi-cellphone</v-icon> 
+                          <v-icon v-else-if="p.type === 'work'">mdi-toolbox</v-icon>
+                          <v-icon v-else>mdi-phone</v-icon>
+                          {{p.number}}
                         </v-card-text>
                         <v-card-text v-if="member.email != 'null'">
                           {{member.email}}
@@ -340,8 +344,10 @@ export default {
       // Setting the view's leader variable with the leader in groupMembers
       this.leader = this.groupMembers.find(x => x.ID === this.group.leader);
 
+      let adminRoleID = types.data.find(x => x.value === 'admin').ID;
+
       this.$nextTick(()=>{
-        if(this.user.ID === this.leader.ID)
+        if(this.user.ID === this.leader.ID || this.user.role === adminRoleID)
           this.userHasPerms = true;
       });
 
@@ -370,8 +376,7 @@ export default {
             let tempPhone = {};
             // Get phone type for each usable phone number
             let tempPhoneType = phoneTypes.find(x => x.ID === phones.data[i].type).value;
-            // Capitalize the first letter in phone type
-            tempPhone.type = tempPhoneType.charAt(0).toUpperCase() + tempPhoneType.slice(1);
+            tempPhone.type = tempPhoneType;
             tempPhone.number = phones.data[i].number;
             this.leader.phone.push(tempPhone);
           }
@@ -412,8 +417,7 @@ export default {
               let tempPhone = {};
               // Get the phone type
               let tempPhoneType = phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
-              // Capitalizes the first letter of phone type
-              tempPhone.type = tempPhoneType.charAt(0).toUpperCase() + tempPhoneType.slice(1);
+              tempPhone.type = tempPhoneType;
               tempPhone.number = memberPhones.data[j].number;
               this.groupMembers[i].phone.push(tempPhone);
             }
