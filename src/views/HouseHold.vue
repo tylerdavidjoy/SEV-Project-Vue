@@ -79,7 +79,7 @@
                         <v-list class="list">
                           <v-list-item
                             v-for="member in churchMembers"
-                            v-bind:key="member" class="list">
+                            v-bind:key="member" class="list" @click="addMemberToFamily(member.ID)">
                             <!-- <v-list-item-icon>
                               <img src="../assets/dog.jpg" class="smallUserImg">
                             </v-list-item-icon> -->
@@ -312,7 +312,58 @@ import axios from 'axios'
 
       addMember: function() {
         console.log("member added")
+        axios
+        .get(this.baseURL + "person")
+        .then(response => {
+          console.log(response.data)
+          this.churchMembers = response.data;
+        })
+      },
 
+      addMemberToFamily(memberID) {
+        console.log(memberID)
+        var userID = null;
+        var congregationID = null;
+        var user_f_name = null;
+        var user_l_name = null;
+        var user_occupation = null;
+        var user_employer = null;
+        // var familyID = null;
+        var user_email = null;
+        var user_gender = null;
+        var preferredName = null;
+        var user_role = null;
+        axios
+        .get(this.baseURL + "person?id=" + memberID)
+        .then(response => {
+          console.log(response.data)
+          userID = response.data[0].ID;
+          congregationID = response.data[0].congregation_ID;
+          user_f_name = response.data[0].f_name;
+          user_l_name = response.data[0].l_name;
+          user_occupation = response.data[0].occupation;
+          user_employer = response.data[0].employer;
+          // familyID = response.data[0].family_ID;
+          user_email = response.data[0].email;
+          user_gender = response.data[0].gender;
+          preferredName = response.data[0].preferred_name;
+          user_role = response.data[0].role;
+        })
+
+        axios.put(this.baseURL + "person?id="  + memberID, {
+          ID: userID,
+          congregation_ID: congregationID,
+          f_name: user_f_name,
+          l_name: user_l_name,
+          occupation: user_occupation,
+          employer: user_employer,
+          family_ID: this.familyId,
+          email: user_email,
+          gender: user_gender,
+          preferred_name: preferredName,
+          role: user_role
+
+        })
       }
     }
   }
