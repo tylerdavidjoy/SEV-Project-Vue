@@ -169,7 +169,7 @@ import axios from 'axios'
         .get(this.baseURL + "family?person_ID=" + this.userId)
         .then(response => {
           this.familyId = response.data[0].ID;
-          console.log(response.data);
+          console.log("Family ID: " + response.data);
           console.log("Family ID: " + this.familyId)
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
         })
@@ -322,8 +322,7 @@ import axios from 'axios'
 
       addMemberToFamily(memberID) {
         console.log(memberID)
-        var userID = null;
-        var congregationID = null;
+        var user_congregation_ID = null;
         var user_f_name = null;
         var user_l_name = null;
         var user_occupation = null;
@@ -331,14 +330,13 @@ import axios from 'axios'
         // var familyID = null;
         var user_email = null;
         var user_gender = null;
-        var preferredName = null;
+        var user_preferred_name = null;
         var user_role = null;
         axios
         .get(this.baseURL + "person?id=" + memberID)
         .then(response => {
           console.log(response.data)
-          userID = response.data[0].ID;
-          congregationID = response.data[0].congregation_ID;
+          user_congregation_ID = response.data[0].congregation_ID;
           user_f_name = response.data[0].f_name;
           user_l_name = response.data[0].l_name;
           user_occupation = response.data[0].occupation;
@@ -346,13 +344,13 @@ import axios from 'axios'
           // familyID = response.data[0].family_ID;
           user_email = response.data[0].email;
           user_gender = response.data[0].gender;
-          preferredName = response.data[0].preferred_name;
+          user_preferred_name = response.data[0].preferred_name;
           user_role = response.data[0].role;
+          console.log("Congregation ID: " + user_congregation_ID + ", First Name: " + user_f_name + ", Last Name: " + user_l_name + ", Occupation: " + user_occupation + ", Employer: " + user_employer + ", Email: " + user_email + ", Gender: " + user_gender + ", Preferred Name: " + user_preferred_name + ", Role: " + user_role)
         })
 
         axios.put(this.baseURL + "person?id="  + memberID, {
-          ID: userID,
-          congregation_ID: congregationID,
+          congregation_ID: user_congregation_ID,
           f_name: user_f_name,
           l_name: user_l_name,
           occupation: user_occupation,
@@ -360,9 +358,8 @@ import axios from 'axios'
           family_ID: this.familyId,
           email: user_email,
           gender: user_gender,
-          preferred_name: preferredName,
+          preferred_name: user_preferred_name,
           role: user_role
-
         })
       }
     }
