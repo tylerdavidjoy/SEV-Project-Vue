@@ -83,7 +83,7 @@
                           </v-btn>
                         </template>
                         <v-card>
-                          <v-card-title>Select Member to Make Group Leader</v-card-title>
+                          <v-card-title>Select Member to Make<br/>Group Leader</v-card-title>
                           <v-divider></v-divider>
                           <v-card-text style="height: 300px;">
                             <v-radio-group
@@ -91,7 +91,7 @@
                               column
                             >
                               <v-radio
-                              v-for="changePerson in possibleLeaderList"
+                              v-for="changePerson in groupMembers"
                               :key="changePerson.ID"
                               :label="changePerson.f_name + ' ' + changePerson.l_name + ' ' + changePerson.email"
                               :value="changePerson"
@@ -250,7 +250,6 @@ export default {
     return {
         possibleAddList: [],
         addList: [],
-        possibleLeaderList: [],
         user: this.$person,
         userHasPerms: false,
         group: {},
@@ -283,7 +282,6 @@ export default {
       });
     },
     changeLeader: function(){
-      this.possibleLeaderList.push(this.leader);
       this.groupMembers.push(this.leader);
       
       axios.put(`${apiBaseUrl}/group?id=${this.group.ID}`, {
@@ -298,8 +296,7 @@ export default {
 
       this.$nextTick(()=>{
         this.leader = this.dialogm2;
-          this.$delete(this.groupMembers, this.groupMembers.indexOf(this.groupMembers.find(x => x.ID === this.dialogm2.ID)));
-          this.$delete(this.possibleLeaderList, this.possibleLeaderList.indexOf(this.dialogm2));
+        this.$delete(this.groupMembers, this.groupMembers.indexOf(this.groupMembers.find(x => x.ID === this.dialogm2.ID)));
       })
 
       this.dialog2 = false;
@@ -341,6 +338,8 @@ export default {
       this.group = group.data;
       this.groupMembers = groupMembers.data;
 
+      console.log(this.groupMembers.find(x => x.ID === this.group.leader))
+
       // Setting the view's leader variable with the leader in groupMembers
       this.leader = this.groupMembers.find(x => x.ID === this.group.leader);
 
@@ -356,13 +355,7 @@ export default {
       this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
 
       // Remove the leader from the list of group members
-      this.groupMembers.splice(groupMembers.data.indexOf(this.leader), 1);
-
-      // Set list of possible group leaders to everyone, then splice out current leader
-      this.possibleLeaderList = churchMembers.data.filter(member => {
-        if(member.ID != this.leader.ID)
-          return true;
-      });      
+      this.groupMembers.splice(groupMembers.data.indexOf(this.leader), 1);  
 
       axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.leader.ID}`)
       .then(phones => {
