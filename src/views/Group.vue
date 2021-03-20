@@ -9,9 +9,8 @@
           <v-row>
                 <v-col>
                   <v-sheet 
-                  color="white"
-                  elevation="2">
-                    <v-card elevation="2" v-if="renderLeader">
+                  color="transparent">
+                    <v-card elevation="2" v-if="renderLeader" :height="270">
                       <v-card-title>
                         Group Leader
                       </v-card-title>
@@ -57,14 +56,13 @@
                 </v-col>
                 <v-col>
                   <v-sheet 
-                  color="white"
-                  elevation="2">
-                    <v-card>
-                      <v-avatar size="auto" :tile="true" min-height="200" max-height="250" min-width="200" max-width="250">
-                        <v-img alt="Image of the group leader.">
+                  color="transparent">
+                    <v-card :height="270">
+                      <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270">
+                        <v-img src="https://i.imgur.com/NZtcOfi.jpg">
                         </v-img>
                       </v-avatar>
-                    </v-card>
+                    
                     <v-row justify="center" v-if="userHasPerms">
                       <v-dialog
                         v-model="dialog2"
@@ -72,6 +70,7 @@
                         max-width="300px"
                       >
                         <template v-slot:activator="{ on, attrs }">
+                          <v-card-actions>
                           <v-btn
                             color="primary"
                             dark
@@ -81,6 +80,7 @@
                           >
                             Change Leader
                           </v-btn>
+                          </v-card-actions>
                         </template>
                         <v-card>
                           <v-card-title>Select Member to Make<br/>Group Leader</v-card-title>
@@ -118,17 +118,16 @@
                         </v-card>
                       </v-dialog>
                     </v-row>
+                    </v-card>
                   </v-sheet>
                 </v-col>
           </v-row>
           <v-row>
             <v-col>
-              <v-sheet 
-              color="white"
-              elevation="2">
-                <v-list>
-                    <div v-if="renderMembers">
-                      <v-card v-for="(member, index) in groupMembers" :key="member.ID" >
+              <v-container>
+                <v-list color="transparent">
+                    <template v-if="renderMembers" >
+                      <v-card v-for="(member, index) in groupMembers" :key="member.ID" class="my-2">
                         <v-card-subtitle>
                           {{member.f_name + " " + member.l_name}}
                         </v-card-subtitle>
@@ -150,8 +149,8 @@
                         </v-btn>
                       </v-card-actions>
                       </v-card>
-                    </div>
-                    <div v-else-if="this.groupMembers.length > 0">
+                    </template>
+                    <template v-else-if="this.groupMembers.length > 0">
                       <v-card>
                         <v-card-subtitle>
                           <v-progress-circular
@@ -174,9 +173,9 @@
                           ></v-progress-circular>
                         </v-card-text>
                       </v-card>
-                    </div>
+                    </template>
                 </v-list>
-              </v-sheet>
+              </v-container>
             </v-col>
           </v-row>
           <v-row justify="center" v-if="userHasPerms">
@@ -287,7 +286,8 @@ export default {
       axios.put(`${apiBaseUrl}/group?id=${this.group.ID}`, {
         type: this.group.type,
         leader: this.dialogm2.ID,
-        congregation_ID: this.group.congregation_ID
+        congregation_ID: this.group.congregation_ID,
+        name: this.group.name
       })
       .then()
       .catch(error =>{
