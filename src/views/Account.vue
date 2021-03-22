@@ -722,6 +722,7 @@ export default {
     this.form.data_Immersed = this.user.data_Immersed;
     this.form.birthday = this.user.birthday;
     this.form.occupation = this.user.occupation;
+    this.form.employer = this.user.employer;
     this.form.phones = this.user.phones;
     this.form.isPublic = this.user.isPublic;
     this.form.workPhone = this.user.workPhone;
@@ -783,8 +784,8 @@ export default {
       immersed: false,
       data_Immersed: "",
       birthday: "",
-      occupation: "Cram Salesman",
-      employer: "John Stamose",
+      occupation: "",
+      employer: "",
       cellPhoneTypes: ["Work","Home","Mobile"],
       LifeEventTypes: ["Marriage","Baptizemal","Birthday","Death","Divorce","Birth of family member","Other"],
       RelationType: ["Parent","Spouse","Sibling","Child","Extended-Family"],
@@ -799,19 +800,19 @@ export default {
       congregation_id: 0,
       f_name: "John",
       l_name: "Smith",
-      email: "Beavis@dam.com",
+      email: "John.Smith@AOL.com",
       immersed: true,
       data_Immersed: "",
       birthday: "",
-      occupation: "Cram Salesman",
-      employer: "John Stamose",
+      occupation: "IT Specialist",
+      employer: "Ron Pearlman",
       phones: [],
-      hobbies:['Caddyshack','Ronald McDonald','Owls'], //Should be comma seperating to keep it all in one field
+      hobbies:["AutoMechanics","Carpentry","Children's Ministry"], //Should be comma seperating to keep it all in one field
       LifeEvents:[],
       Relations:[],
       family_ID: 0,
       image:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1",
+        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.wKCOPiWXFnsPQdoYbNlZowHaHi%26pid%3DApi&f=1",
     },
     //Test Data for searching for People
     people:[
