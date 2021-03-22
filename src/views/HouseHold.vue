@@ -9,18 +9,25 @@
                 <v-sheet width="600">
                   <img src="../assets/dog.jpg" class="familyImg">
                   <br />
+                  <input style="display: none"
+                    type="file"
+                    @change="onFileSelected"
+                    ref="fileInput">
+                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick Photo</v-btn>
+                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn>
+                  <br />
                   <h1>HouseHold Information</h1>
                   <br />
                   <label>Address</label>
-                  <v-text-field v-model="address" label="Family Address" id="address_field" :readonly="!editable"></v-text-field>
+                  <v-text-field v-model="address" label="Family Address" :readonly="!editable"></v-text-field>
                   <label>Phone Number</label>
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
-                  <v-text-field v-model="email" label="Family Email" :readonly="!editable"></v-text-field>
-                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
+                  <v-text-field v-model="email" label="Family Email" :readonly="true"></v-text-field>
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn @click="onSave" class="ma-2" outlined large fab color="indigo" v-if="isHeadOfFamily">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -36,7 +43,7 @@
                   <v-list class="list">
                     <v-list-item
                       v-for="member in familyMembers"
-                      v-bind:key="member" class="list">
+                      v-bind:key="member.ID" class="list" @click="navToAccountPage(member.ID)">
                       <v-list-item-icon>
                         <img src="../assets/dog.jpg" class="smallUserImg">
                       </v-list-item-icon>
@@ -46,6 +53,120 @@
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
+
+                  <v-dialog
+                    v-model="dialogDelete"
+                    scrollable
+                    max-width="300px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn @click="deleteMemberDialog"
+                        class="ma-2"
+                        outlined
+                        large
+                        fab
+                        color="red darken-4"
+                        v-if="isAdmin"
+                        v-on="on"
+                        v-bind="attrs"
+                      >
+                        <v-icon>mdi-account-minus</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>Select Person</v-card-title>
+                      <v-divider></v-divider>
+                      <v-card-text style="height: 300px;">
+                        <v-list class="list">
+                          <v-list-item
+                            v-for="member in familyMembers"
+                            v-bind:key="member.ID" class="list" @click="deleteMemberFromFamily(member)">
+                            <!-- <v-list-item-icon>
+                              <img src="../assets/dog.jpg" class="smallUserImg">
+                            </v-list-item-icon> -->
+
+                            <v-list-item-content class="large">
+                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                      <v-card-actions>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialogDelete = false"
+                        >
+                          Close
+                        </v-btn>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialogDelete = false"
+                        >
+                          Save
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
+                  <v-dialog
+                    v-model="dialogAdd"
+                    scrollable
+                    max-width="300px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn @click="addMemberDialog"
+                        class="ma-2"
+                        outlined
+                        large
+                        fab
+                        color="red darken-4"
+                        v-if="isAdmin"
+                        v-on="on"
+                        v-bind="attrs"
+                      >
+                        <v-icon>mdi-account-plus</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>Select Person</v-card-title>
+                      <v-divider></v-divider>
+                      <v-card-text style="height: 300px;">
+                        <v-list class="list">
+                          <v-list-item
+                            v-for="member in churchMembers"
+                            v-bind:key="member.ID" class="list" @click="addMemberToFamily(member)">
+                            <!-- <v-list-item-icon>
+                              <img src="../assets/dog.jpg" class="smallUserImg">
+                            </v-list-item-icon> -->
+
+                            <v-list-item-content class="large">
+                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                      <v-card-actions>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialogAdd = false"
+                        >
+                          Close
+                        </v-btn>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="dialogAdd = false"
+                        >
+                          Save
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
                 </v-sheet>
               </v-container>
             </v-col>
@@ -63,6 +184,7 @@ import axios from 'axios'
   export default {
     data() { 
       return {
+        selectedFile: null,
         address: "",
         phone: "",
         email: "",
@@ -82,6 +204,7 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
+        churchMembers: [],
         userId: 1,
         familyId: "",
         address_ID: "",
@@ -89,7 +212,10 @@ import axios from 'axios'
         phoneNumber_Type: "",
         can_publish: "",
         editable: false,
-        isHeadOfFamily: false
+        isHeadOfFamily: false,
+        isAdmin: true,
+        dialogAdd: false,
+        dialogDelete: false
       }
 
     
@@ -102,7 +228,7 @@ import axios from 'axios'
         .get(this.baseURL + "family?person_ID=" + this.userId)
         .then(response => {
           this.familyId = response.data[0].ID;
-          console.log(response.data);
+          console.log("Family ID: " + response.data);
           console.log("Family ID: " + this.familyId)
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
         })
@@ -176,6 +302,13 @@ import axios from 'axios'
     },
 
     methods: {
+      onFileSelected(event) {
+        console.log(event)
+        this.selectedFile = event.target.files[0]
+      },
+      onUpload() {
+
+      },
       onEdit: function() {
 
         // If the head of household is logged in give edit permission
@@ -207,19 +340,6 @@ import axios from 'axios'
           can_publish: this.can_publish,
           type: this.phoneNumber_Type
         })
-
-
-      // Update family email
-        axios
-        .put(this.baseURL + "person?id=" + this.headOfFamilyID, {
-          congregation_ID: this.congregationID,
-          f_name: this.f_name,
-          l_name: this.l_name,
-          occupation: this.occupation,
-          employer: this.employer,
-          family_ID: this.familyId,
-          email: this.email
-        })
       },
 
       isHeadOfHousehold: function() {
@@ -228,6 +348,86 @@ import axios from 'axios'
           this.isHeadOfFamily = true;
         }
         // return this.isHeadOfFamily;
+      },
+
+      navToAccountPage: function(param) {
+        console.log("Navigate to account page!")
+        console.log(param)
+        this.$router.push({ path: '/account', params: { id: param }})
+      },
+
+      addMemberDialog: function() {
+        console.log("member add dialog")
+        axios
+        .get(this.baseURL + "person")
+        .then(response => {
+          console.log(response.data)
+          this.churchMembers = response.data;
+        })
+      },
+
+      deleteMemberDialog: function() {
+        console.log("member remove dialog")
+        axios
+        .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        .then(response => {
+          this.familyMembers = response.data;
+          console.log(response.data)
+          console.log(this.familyMembers)
+        })
+      },
+
+      addMemberToFamily(member) {
+        axios.put(this.baseURL + "person?id="  + member.ID, {
+          congregation_ID: member.congregation_ID,
+          f_name: member.f_name,
+          l_name: member.l_name,
+          occupation: member.occupation,
+          employer: member.employer,
+          family_ID: this.familyId,
+          email: member.email,
+          gender: member.gender,
+          preferred_name: member.preferred_name,
+          role: member.role
+        })
+        .then(response => {
+          console.log(response.data)
+          console.log("Person added to family: " + member.f_name + ", " + member.l_name)
+          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        })
+
+        .then(response => {
+          this.familyMembers = response.data;
+          console.log(response.data)
+          console.log(this.familyMembers)
+        })
+
+      },
+
+      deleteMemberFromFamily(member) {
+        axios.put(this.baseURL + "person?id="  + member.ID, {
+          congregation_ID: member.congregation_ID,
+          f_name: member.f_name,
+          l_name: member.l_name,
+          occupation: member.occupation,
+          employer: member.employer,
+          family_ID: null,
+          email: member.email,
+          gender: member.gender,
+          preferred_name: member.preferred_name,
+          role: member.role
+        })
+        .then(response => {
+          console.log(response.data)
+          console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
+          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        })
+
+        .then(response => {
+          this.familyMembers = response.data;
+          console.log(response.data)
+          console.log(this.familyMembers)
+        })
       }
     }
   }
