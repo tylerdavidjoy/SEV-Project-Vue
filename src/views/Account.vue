@@ -589,6 +589,19 @@
 
                       <div :class="'px-6'">
                         <v-text-field
+                          :disabled="!editflag"
+                          v-model="form.preferred_name"
+                          :counter="10"
+                          :rules="nameRules"
+                          :label="'Preferred Name: ' + user.occupation"
+                          required
+                        ></v-text-field>
+                      </div>
+
+                      <v-divider></v-divider>
+
+                      <div :class="'px-6'">
+                        <v-text-field
                           v-model="form.email"
                           :label="'E-mail: ' + user.email"
                           disabled
@@ -606,6 +619,20 @@
                           :label="'Occupation: ' + user.occupation"
                           required
                         ></v-text-field>
+                      </div>
+
+                      <v-spacer></v-spacer>
+
+                      <div :class="'px-6'">
+                        <v-select
+                          :disabled="!editflag"
+                          v-model="form.gender"
+                          :items="form.GenderTypes"
+                          label="Gender"
+                          menu-props="auto"
+                          return-object
+                          single-line
+                        ></v-select>
                       </div>
 
                       <v-divider></v-divider>
@@ -1222,12 +1249,22 @@
 </template>
 <script>
 import axios from "axios";
+var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
+    //call GetValidValue function
+    var promises = [];
+    promises.push(this.GetValidValues());
+    promises.push(this.GetCongregation());
+    Promise.allSettled(promises);
+    promises = [];
+    promises.push(this.GetRelations());
+    Promise.allSettled(promises);
+    //Assign the valid values for Relationships and Life Events
     //Get User Info from window.person
     this.user.id = window.person.id;
     axios
-    .get('http://team2.eaglesoftwareteam.com/person?email='+ window.user.email)
+    .get(baseURL + 'person?email='+ window.user.email)
     .then(response => {
       if(response.data[0].f_name)
       {
@@ -1239,20 +1276,24 @@ export default {
         this.user.email = response.data[0].email;
         this.user.occupation = response.data[0].occupation;
         this.user.employer = response.data[0].employer;
+        this.user.role = response.data[0].role
+        //iterate through valid_values to get the Role
+        this.isAdmin = false;
+        for(var i = 0; i < this.validvalues.length; i++)
+        {
+          if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
+            this.isAdmin = true;
+        }
       }
       })
     .catch(error => {
       console.log("User Fetch Error: " + error);
       this.errored = true;
-      })
-    .finally(() => {
-      //Set the name variable that will load on the Home page to greet the user
-      console.log("Finished Loading User for Account Page");
-    });
-    //axios call to get phones
+      });
 
+    //axios call to get phones
     axios
-      .get("http://team2.eaglesoftwareteam.com/phone_number")
+      .get(baseURL + "phone_number?person_ID=" + window.person.id)
       .then((response) => {
         this.form.phones = response.data;
         console.log("Loading Phones...");
@@ -1262,32 +1303,45 @@ export default {
         console.log(error);
       });
       
-    //Axios call for all users for Relationships
+    
 
     //Axios calls for Life Events
-
-    //Axios Call for Getting everyone in the congregation
     axios
-      .get("http://team2.eaglesoftwareteam.com/person")
+      .get(baseURL + "life_event?person_id=" + window.person.id)
       .then((response) => {
-        //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
-        for( var i = 0; i < response.data.length; i++)
-        {
-          var temp = {
-              ID: response.data[i].ID,
-              FullName: response.data[i].f_name + " " + response.data[i].l_name,
-          };
-          // console.log("temp: " + temp.ID + " " + temp.FullName);
-          this.people.push(temp);
-          // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
-        }
-        // this.people = response.data;
-        console.log("Loading Congregation Members...");
+        this.form.LifeEvents = response.data;
+        console.log("Loading User's Life Events...");
       })
       .catch((error) => {
-        console.log("Congregation Fetch: " + error);
+        console.log(error);
       });
 
+    //Axios Call for Getting everyone in the congregation
+    // this.GetCongregation();
+
+    //Axios Call for Getting all types of Involvements and the User's Involvments
+    // axios
+    //   .get(baseURL + "person")
+    //   .then((response) => {
+    //     //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
+    //     for( var i = 0; i < response.data.length; i++)
+    //     {
+    //       var temp = {
+    //           ID: response.data[i].ID,
+    //           FullName: response.data[i].f_name + " " + response.data[i].l_name,
+    //       };
+    //       // console.log("temp: " + temp.ID + " " + temp.FullName);
+    //       this.people.push(temp);
+    //       // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
+    //     }
+    //     // this.people = response.data;
+    //     console.log("Loading Congregation Members...");
+    //   })
+    //   .catch((error) => {
+    //     console.log("Congregation Fetch: " + error);
+    //   });
+    
+    
     //Section for setting Form data from user data
     this.form.f_name = this.user.f_name;
     this.form.l_name = this.user.l_name;
@@ -1307,6 +1361,8 @@ export default {
   },
 
   data: () => ({
+    //Array for all the Valid_Values
+    validvalues:[],
     //Dumbee data for the admin
     isAdmin: true,
     //Variables for the Datatable
@@ -1314,14 +1370,16 @@ export default {
     dialogDelete: false,
     editedIndex: -1,
     editedItem: {
-      type: "",
+      ID:null,
       number: "",
       can_publish: false,
+      type: "",
     },
     defaultItem: {
-      type: "",
+      ID:0,
       number: "000-000-0000",
       can_publish: false,
+      type: "",
     },
     //Variables for the Life Events and relationships
     menuDate: false,
@@ -1354,9 +1412,9 @@ export default {
       description: "",
       date: "",
       type: "",
+      visible:true,
     },
     defaultRelationship: {
-      id: 0, //id of user
       person: {}, //Id of the person that you have a relationship with
       type: "", //relationship type that you can have with the person
     },
@@ -1380,16 +1438,8 @@ export default {
       occupation: "",
       employer: "",
       cellPhoneTypes: ["Work", "Home", "Mobile"],
-      LifeEventTypes: [
-        { type: "Marriage" },
-        { type: "Baptizemal" },
-        { type: "Birthday" },
-        { type: "Death" },
-        { type: "Divorce" },
-        { type: "Birth of family member" },
-        { type: "Other" },
-      ],
-      RelationType: ["Parent", "Spouse", "Sibling", "Child", "Extended-Family"],
+      LifeEventTypes: [],
+      RelationType: [],
       InvolmentTypes: [
         {type:"Adult Education"},
         {type:"College Education"},
@@ -1417,6 +1467,7 @@ export default {
         {type:"Advertising"},
         {type:"Door Greeters"},
       ],
+      GenderTypes: ["male","female","other"],
       ministry: [],
       involment: [],
       phones: [],
@@ -1446,18 +1497,13 @@ export default {
       hobbies: [], //Should be comma seperating to keep it all in one field
       LifeEvents: [],
       Relations: [],
+      role:null,
       family_ID: null,
       image:
         "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.wKCOPiWXFnsPQdoYbNlZowHaHi%26pid%3DApi&f=1",
     },
     //Test Data for searching for People
-    people: [
-      // { id: 0, name: "Sarah Conner" },
-      // { id: 1, name: "John Conner" },
-      // { id: 2, name: "Kate Brewster" },
-      // { id: 3, name: "Terminator" },
-      // { id: 4, name: "T-X" },
-    ],
+    people: [],
     newFile: {},
     nameRules: [
       (v) => !!v || "Name is required",
@@ -1606,6 +1652,8 @@ export default {
         Object.assign(this.form.phones[this.editedIndex], this.editedItem);
       } else {
         this.form.phones.push(this.editedItem);
+        // console.log("Making Post");
+        this.MakePost(this.editedItem,-1);
       }
       this.close();
     },
@@ -1757,6 +1805,8 @@ export default {
           );
         } else {
           this.form.LifeEvents.push(this.editedEvent);
+          // console.log("Making Post");
+          this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
       } else if (type == 1) {
@@ -1767,6 +1817,7 @@ export default {
           );
         } else {
           this.form.Relations.push(this.editedEvent);
+          this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
       } else if(type == 2){
@@ -1777,6 +1828,8 @@ export default {
           );
         } else {
           this.form.LifeEventTypes.push(this.editedEvent);
+          console.log("Making a Post");
+          this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
       } else if (type == 3){
@@ -1816,11 +1869,233 @@ export default {
           this.editedEvent.person_id.id
       );
     },
-    //Function for making axios calls for the phones
+    async GetValidValues()
+    {
+      //Axios call for getting the Valid_Values
+      return axios
+        .get(baseURL + "valid_value")
+        .then((response) => {
+          //Do a For loop to iterate through the list and then create an Object
+          console.log("Loading Valid Values...");
+          for( var i = 0; i < response.data.length; i++)
+          {
+            var temp = { //setup variable for getting the Valid_values from the array
+                ID: response.data[i].ID,
+                value_group:response.data[i].value_group,
+                value:response.data[i].value,
+                type: response.data[i].value,//Set to the value to make the type that value and then switch on a Put
+            }
+            this.validvalues.push(temp);
+            if(temp.value_group == 'relationship')
+            {
+              this.form.RelationType.push(temp);
+              console.log("Relationship");
+            }
+            else if(temp.value_group == 'life_event')
+            {
+              this.form.LifeEventTypes.push(temp);
+              console.log("Life Events");
+            }
+            console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
+          }
+          // this.people = response.data;
+        })
+        .catch((error) => {
+            console.log("Valid Values Fetch Error: ");
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.log('Error', error.message);
+            }
+            console.log(error.config);
+        })
+        // .finally(()=> {
+        //   //Call GetCongregation so that it is called before GetRelations
+        //   this.GetCongregation();
+        // });
+      
+    },
+    async GetRelations()
+    {
+      //Axios call for all users for Relationships
+    return axios
+      .get(baseURL + "relationship?person1_ID=" + window.person.id)
+      .then((response) => {
+        this.form.Relations = response.data;
+        //Loop through and make another axios call for each of the person_ids to get that person with their full name
+        for( var i = 0; i < response.data.length; i++)
+        {
+          var temp = {
+              "person1_ID":response.data[i].person1_ID, //The user's ID
+              "person2_ID":response.data[i].person2_ID, //The other person's ID
+              "type_id":response.data[i].type, //The type of relationship from the Valid Values
+              "type": "",
+              "person":{},
+          };
+          /*Iterate through the people array to find the person that matches that ID for person2_ID and 
+          1. remove them and 2. assign that person as person*/
+          if(this.form.RelationType == null)
+          {
+            console.log("Array is empty");
+          }
+          for( var j = 0; j < this.people.length;j++)
+          {
+            if(this.people[j].ID == temp.person2_ID)//Assuming that the Axios call for Congregation is returning before this is ran
+              {
+                //Assign Person to the temp variable
+                temp.person = this.people[j];
+                //Remove the perosn from the array that a person can use.
+                this.people.splice(j, 1);
+              }
+          }
+          /*Iterate through Relationship Types to assign the Relationship type*/
+          for( var k = 0; k < this.form.RelationType.length; k++)
+          {
+            if(this.RelationType[k].ID == temp.type_id)
+              console.log("Found Match");
+          }
+          this.form.Relations.push(temp);
+        }
+        console.log("Loading Relationships for the User...");
+        console.log(JSON.parse(this.form.phones));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    },
+    async GetCongregation()
+    {
+      //Axios call for all users for Relationships
+      return axios
+        .get(baseURL + "person")
+        .then((response) => {
+          console.log("Loading Congregation Members...");
+          //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
+          for( var i = 0; i < response.data.length; i++)
+          {
+            var temp = {
+                ID: response.data[i].ID,
+                FullName: response.data[i].f_name + " " + response.data[i].l_name,
+            };
+            //If the ID is not the User ID
+            if(temp.ID != window.person.id)
+              {
+                this.people.push(temp);
+                console.log("Adding Person");
+              }
+            // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
+          }
+        })
+        .catch((error) => {
+          console.log("Congregation Fetch: " + error);
+        })
+        // .finally(()=> {
+        //   //Call GetRelation so that it is called after this axios call resolves
+        //   this.GetRelations();
+        // });
+    
+    },
+    //Function for Posts
+    MakePost(object, type)
+    {
+      var Data;
+      if( type == -1 )//New Phone
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "number": object.number,
+          "can_publish": object.can_publish,
+          "type": null,
+        };
+        //If statement for the Valid_values stuff for the phones
+        if(object.type == 'Home')
+          Data.type = 1;
+        else if(object.type == 'Work')
+          Data.type = 2;
+        else  
+          Data.type = 3;
+        axios
+        .post(baseURL + 'phone_number?id=' + window.person.id, Data)
+        .then(response =>
+        {
+          console.log("Posting to Phones: " + JSON.parse(response));
+        })
+        .catch(error=>
+        {
+          console.log('Posting Phones Error: ' + error);
+        })
+      } else if( type == 0 )//New Life Event
+      {
+        console.log(object.type.ID);
+        //Create Object to send from Given Data
+        Data = {
+          "person_ID":window.person.id,
+          "description":object.description,
+          "date":object.date,
+          "type":object.type.ID,
+          "visible": object.visible,
+        };
+        axios
+        .post(baseURL + 'life_event', Data)
+        .then(response =>
+        {
+          console.log("Posting to User's Life Events: " + JSON.parse(response));
+        })
+        .catch(error=>
+        {
+          console.log('Posting Life Events Error: ' + error);
+        })
+      } else if( type == 1 )//New Relationship
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "person1_ID":this.user.id,
+          "person2_ID":object.person.ID,
+          "type": object.type.ID,
+        };
+        axios
+        .post(baseURL + 'relationship', Data)
+        .then(response =>
+        {
+          console.log("Posting to User's Life Events: " + JSON.parse(response));
+        })
+        .catch(error=>
+        {
+          console.log('Posting Life Events Error: ' + error);
+        })
+      } else if( type == 2 )//New Event Type
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"life_event",
+          "value": object.type,
+        };
+        axios
+        .post(baseURL + 'valid_value', Data)
+        .then(response =>
+        {
+          console.log("Posting to Event Type: " + JSON.parse(response));
+        })
+        .catch(error=>
+        {
+          console.log('Posting Event Type Error: ' + error);
+        })
+      }
+    }
 
-    //Function for making axios calls for the Life Events
+    //Function for making axios PUTS
 
-    //Function for making axios calls for the Relationships
+    //Function for making axios DELETES
   },
 };
 </script>
