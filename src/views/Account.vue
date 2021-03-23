@@ -1252,14 +1252,97 @@ import axios from "axios";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
-    //call GetValidValue function
-    var promises = [];
-    promises.push(this.GetValidValues());
-    promises.push(this.GetCongregation());
-    Promise.allSettled(promises);
-    promises = [];
-    promises.push(this.GetRelations());
-    Promise.allSettled(promises);
+    //call Axios all for the Valid_Values, the Congregation, Person, (possibly Life Events) and the Relationships for this person
+    axios.all([
+      axios.get(baseURL + "valid_value"),
+      axios.get(baseURL + "person"),
+      axios.get(baseURL + "relationship?person1_ID=" + window.person.id),
+      ])
+      .then(axios.spread((validV, persons, relations, /*addresses, types, churchMembers*/) => {
+      //Do a For loop to iterate through the list and then create an Object
+      console.log("Loading Valid Values...");
+      for( var i = 0; i < validV.data.length; i++)
+      {
+        var temp = { //setup variable for getting the Valid_values from the array
+            ID: validV.data[i].ID,
+            value_group:validV.data[i].value_group,
+            value:validV.data[i].value,
+            type: validV.data[i].value,//Set to the value to make the type that value and then switch on a Put
+        }
+        this.validvalues.push(temp);
+        if(temp.value_group == 'relationship')
+        {
+          this.form.RelationType.push(temp);
+          // console.log("Relationship");
+        }
+        else if(temp.value_group == 'life_event')
+        {
+          this.form.LifeEventTypes.push(temp);
+          // console.log("Life Events");
+        }
+        // console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
+      }
+
+      //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
+      console.log("Loading Congregation Members...");
+      for( var i2 = 0; i2 < persons.data.length; i2++)
+      {
+        var temp2 = {
+            ID: persons.data[i2].ID,
+            FullName: persons.data[i2].f_name + " " + persons.data[i2].l_name,
+        };
+        //If the ID is not the User ID
+        if(temp2.ID != window.person.id)
+        {
+          this.people.push(temp2);
+          // console.log("Adding Person");
+        }
+        // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
+      }
+
+      console.log("Loading Relationships for the User...");
+      //Loop through and make another axios call for each of the person_ids to get that person with their full name
+      for( var i3 = 0; i3 < relations.data.length; i3++)
+      {
+        var temp3 = {
+            "person1_ID":relations.data[i3].person1_ID, //The user's ID
+            "person2_ID":relations.data[i3].person2_ID, //The other person's ID
+            "type_id":relations.data[i3].type, //The type of relationship from the Valid Values
+            "type": "",
+            "person":{},
+        };
+        /*Iterate through the people array to find the person that matches that ID for person2_ID and 
+        1. remove them and 2. assign that person as person*/
+        for( var j = 0; j < this.people.length;j++)
+        {
+          if(this.people[j].ID == temp3.person2_ID)//Assuming that the Axios call for Congregation is returning before this is ran
+            {
+              //Assign Person to the temp variable
+              temp3.person = this.people[j];
+              //Remove the perosn from the array that a person can use.
+              this.people.splice(j, 1);
+            }
+        }
+        /*Iterate through Relationship Types to assign the Relationship type*/
+        for( var k = 0; k < this.form.RelationType.length; k++)
+        {
+          if(this.RelationType[k].ID == temp3.type_id)
+            {
+              temp3.type = this.RelationType[k].type;
+              console.log("Found Match");
+            }
+        }
+        this.form.Relations.push(temp3);
+        console.log("Relationship Data: " + this.form.Relations[i3].type);
+      }
+      // // Setting the currentAddress id for grabbing a member's current address later.
+      // let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
+
+      // // Set list of possible members to add to group to everyone, remove current members
+      // this.possibleAddList = churchMembers.data;
+      // this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
+      }
+    )); 
     //Assign the valid values for Relationships and Life Events
     //Get User Info from window.person
     this.user.id = window.person.id;
@@ -1931,7 +2014,7 @@ export default {
     return axios
       .get(baseURL + "relationship?person1_ID=" + window.person.id)
       .then((response) => {
-        this.form.Relations = response.data;
+        // this.form.Relations = response.data;
         //Loop through and make another axios call for each of the person_ids to get that person with their full name
         for( var i = 0; i < response.data.length; i++)
         {
@@ -1967,7 +2050,6 @@ export default {
           this.form.Relations.push(temp);
         }
         console.log("Loading Relationships for the User...");
-        console.log(JSON.parse(this.form.phones));
       })
       .catch((error) => {
         console.log(error);
