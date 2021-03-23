@@ -12,7 +12,7 @@ export default ({
     {
     generateReport: function(date_start, date_end, type)
     {
-        axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type)
+        axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
         .then(response => {
         this.pdfCreation(response.data);
         })
@@ -29,7 +29,7 @@ export default ({
         var rows = [];
 
         for(var i=0; i < life_event.length; i++){
-            rows.push([life_event[i].name, life_event[i].description, life_event[i].date.toString().substr(0,10)]);
+            rows.push([life_event[i].f_name + " " + life_event[i].l_name , life_event[i].description, new Date(life_event[i].date).toLocaleDateString()]);
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
