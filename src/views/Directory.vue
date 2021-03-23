@@ -1,14 +1,109 @@
 <template>
-  <div class="directory">
-    <h1>This is a Directory page</h1>
-    <DirectoryReportNoImg/>
-    <GroupReportNoImg/>
-    <LifeEventReport/>
-  </div>
+  <v-app id="inspire">
+    <div class="events">
+      <v-system-bar app>
+        <v-spacer></v-spacer>
+
+        <v-icon>mdi-logout</v-icon>
+      </v-system-bar>
+      <v-main :class="'grey lighten-2'">
+        <div :class="'mt-n12'">
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+              </v-col>
+              <v-col cols="12">
+                  <v-sheet class="rounded-lg">
+                    <div class="px-4">
+                      
+                      <!-- Search Bar -->
+                      <div>
+                        <v-text-field
+                          v-model="search"
+                          label="Search"
+                          hint="Search for a person / family'"
+                          clearable
+                          @change="SearchAPI()"
+                        ></v-text-field>
+                      </div>
+
+                    </div>
+                  </v-sheet>
+              </v-col>
+              <v-col cols="12">
+                  <v-sheet class="rounded-lg">
+                    <div class="px-4">
+                      <!-- Switch for Pagenation and Calendar -->
+                      <div>
+                        <v-container>
+                          <v-row>
+                            <v-col cols="6">
+                              <v-container>    
+                                <v-sheet class="rounded-lg">
+                                  <div>
+                                    <v-btn @click='viewMode("person")' block elevation="2" outlined>Person View</v-btn>
+                                  </div>
+                                </v-sheet>
+                              </v-container>
+                            </v-col>
+                            <v-col cols="6">
+                              <v-container>    
+                                <v-sheet class="rounded-lg">
+                                  <div>
+                                    <v-btn @click='viewMode("family")' block elevation="2" outlined >Family View</v-btn>
+                                  </div>
+                                </v-sheet>
+                              </v-container>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </div>
+
+                      <!-- Results Bar -->
+                      <div class="pt-2">
+                        <v-container>
+
+                          <div style="width:100%; margin:auto; padding-left:3.5%;">
+                            <div v-for="person in display" :key="person.name" style="float:left; padding: 15px;">
+                              <div>
+                                <v-img
+                                  height="175px"
+                                  width="175px"
+                                  lazy-src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jAioCeiE6Cwhq9Ph3dee4gHaHa%26pid%3DApi&f=1"
+                                  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1"
+                                ></v-img>
+                              </div>
+                              <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
+                            </div>
+                          </div>
+
+                          <v-container class="max-width">
+                            <v-pagination
+                              v-model="page"
+                              class="my-4"
+                              :length="pageLength"
+                              :total-visible="7"
+                            ></v-pagination>
+                          </v-container>
+                          <DirectoryReportNoImg/>
+                           <GroupReportNoImg/>
+                          <LifeEventReport/>
+                          
+                        </v-container>
+                      </div>
+                    </div>
+                  </v-sheet>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+      </v-main>
+    </div>
+
+  </v-app>
 </template>
-
-
 <script>
+import axios from "axios";
 import DirectoryReportNoImg from "@/components/directory_report.vue";
 import GroupReportNoImg from "@/components/group_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
@@ -18,6 +113,105 @@ export default {
     DirectoryReportNoImg,
     GroupReportNoImg,
     LifeEventReport
-  }
-};
+  },
+  mounted() {
+    //People
+    axios.get("http://team2.eaglesoftwareteam.com/person")
+    .then(response => {
+      console.log(response.data);
+      for(var i = 0; i < response.data.length; i++)
+      {
+        this.people.push({
+          id: response.data[i].id,
+          name: response.data[i].f_name + " " + response.data[i].l_name
+        })
+      }
+      if(this.people.length > 20)
+        this.display = this.people.slice(0,19);
+      
+      else
+        this.display = this.people;
+
+      if(this.people.length == 20)
+        this.pageLength = 1;
+      
+      else
+        this.pageLength = (this.people.length / 20) + 1;
+    })
+    .catch(error => {
+      console.log(error);
+    })
+
+    axios.get("http://team2.eaglesoftwareteam.com/family")
+    .then(response => {
+      console.log(response.data);
+      for(var i = 0; i < response.data.length; i++)
+      {
+        this.family.push({
+          id: response.data[i].id,
+          name: response.data[i].f_name + " " + response.data[i].l_name
+        })
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    })
+
+
+  },
+    data() {
+    return {
+      isAdmin:true,
+      search:'',
+      page:1,
+      pageLength:20,
+      display:[],
+      people:[],
+      family: []
+    }
+  },
+  methods:{
+    //Function for loading in the Events based on given API filters and Search Parameters
+    SearchAPI()
+    {
+
+      console.log("Filter Types: " + this.filters);
+      console.log("Search Parameters: " + this.search);
+    },
+
+    viewMode(mode)
+    {
+      if(mode == "person")
+      {
+        if(this.people.length > 20)
+          this.display = this.people.slice(0,19);
+      
+        else
+          this.display = this.people;
+
+        if(this.people.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (this.people.length / 20) + 1;
+      }
+
+      else
+      {
+        if(this.family.length > 20)
+          this.display = this.people.slice(0,19);
+      
+        else
+          this.display = this.family;
+
+        if(this.family.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (this.family.length / 20) + 1;
+      }
+    }
+  },
+
+}
 </script>

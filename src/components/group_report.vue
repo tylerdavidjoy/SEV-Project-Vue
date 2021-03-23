@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn @click.native="generateReport(1)">Generate Group Memeber Report</v-btn>
+  <v-btn color="green" @click.native="generateReport(1)">Generate <br/> Group Memeber Report</v-btn>
 </template>
 
 <script>

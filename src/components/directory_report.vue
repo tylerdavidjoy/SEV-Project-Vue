@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn @click.native="generateReport">Generate Directory</v-btn>
+  <v-btn color="green" @click.native="generateReport">Generate <br/> Directory</v-btn>
 </template>
 
 <script>

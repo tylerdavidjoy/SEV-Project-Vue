@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn @click.native="generateReport('2000-04-04','2121-06-04', 5)">Generate Life Event Report</v-btn>
+  <v-btn color="green" @click.native="generateReport('2000-04-04','2121-06-04', 5)">Generate <br/> Life Event  Report</v-btn>
 </template>
 
 <script>
