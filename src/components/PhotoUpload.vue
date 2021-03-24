@@ -70,7 +70,6 @@ input {
 }
 
 input,
-div,
 button {
     margin-top: 2rem;
 }
