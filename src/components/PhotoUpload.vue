@@ -1,6 +1,6 @@
 <template>
     <div class="file-upload">
-        <input type="file" @change="onFileChange" />
+        <input type="file" @change="onFileChange" accept="file_extension|image/*"/>
         <div v-if="progress" class="progress-bar" :style="{'width': progress}">
             {{progress}}
         </div>
