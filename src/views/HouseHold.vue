@@ -9,12 +9,13 @@
                 <v-sheet width="600">
                   <img src="../assets/dog.jpg" class="familyImg">
                   <br />
-                  <input style="display: none"
+                  <PhotoUpload />
+                  <!-- <input style="display: none"
                     type="file"
                     @change="onFileSelected"
                     ref="fileInput">
                   <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick Photo</v-btn>
-                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn>
+                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn> -->
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
@@ -179,7 +180,8 @@
 
 <script>
 
-import axios from 'axios'
+import axios from 'axios';
+import PhotoUpload from "./components/FileUpload.vue";
 
   export default {
     data() { 

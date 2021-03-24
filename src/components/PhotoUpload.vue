@@ -16,6 +16,7 @@ export default {
     data() {
         return {
             selectedFile: "",
+            baseURL: "http://team2.eaglesoftwareteam.com/",
             progress: 0
         };
     },
@@ -31,7 +32,7 @@ export default {
 
             // sending file to backend
             axios
-            .post("", formData, {
+            .post(this.baseURL + "/upload", formData, {
                 onUploadProgress: ProgressEvent => {
                     let progress = 
                         Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
