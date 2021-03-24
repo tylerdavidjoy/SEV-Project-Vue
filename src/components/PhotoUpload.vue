@@ -1,6 +1,6 @@
 <template>
     <div class="file-upload">
-        <input type="file" @change="onFileChange" accept="file_extension|image/*"/>
+        <input type="file" @change="onFileChange" accept="image/*"/>
         <div v-if="progress" class="progress-bar" :style="{'width': progress}">
             {{progress}}
         </div>
@@ -32,7 +32,7 @@ export default {
 
             // sending file to backend
             axios
-            .post(this.baseURL + "/upload", formData, {
+            .post(this.baseURL + "upload", formData, {
                 onUploadProgress: ProgressEvent => {
                     let progress = 
                         Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
