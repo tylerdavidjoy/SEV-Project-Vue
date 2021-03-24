@@ -181,7 +181,7 @@
 <script>
 
 import axios from 'axios';
-import PhotoUpload from "./components/FileUpload.vue";
+import PhotoUpload from "../components/FileUpload.vue";
 
   export default {
     components: {
