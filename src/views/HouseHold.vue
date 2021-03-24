@@ -184,6 +184,9 @@ import axios from 'axios';
 import PhotoUpload from "./components/FileUpload.vue";
 
   export default {
+    components: {
+      PhotoUpload
+    },
     data() { 
       return {
         selectedFile: null,
