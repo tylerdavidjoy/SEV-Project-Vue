@@ -23,7 +23,8 @@
                           label="Search"
                           hint="Search for a person / family'"
                           clearable
-                          @change="SearchAPI()"
+                          @input="SearchAPI()"
+                          @click:clear="clearAPI()"
                         ></v-text-field>
                       </div>
 
@@ -118,11 +119,11 @@ export default {
     //People
     axios.get("http://team2.eaglesoftwareteam.com/person")
     .then(response => {
-      console.log(response.data);
+      console.log("people Res:", response.data);
       for(var i = 0; i < response.data.length; i++)
       {
         this.people.push({
-          id: response.data[i].id,
+          id: response.data[i].ID,
           name: response.data[i].f_name + " " + response.data[i].l_name
         })
       }
@@ -148,7 +149,7 @@ export default {
       for(var i = 0; i < response.data.length; i++)
       {
         this.family.push({
-          id: response.data[i].id,
+          id: response.data[i].ID,
           name: response.data[i].f_name + " " + response.data[i].l_name
         })
       }
@@ -167,20 +168,68 @@ export default {
       pageLength:20,
       display:[],
       people:[],
-      family: []
+      family: [],
+      displayMode: "person",
     }
   },
   methods:{
+    clearAPI()
+    {
+      this.search = "";
+      this.SearchAPI();
+    },
     //Function for loading in the Events based on given API filters and Search Parameters
     SearchAPI()
     {
+      if(this.search.length > 0)
+      {
+        var temp = [];
+        if(this.displayMode == "person")
+          temp = JSON.parse(JSON.stringify(this.people));
 
-      console.log("Filter Types: " + this.filters);
-      console.log("Search Parameters: " + this.search);
+        else
+          temp = JSON.parse(JSON.stringify(this.family));
+        
+
+        temp.forEach(x => x.name = x.name.toLowerCase());
+        temp = temp.filter(item => item.name.includes(this.search.toLowerCase()));
+
+        temp.forEach(x => 
+          {
+            var split = x.name.split(" ");
+            for(var y = 0; y < split.length; y++)
+            {
+              split[y] = split[y][0].toUpperCase() + split[y].substr(1);
+            }
+            x.name = split[0] + " " + split[1];
+          })
+          
+
+        console.log(temp);
+        if(temp.length > 20)
+          this.display = temp.slice(0,19);
+  
+        else
+          this.display = temp;
+
+        if(this.temp.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (temp.length / 20) + 1;
+      }
+
+      else
+      {
+        console.log("People:",this.people);
+        this.viewMode(this.displayMode);
+      }
+        
     },
 
     viewMode(mode)
     {
+      this.displayMode = mode;
       if(mode == "person")
       {
         if(this.people.length > 20)
