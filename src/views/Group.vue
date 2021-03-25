@@ -322,8 +322,8 @@ export default {
   beforeCreate()
   {
     axios.all([
-      axios.get(`${apiBaseUrl}/group?id=1`),
-      axios.get(`${apiBaseUrl}/group?id=1&get_members=1`),
+      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
+      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=${this.$route.params.groupLeaderID}`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`)
       ])
@@ -346,7 +346,7 @@ export default {
       let adminRoleID = types.data.find(x => x.value === 'admin').ID;
 
       this.$nextTick(()=>{
-        if(this.user.ID === this.leader.ID || this.user.role === adminRoleID)
+        if(this.$person.ID === this.leader.ID || this.$person.role === adminRoleID)
           this.userHasPerms = true;
       });
 
