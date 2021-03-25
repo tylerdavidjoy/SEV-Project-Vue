@@ -14,22 +14,42 @@ export default ({
     {
         axios.get("http://team2.eaglesoftwareteam.com/group?id="+id+"&get_members=1")
         .then(response => {
-        this.pdfCreation(response.data);
+        //this.pdfCreation(response.data);
+        this.csvCreation(response.data);
         })
         .catch(error => {
         console.log(error);
         })
     },
 
-    pdfCreation: function(people)
+    csvCreation(group)
+    {
+        var rows = [];
+        for(var i=0; i < group.length; i++){
+            rows.push([group[i].f_name + " " + group[i].l_name, group[i].occupation, group[i].employer, group[i].email]);
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "group.csv");
+        document.body.appendChild(link); 
+
+        link.click();
+    },
+
+
+    pdfCreation: function(group)
         {
         require('jspdf-autotable');
         
         var columns = ["Name", "Occupation", "Employer", "Email" ];
         var rows = [];
 
-        for(var i=0; i < people.length; i++){
-            rows.push([people[i].f_name + " " + people[i].l_name, people[i].occupation, people[i].employer, people[i].email]);
+        for(var i=0; i < group.length; i++){
+            rows.push([group[i].f_name + " " + group[i].l_name, group[i].occupation, group[i].employer, group[i].email]);
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
