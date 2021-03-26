@@ -21,9 +21,10 @@
                         <v-text-field
                           v-model="search"
                           label="Search"
-                          hint="Search for a group'"
+                          hint="Search for a group"
                           clearable
                           @change="SearchAPI()"
+                          @click:clear="ClearAPI()"
                         ></v-text-field>
                       </div>
 
@@ -131,12 +132,53 @@ export default {
     })
   },
   methods:{
-    //Function for loading in the Events based on given API filters and Search Parameters
+    ClearAPI(){
+      this.search = "";
+      this.SearchAPI();
+    },
+    //Function for loading in the groups based on given API Search Parameters
     SearchAPI()
     {
 
-      console.log("Filter Types: " + this.filters);
-      console.log("Search Parameters: " + this.search);
+      if(this.search.length > 0)
+      {
+        var temp = [];
+        temp = JSON.parse(JSON.stringify(this.groups));        
+
+        temp.forEach(x => x.name = x.name.toLowerCase());
+        temp = temp.filter(item => item.name.includes(this.search.toLowerCase()));
+
+        temp.forEach(x => 
+          {
+            var split = x.name.split(" ");
+            for(var y = 0; y < split.length; y++)
+            {
+              split[y] = split[y][0].toUpperCase() + split[y].substr(1);
+            }
+            x.name = split[0] + " " + split[1];
+          })
+          
+
+        console.log(temp);
+        if(temp.length > 20)
+          this.display = temp.slice(0,19);
+  
+        else
+          this.display = temp;
+
+        if(this.temp.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (temp.length / 20) + 1;
+      }
+
+      else
+      {
+        console.log("People:",this.people);
+        this.viewMode(this.displayMode);
+      }
+        
     },
 
     viewMode()
