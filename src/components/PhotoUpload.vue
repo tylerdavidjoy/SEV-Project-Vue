@@ -17,7 +17,8 @@ export default {
         return {
             selectedFile: "",
             baseURL: "http://team2.eaglesoftwareteam.com/",
-            progress: 0
+            progress: 0,
+            familyImgSrc: ""
         };
     },
 
