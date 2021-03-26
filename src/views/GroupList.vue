@@ -42,7 +42,7 @@
 
                           <div style="width:100%; margin:auto; padding-left:3.5%;">
                             <div v-if="display.length === 0">
-                              Looks like you aren't in any groups.
+                              Looks like you aren't in any groups or we can't find any groups related to your search.
                             </div>
                             <div v-else>
                               <div v-for="group in display" :key="group.name" style="float:left; padding: 15px;">
