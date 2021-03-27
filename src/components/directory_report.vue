@@ -12,7 +12,7 @@ export default ({
     {
     generateReport: function()
     {
-        axios.get("http://team2.eaglesoftwareteam.com/person")
+        axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
         //this.pdfCreation(response.data,false);
         this.csvCreation(response.data);
@@ -26,7 +26,7 @@ export default ({
     {
         var rows = [];
         for(var i=0; i < people.length; i++){
-            rows.push([people[i].f_name + " " + people[i].l_name, people[i].occupation, people[i].employer, people[i].email]);
+            rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
         }
 
         let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
@@ -47,11 +47,11 @@ export default ({
             {       
                 require('jspdf-autotable');
             
-                var columns = ["Name", "Occupation", "Employer", "Email" ];
+                var columns = ["Name", "Preferred Name", "Occupation", "Employer", "Email", "Role Type", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
                 var rows = [];
 
                 for(var i=0; i < people.length; i++){
-                    rows.push([people[i].f_name + " " + people[i].l_name, people[i].occupation, people[i].employer, people[i].email]);
+                    rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
                 }
                 
                 doc.autoTable(columns, rows);

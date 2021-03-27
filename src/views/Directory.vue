@@ -66,15 +66,19 @@
 
                           <div style="width:100%; margin:auto; padding-left:3.5%;">
                             <div v-for="person in display" :key="person.name" style="float:left; padding: 15px;">
-                              <div>
-                                <v-img
-                                  height="175px"
-                                  width="175px"
-                                  lazy-src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jAioCeiE6Cwhq9Ph3dee4gHaHa%26pid%3DApi&f=1"
-                                  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1"
-                                ></v-img>
-                              </div>
-                              <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
+                              <v-btn style="text-transform:none" height="auto" color="transparent" @click="goToPage(person.ID)" elevation="10">
+                                <div>
+                                  <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
+                                    <v-img
+                                      height="175px"
+                                      width="175px"
+                                      lazy-src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jAioCeiE6Cwhq9Ph3dee4gHaHa%26pid%3DApi&f=1"
+                                      src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1"
+                                    ></v-img>
+                                  </v-avatar>
+                                  <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
+                                </div>
+                              </v-btn>
                             </div>
                           </div>
 
@@ -173,6 +177,15 @@ export default {
     }
   },
   methods:{
+    goToPage(ID)
+    {
+      if(this.displayMode == "person")
+        this.$router.push({name: 'Account', params: {personID: ID}})
+
+      else
+        this.$router.push({name: 'HouseHold', params: {familyID: ID}})
+    },
+
     clearAPI()
     {
       this.search = "";
