@@ -28,7 +28,7 @@ export default ({
     {
         var rows = [];
         for(var i=0; i < group.length; i++){
-            rows.push([group[i].ID, group[i].name, group[i].leader_f_name, group[i].type_val]);
+            rows.push([group[i].ID, group[i].name, group[i].f_name + " " + group[i].l_name, group[i].value]);
         }
 
         let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
@@ -47,11 +47,11 @@ export default ({
         {
         require('jspdf-autotable');
         
-        var columns = ["ID", "Name", "Leader", "Type"];
+        var columns = ["ID", "Group Name", "Leader", "Type"];
         var rows = [];
 
         for(var i=0; i < group.length; i++){
-            rows.push([group[i].ID, group[i].name, group[i].leader_f_name, group[i].type_val]);
+            rows.push([group[i].ID, group[i].name, group[i].f_name + " " + group[i].l_name, group[i].value]);
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
