@@ -176,7 +176,7 @@
                                                 <v-list>
                                                   <v-list-item
                                                     v-for="EventType in form.LifeEventTypes"
-                                                    v-bind:key="EventType"
+                                                    v-bind:key="EventType.type"
                                                   >
                                                     <v-list-item-content>
                                                       <v-list-item-title v-text="EventType.type"></v-list-item-title>
@@ -294,11 +294,7 @@
                                                 <v-date-picker
                                                   ref="picker"
                                                   v-model="editedEvent.date"
-                                                  :max="
-                                                    new Date()
-                                                      .toISOString()
-                                                      .substr(0, 10)
-                                                  "
+                                                  :max="new Date().toISOString().substr(0, 10)"
                                                   min="1950-01-01"
                                                   @change="saveDate"
                                                 ></v-date-picker>
@@ -360,11 +356,11 @@
                                 <v-list>
                                   <v-list-item
                                     v-for="LifeEvent in form.LifeEvents"
-                                    v-bind:key="LifeEvent"
+                                    v-bind:key="LifeEvent.type"
                                   >
                                     <v-list-item-content>
                                       <v-list-item-title>{{
-                                        LifeEvent.type.type
+                                        LifeEvent.type
                                       }}</v-list-item-title>
                                       <v-list-item-subtitle
                                         >Event Description:
@@ -509,7 +505,7 @@
                                 <v-list>
                                   <v-list-item
                                     v-for="Relation in form.Relations"
-                                    v-bind:key="Relation"
+                                    v-bind:key="Relation.type"
                                   >
                                     <v-list-item-content>
                                       <v-list-item-title
@@ -641,8 +637,6 @@
                         <v-text-field
                           :disabled="!editflag"
                           v-model="form.employer"
-                          :counter="30"
-                          :rules="nameRules"
                           :label="'Employer: ' + user.employer"
                           required
                         ></v-text-field>
@@ -754,7 +748,7 @@
                           </v-list-item>
                           <v-list-item
                             v-for="phone in form.phones"
-                            v-bind:key="phone"
+                            v-bind:key="phone.type"
                           >
                             <v-list-item-content>
                               <div>
@@ -838,7 +832,7 @@
                       <v-divider></v-divider>
 
                       <div :class="'px-6'">
-                        <v-combobox
+                        <v-select
                           :disabled="!editflag"
                           v-model="form.involment"
                           label="Involvment in the Church"
@@ -846,11 +840,12 @@
                           item-text="type"
                           dense
                           filled
-                          clearable
                           multiple
                           small
                           chips
-                        ></v-combobox>
+                          return-object
+                          v-on:change="ListChanged(1)"
+                        ></v-select>
                       </div>
 
                       <!-- Admin Button for Involment Types -->
@@ -970,7 +965,7 @@
                                       <v-list>
                                         <v-list-item
                                           v-for="InvolvmentType in form.InvolmentTypes"
-                                          v-bind:key="InvolvmentType"
+                                          v-bind:key="InvolvmentType.type"
                                         >
                                           <v-list-item-content>
                                             <v-list-item-title v-text="InvolvmentType.type">
@@ -1022,7 +1017,7 @@
                       <v-divider></v-divider>
 
                       <div :class="'px-6'">
-                        <v-combobox
+                        <v-select
                           :disabled="!editflag"
                           v-model="form.ministry"
                           label="Ministry Interests"
@@ -1030,11 +1025,11 @@
                           item-text="type"
                           dense
                           filled
-                          clearable
                           multiple
                           small
                           chips
-                        ></v-combobox>
+                          return-object
+                        ></v-select>
                       </div>
 
                       <div :class="'px-6'">
@@ -1153,7 +1148,7 @@
                                       <v-list>
                                         <v-list-item
                                           v-for="MinistryType in form.MinistryTypes"
-                                          v-bind:key="MinistryType"
+                                          v-bind:key="MinistryType.type"
                                         >
                                           <v-list-item-content>
                                             <v-list-item-title v-text="MinistryType.type">
@@ -1252,178 +1247,159 @@ import axios from "axios";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
-    //call Axios all for the Valid_Values, the Congregation, Person, (possibly Life Events) and the Relationships for this person
+    //Get User Info from window.person
+    this.user.id = window.person.id;//Figure out some way to set this value before loading page
+    this.user.email = window.person.email//Set value before loading page 
+
+    //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
       axios.get(baseURL + "valid_value"),
       axios.get(baseURL + "person"),
-      axios.get(baseURL + "relationship?person1_ID=" + window.person.id),
+      axios.get(baseURL + "relationship?person1_ID=" + this.user.id),
+      axios.get(baseURL + "life_event?person_id=" + this.user.id),
+      axios.get(baseURL + 'person?email='+ this.user.email),
       ])
-      .then(axios.spread((validV, persons, relations, /*addresses, types, churchMembers*/) => {
-      //Do a For loop to iterate through the list and then create an Object
-      console.log("Loading Valid Values...");
-      for( var i = 0; i < validV.data.length; i++)
-      {
-        var temp = { //setup variable for getting the Valid_values from the array
-            ID: validV.data[i].ID,
-            value_group:validV.data[i].value_group,
-            value:validV.data[i].value,
-            type: validV.data[i].value,//Set to the value to make the type that value and then switch on a Put
-        }
-        this.validvalues.push(temp);
-        if(temp.value_group == 'relationship')
-        {
-          this.form.RelationType.push(temp);
-          // console.log("Relationship");
-        }
-        else if(temp.value_group == 'life_event')
-        {
-          this.form.LifeEventTypes.push(temp);
-          // console.log("Life Events");
-        }
-        // console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
-      }
+      .then(axios.spread((validV, persons, relations, lifeEvents, user) => {
+        //Section for Getting the User info first to use the ID for all calls.
 
-      //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
-      console.log("Loading Congregation Members...");
-      for( var i2 = 0; i2 < persons.data.length; i2++)
-      {
-        var temp2 = {
-            ID: persons.data[i2].ID,
-            FullName: persons.data[i2].f_name + " " + persons.data[i2].l_name,
-        };
-        //If the ID is not the User ID
-        if(temp2.ID != window.person.id)
+        //Do a For loop to iterate through the list and then create an Object
+        console.log("Loading Valid Values...");
+        for( var v = 0; v < validV.data.length; v++)
         {
-          this.people.push(temp2);
-          // console.log("Adding Person");
+          var temp = { //setup variable for getting the Valid_values from the array
+              ID: validV.data[v].ID,
+              value_group:validV.data[v].value_group,
+              value:validV.data[v].value,
+              type: validV.data[v].value,//Set to the value to make the type that value and then switch on a Put
+          }
+          this.validvalues.push(temp);
+          if(temp.value_group == 'relationship')
+          {
+            this.form.RelationType.push(temp);
+            // console.log("Relationship");
+          }
+          else if(temp.value_group == 'life_event')
+          {
+            this.form.LifeEventTypes.push(temp);
+            // console.log("Life Events");
+          }
+          else if(temp.value_group == 'involvement')
+          {
+            this.form.InvolmentTypes.push(temp)
+          }
+          else if(temp.value_group == 'ministry')
+          {
+            this.form.MinistryTypes.push(temp)
+          }
+          // console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
         }
-        // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
-      }
+        //Assign start list for Involvement for 
+        this.involmentlist = this.form.involment;
 
-      console.log("Loading Relationships for the User...");
-      //Loop through and make another axios call for each of the person_ids to get that person with their full name
-      for( var i3 = 0; i3 < relations.data.length; i3++)
-      {
-        var temp3 = {
-            "person1_ID":relations.data[i3].person1_ID, //The user's ID
-            "person2_ID":relations.data[i3].person2_ID, //The other person's ID
-            "type_id":relations.data[i3].type, //The type of relationship from the Valid Values
-            "type": "",
-            "person":{},
-        };
-        /*Iterate through the people array to find the person that matches that ID for person2_ID and 
-        1. remove them and 2. assign that person as person*/
-        for( var j = 0; j < this.people.length;j++)
+        //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
+        console.log("Loading Congregation Members...");
+        for( var c = 0; c < persons.data.length; c++)
         {
-          if(this.people[j].ID == temp3.person2_ID)//Assuming that the Axios call for Congregation is returning before this is ran
-            {
-              //Assign Person to the temp variable
-              temp3.person = this.people[j];
-              //Remove the perosn from the array that a person can use.
-              this.people.splice(j, 1);
-            }
+          var temp2 = {
+              ID: persons.data[c].ID,
+              FullName: persons.data[c].f_name + " " + persons.data[c].l_name,
+          };
+          //If the ID is not the User ID
+          if(temp2.ID != window.person.id)
+          {
+            this.people.push(temp2);
+            // console.log("Adding Person");
+          }
+          // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
         }
-        /*Iterate through Relationship Types to assign the Relationship type*/
-        for( var k = 0; k < this.form.RelationType.length; k++)
-        {
-          if(this.RelationType[k].ID == temp3.type_id)
-            {
-              temp3.type = this.RelationType[k].type;
-              console.log("Found Match");
-            }
-        }
-        this.form.Relations.push(temp3);
-        console.log("Relationship Data: " + this.form.Relations[i3].type);
-      }
-      // // Setting the currentAddress id for grabbing a member's current address later.
-      // let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
 
-      // // Set list of possible members to add to group to everyone, remove current members
-      // this.possibleAddList = churchMembers.data;
-      // this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
+        console.log("Loading Relationships for the User...");
+        //Loop through and make another axios call for each of the person_ids to get that person with their full name
+        for( var r = 0; r < relations.data.length; r++)
+        {
+          var temp3 = {
+              "person1_ID":relations.data[r].person1_ID, //The user's ID
+              "person2_ID":relations.data[r].person2_ID, //The other person's ID
+              "type_id":relations.data[r].type, //The type of relationship from the Valid Values
+              "type": "",
+              "person":{},
+          };
+          /*Iterate through the people array to find the person that matches that ID for person2_ID and 
+          1. remove them and 2. assign that person as person*/
+          for( var j = 0; j < this.people.length;j++)
+          {
+            if(this.people[j].ID == temp3.person2_ID)//Assuming that the Axios call for Congregation is returning before this is ran
+              {
+                //Assign Person to the temp variable
+                temp3.person = this.people[j];
+                //Remove the perosn from the array that a person can use.
+                this.people.splice(j, 1);
+              }
+          }
+          /*Iterate through Relationship Types to assign the Relationship type*/
+          for( var k = 0; k < this.form.RelationType.length; k++)
+          {
+            if(this.form.RelationType[k].ID == temp3.type_id)
+              {
+                temp3.type = this.form.RelationType[k].type;
+                // console.log("Found Match");
+              }
+          }
+          this.form.Relations.push(temp3);
+          // console.log("Relationship Data: " + this.form.Relations[i3].type);
+        }
+
+        console.log("Loading User's Life Events...");
+        for( var l = 0; l < lifeEvents.data.length; l++)
+        {
+          var event = {
+            ID: lifeEvents.data[l].ID,
+            person_id: lifeEvents.data[l].person_ID,
+            description: lifeEvents.data[l].description,
+            date: lifeEvents.data[l].date,
+            type_id: lifeEvents.data[l].type, //The ID for the Type of Life Event
+            type: "",
+            visible: lifeEvents.data[l].visible,
+          }
+          for( var lk = 0; lk < this.form.LifeEventTypes.length; lk++)
+          {
+            // console.log(this.form.LifeEventTypes[lk].type);
+            if(this.form.LifeEventTypes[lk].ID == event.type_id)
+              {
+                // console.log(this.form.LifeEventTypes[lk].ID);
+                event.type = this.form.LifeEventTypes[lk].type;
+              }
+          }
+          this.form.LifeEvents.push(event);
+        }
+
+        console.log("Loading User Info: ");
+        //Set user Info for the V-Form
+        if(user.data[0].f_name)
+        {
+          //Section for setting Form data from user data
+          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.f_name = user.data[0].f_name;
+          this.user.l_name = user.data[0].l_name;
+          this.user.gender = user.data[0].gender;
+          this.user.preferred_name = user.data[0].preferred_name;
+          this.user.occupation = user.data[0].occupation;
+          this.user.employer = user.data[0].employer;
+          this.user.role = user.data[0].role
+          this.user.family_ID = user.data[0].family_ID;
+          //iterate through valid_values to get the Role
+          this.isAdmin = false;
+          for(var i = 0; i < this.validvalues.length; i++)
+          {
+            if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
+              this.isAdmin = true;
+          }
+        }
       }
     )); 
-    //Assign the valid values for Relationships and Life Events
-    //Get User Info from window.person
-    this.user.id = window.person.id;
-    axios
-    .get(baseURL + 'person?email='+ window.user.email)
-    .then(response => {
-      if(response.data[0].f_name)
-      {
-        //Section for setting Form data from user data
-        this.user.f_name = response.data[0].f_name;
-        this.user.l_name = response.data[0].l_name;
-        this.user.gender = response.data[0].gender;
-        this.user.preferred_name = response.data[0].preferred_name;
-        this.user.email = response.data[0].email;
-        this.user.occupation = response.data[0].occupation;
-        this.user.employer = response.data[0].employer;
-        this.user.role = response.data[0].role
-        //iterate through valid_values to get the Role
-        this.isAdmin = false;
-        for(var i = 0; i < this.validvalues.length; i++)
-        {
-          if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
-            this.isAdmin = true;
-        }
-      }
-      })
-    .catch(error => {
-      console.log("User Fetch Error: " + error);
-      this.errored = true;
-      });
 
     //axios call to get phones
-    axios
-      .get(baseURL + "phone_number?person_ID=" + window.person.id)
-      .then((response) => {
-        this.form.phones = response.data;
-        console.log("Loading Phones...");
-        console.log(JSON.parse(this.form.phones));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-      
-    
-
-    //Axios calls for Life Events
-    axios
-      .get(baseURL + "life_event?person_id=" + window.person.id)
-      .then((response) => {
-        this.form.LifeEvents = response.data;
-        console.log("Loading User's Life Events...");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    //Axios Call for Getting everyone in the congregation
-    // this.GetCongregation();
-
-    //Axios Call for Getting all types of Involvements and the User's Involvments
-    // axios
-    //   .get(baseURL + "person")
-    //   .then((response) => {
-    //     //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
-    //     for( var i = 0; i < response.data.length; i++)
-    //     {
-    //       var temp = {
-    //           ID: response.data[i].ID,
-    //           FullName: response.data[i].f_name + " " + response.data[i].l_name,
-    //       };
-    //       // console.log("temp: " + temp.ID + " " + temp.FullName);
-    //       this.people.push(temp);
-    //       // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
-    //     }
-    //     // this.people = response.data;
-    //     console.log("Loading Congregation Members...");
-    //   })
-    //   .catch((error) => {
-    //     console.log("Congregation Fetch: " + error);
-    //   });
-    
+    this.GetPhones();
     
     //Section for setting Form data from user data
     this.form.f_name = this.user.f_name;
@@ -1431,8 +1407,6 @@ export default {
     this.form.gender = this.user.gender;
     this.form.preferred_name = this.user.preferred_name;
     this.form.email = this.user.email;
-    this.form.data_Immersed = this.user.data_Immersed;
-    this.form.birthday = this.user.birthday;
     this.form.occupation = this.user.occupation;
     this.form.employer = this.user.employer;
     this.form.ministry = this.user.ministry;
@@ -1444,8 +1418,12 @@ export default {
   },
 
   data: () => ({
+    //For v-form
+    valid: false,
     //Array for all the Valid_Values
     validvalues:[],
+    //Start array for the Invlovement list
+    involmentlist:[],
     //Dumbee data for the admin
     isAdmin: true,
     //Variables for the Datatable
@@ -1493,7 +1471,7 @@ export default {
       id: 0,
       person_id: 0,
       description: "",
-      date: "",
+      date: new Date(),
       type: "",
       visible:true,
     },
@@ -1523,33 +1501,8 @@ export default {
       cellPhoneTypes: ["Work", "Home", "Mobile"],
       LifeEventTypes: [],
       RelationType: [],
-      InvolmentTypes: [
-        {type:"Adult Education"},
-        {type:"College Education"},
-        {type:"Youth Group (6th-12th Grade)"},
-        {type:"Primary Education (1st-5th Grade)"},
-        {type:"Children's Education (Nursery - K)"},
-        {type:"Rainbow Village"},
-        {type:"Nursery"},
-        {type:"Vacation Bible School"},
-        {type:"Family Life Groups"},
-        {type:"Visitation"},
-        {type:"Communion Preparation"},
-        {type:"Worship Leadership"},
-      ],
-      MinistryTypes: [
-        {type:"Men's Ministry"},
-        {type:"Women's Ministry"},
-        {type:"College Ministry"},
-        {type:"Youth Ministry"},
-        {type:"Personal Evangelism"},
-        {type:"World Bible School"},
-        {type:"Radio Ministry"},
-        {type:"Transportation"},
-        {type:"Building and Grounds"},
-        {type:"Advertising"},
-        {type:"Door Greeters"},
-      ],
+      InvolmentTypes: [],
+      MinistryTypes: [],
       GenderTypes: ["male","female","other"],
       ministry: [],
       involment: [],
@@ -1662,27 +1615,30 @@ export default {
       formData.mv(`../public/${this.newFile.name}`);
     },
     submit() {
+      console.log("PreSubmit");
       if (this.$refs.form.validate()) {
+        console.log("PostSubmit");
         this.user.f_name = this.form.f_name;
         this.user.l_name = this.form.l_name;
         this.user.gender = this.form.gender;
         this.user.preferred_name = this.form.preferred_name;
         this.user.email = this.form.email;
-        this.user.data_Immersed = this.form.data_Immersed;
-        this.user.immersed = this.form.immersed;
-        this.user.birthday = this.form.birthday;
         this.user.occupation = this.form.occupation;
         this.user.employer = this.form.employer;
         this.user.ministry = this.form.ministry;
-        this.user.involment = this.form.involment;
-        this.user.phones = this.form.phones;
-        this.user.hobbies = this.form.hobbies;
-        this.user.LifeEvents = this.form.LifeEvents;
-        this.user.Relations = this.form.Relations;
+        this.MakePut(null,5);
       }
     },
     reset() {
       this.$refs.form.reset();
+      //Section for setting Form data from user data
+      this.form.f_name = this.user.f_name;
+      this.form.l_name = this.user.l_name;
+      this.form.gender = this.user.gender;
+      this.form.preferred_name = this.user.preferred_name;
+      this.form.email = this.user.email;
+      this.form.occupation = this.user.occupation;
+      this.form.employer = this.user.employer;
     },
     resetValidation() {
       this.$refs.form.resetValidation();
@@ -1733,6 +1689,7 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.form.phones[this.editedIndex], this.editedItem);
+        this.MakePut(this.editedItem,-1);
       } else {
         this.form.phones.push(this.editedItem);
         // console.log("Making Post");
@@ -1898,6 +1855,7 @@ export default {
             this.form.Relations[this.EventsIndex],
             this.editedEvent
           );
+          this.MakePut(this.editedEvent,type);
         } else {
           this.form.Relations.push(this.editedEvent);
           this.MakePost(this.editedEvent,type);
@@ -1909,6 +1867,7 @@ export default {
             this.form.LifeEventTypes[this.EventsIndex],
             this.editedEvent
           );
+          this.MakePut(this.editedEvent,type);
         } else {
           this.form.LifeEventTypes.push(this.editedEvent);
           console.log("Making a Post");
@@ -1921,8 +1880,10 @@ export default {
             this.form.InvolmentTypes[this.EventsIndex],
             this.editedEvent
           );
+          this.MakePut(this.editedEvent,type);
         } else {
           this.form.InvolmentTypes.push(this.editedEvent);
+          this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
       } else {
@@ -1931,8 +1892,10 @@ export default {
             this.form.MinistryTypes[this.EventsIndex],
             this.editedEvent
           );
+          this.MakePut(this.editedEvent,type);
         } else {
           this.form.MinistryTypes.push(this.editedEvent);
+          this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
       }
@@ -1952,12 +1915,147 @@ export default {
           this.editedEvent.person_id.id
       );
     },
+    //Function for removing all from backend and posting all in list to backend
+    //Function will also be called every time the list is changed
+    ListChanged(type)
+    {
+      console.log(this.form.involment.length);
+      if(type == 0) { //Hobbies and Interests List
+
+      } else if(type == 1) { //Involvement List
+        //determine if we need to delete or if we need to add to the current list
+        if(this.involmentlist.length > this.form.involment.length)
+        {
+          var deletes = null;
+          if(this.form.involment.length == 0 )
+          {
+            deletes = this.involmentlist[0]; //Set if the base array is zero
+          }
+          else
+          {
+            for(var i = 0; i < this.involmentlist.length; i++)
+            {
+              if(this.form.involment[i] == undefined)
+                {
+                  deletes = this.involmentlist[i];
+                }
+              else if(this.involmentlist[i].involvement_ID != this.form.involment[i].ID)//If the arrays do not match up at a certain point, then that element should be the removed on
+                {
+                  deletes = this.involmentlist[i];
+                  console.log("Assigning value");
+                } 
+            }
+            console.log(deletes.involvement_ID);
+          }
+          console.log("Deletes: ");
+          //perform an axios all to resolve the deletes, posts, and the Get for all of the Involvement stuff
+          // axios.all([
+            axios.delete(baseURL + 'person_involvement?person_id=' + this.user.id + '&involvement_id=' + deletes.involvement_ID)
+            .finally(() => {
+              console.log("Deletes status: ");
+              axios.get(baseURL + 'person_involvement?person_id=' + this.user.id)
+              .then(get =>{
+                //Clear both of the arrays
+                this.involmentlist = [];
+                this.form.involment = [];
+
+                console.log("Getting current List");
+                //Iterate through the list and create new objects that have the ID and the valid_Value.type
+                for(var k = 0; k < get.data.length; k++)
+                {
+                  var temp = {
+                    "person_ID": get.data[k].person_ID,
+                    "involvement_ID": get.data[k].involvement_ID,
+                  }
+                  for(var j = 0; j < this.form.InvolmentTypes.length; j++)
+                  {
+                    if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                    {
+                      //Add that Involement Type to the this.form.involment array since it will just be the types
+                      this.form.involment.push(this.form.InvolmentTypes[k]);
+                    }
+                  }
+                  // put into prechange list first
+                  this.involmentlist.push(temp);
+                }
+              })
+            })
+
+          // }));
+          //Assign the using list
+          this.form.involment = this.involmentlist;
+        }
+        else { //The array is bigger than the prechange list
+          var adds = null;
+          if(this.involmentlist.length == 0 )
+          {
+            adds = this.form.involment[0]; //Set if the base array is zero
+          }
+          else{
+            for(i = 0; i < this.form.involment.length; i++)
+            {
+              if(this.involmentlist[i].involvement_ID == undefined)
+                adds = this.form.involment[i];
+              else if(this.involmentlist[i].involvement_ID != this.form.involment[i].ID)//If the arrays do not match up at a certain point, then that element should be the added
+                adds = this.form.involment[i];//Will do opposite of Delete side
+            }
+          }
+          //create the Data var to send to the backend
+          var Data = {
+              "person_ID": this.user.id,
+              "involvement_ID": adds.ID,
+          }
+          //perform an axios all to resolve the post, and the Get for all of the Involvement stuff
+          // axios.all([
+          axios.post(baseURL + 'person_involvement',Data)
+          .finally(() =>{
+            console.log("Posting status: ");
+            axios.get(baseURL + 'person_involvement?person_id=' + this.user.id)
+            .then(get => {
+          // ])
+          // .then(axios.spread((ad,get) => {
+              //Clear both of the arrays
+              this.involmentlist = [];
+              this.form.involment = [];
+
+              console.log("Getting current List");
+              //Iterate through the list and create new objects that have the ID and the valid_Value.type
+              for(var k = 0; k < get.data.length; k++)
+              {
+                var temp = {
+                  "person_ID": get.data[k].person_ID,
+                  "involvement_ID": get.data[k].involvement_ID,
+                }
+                for(var j = 0; j < this.form.InvolmentTypes.length; j++)
+                {
+                  if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                  {
+                    //Add that Involement Type to the this.form.involment array since it will just be the types
+                    this.form.involment.push(this.form.InvolmentTypes[k]);
+                  }
+                }
+                // put into prechange list first
+                this.involmentlist.push(temp);
+              }
+            })
+          });
+
+        }
+      }
+    },
+    //Get Functions
     async GetValidValues()
     {
       //Axios call for getting the Valid_Values
-      return axios
+      axios
         .get(baseURL + "valid_value")
         .then((response) => {
+          //Clear lists to add the new valid values
+          this.validvalues = [];
+          this.form.RelationType = [];
+          this.form.LifeEventTypes = [];
+          this.form.InvolmentTypes =[];
+          this.form.MinistryTypes = [];
           //Do a For loop to iterate through the list and then create an Object
           console.log("Loading Valid Values...");
           for( var i = 0; i < response.data.length; i++)
@@ -1972,49 +2070,33 @@ export default {
             if(temp.value_group == 'relationship')
             {
               this.form.RelationType.push(temp);
-              console.log("Relationship");
+              // console.log("Relationship");
             }
             else if(temp.value_group == 'life_event')
             {
               this.form.LifeEventTypes.push(temp);
-              console.log("Life Events");
+              // console.log("Life Events");
             }
-            console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
+            else if(temp.value_group == 'involvement')
+            {
+              this.form.InvolmentTypes.push(temp)
+            }
+            else if(temp.value_group == 'ministry')
+            {
+              this.form.MinistryTypes.push(temp)
+            }
           }
-          // this.people = response.data;
         })
-        .catch((error) => {
-            console.log("Valid Values Fetch Error: ");
-            if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              console.log(error.response.data);
-              console.log(error.response.status);
-              console.log(error.response.headers);
-            } else if (error.request) {
-              // The request was made but no response was received
-              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-              // http.ClientRequest in node.js
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              console.log('Error', error.message);
-            }
-            console.log(error.config);
-        })
-        // .finally(()=> {
-        //   //Call GetCongregation so that it is called before GetRelations
-        //   this.GetCongregation();
-        // });
+        .catch((error) => {this.CatchError(error);})
       
     },
     async GetRelations()
     {
       //Axios call for all users for Relationships
-    return axios
+      axios
       .get(baseURL + "relationship?person1_ID=" + window.person.id)
       .then((response) => {
-        // this.form.Relations = response.data;
+        this.form.Relations = [];//Null out array
         //Loop through and make another axios call for each of the person_ids to get that person with their full name
         for( var i = 0; i < response.data.length; i++)
         {
@@ -2051,14 +2133,42 @@ export default {
         }
         console.log("Loading Relationships for the User...");
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((error) => {this.CatchError(error);});
+    },
+    async GetLifeEvents()
+    {
+      axios.get(baseURL + "life_event?person_id=" + this.user.id)
+      .then(lifeEvents =>{
+        console.log("Loading User's Life Events...");
+        this.form.LifeEvents = [];//Clear the old array since we are loading in a new one
+        for( var l = 0; l < lifeEvents.data.length; l++)
+        {
+          var event = {
+            ID: lifeEvents.data[l].ID,
+            person_id: lifeEvents.data[l].person_ID,
+            description: lifeEvents.data[l].description,
+            date: lifeEvents.data[l].date,
+            type_id: lifeEvents.data[l].type, //The ID for the Type of Life Event
+            type: "",
+            visible: lifeEvents.data[l].visible,
+          }
+          for( var lk = 0; lk < this.form.LifeEventTypes.length; lk++)
+          {
+            // console.log(this.form.LifeEventTypes[lk].type);
+            if(this.form.LifeEventTypes[lk].ID == event.type_id)
+              {
+                // console.log(this.form.LifeEventTypes[lk].ID);
+                event.type = this.form.LifeEventTypes[lk].type;
+              }
+          }
+          this.form.LifeEvents.push(event);
+        }
+      })
     },
     async GetCongregation()
     {
       //Axios call for all users for Relationships
-      return axios
+      axios
         .get(baseURL + "person")
         .then((response) => {
           console.log("Loading Congregation Members...");
@@ -2078,14 +2188,63 @@ export default {
             // console.log("Person: " + this.people[i].ID + " " + this.people[i].FullName);
           }
         })
-        .catch((error) => {
-          console.log("Congregation Fetch: " + error);
-        })
-        // .finally(()=> {
-        //   //Call GetRelation so that it is called after this axios call resolves
-        //   this.GetRelations();
-        // });
+        .catch((error) => {this.CatchError(error);})
     
+    },
+    async GetPhones()
+    {
+      //axios call to get phones
+      console.log("Loading Phones...");
+      axios
+        .get(baseURL + "phone_number?person_ID=" + this.user.id)
+        .then((response) => {
+          this.form.phones = response.data;
+        })
+        .catch((error) => {this.CatchError(error);});  
+    },
+    async GetUser()
+    {
+      axios.get(baseURL + 'person?email='+ this.user.email)
+      .then(user => {
+        console.log("Loading User Info: ");
+        //Set user Info for the V-Form
+        if(user.data[0].f_name)
+        {
+          //Section for setting Form data from user data
+          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.f_name = user.data[0].f_name;
+          this.user.l_name = user.data[0].l_name;
+          this.user.gender = user.data[0].gender;
+          this.user.preferred_name = user.data[0].preferred_name;
+          this.user.occupation = user.data[0].occupation;
+          this.user.employer = user.data[0].employer;
+          this.user.role = user.data[0].role
+          this.user.family_ID = user.data[0].family_ID;
+          
+        }
+      })
+      .catch(error =>{this.CatchError(error);})
+    },
+    //Function for Error Logging on the front-end
+    CatchError(error)
+    {
+      console.log("Fetch Error: ");
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
     },
     //Function for Posts
     MakePost(object, type)
@@ -2110,12 +2269,10 @@ export default {
         .post(baseURL + 'phone_number?id=' + window.person.id, Data)
         .then(response =>
         {
-          console.log("Posting to Phones: " + JSON.parse(response));
+          console.log("Posting to Phones: " + JSON.parse(response.status));
+          this.GetPhones();
         })
-        .catch(error=>
-        {
-          console.log('Posting Phones Error: ' + error);
-        })
+        .catch(error=>{this.CatchError(error);})
       } else if( type == 0 )//New Life Event
       {
         console.log(object.type.ID);
@@ -2131,7 +2288,8 @@ export default {
         .post(baseURL + 'life_event', Data)
         .then(response =>
         {
-          console.log("Posting to User's Life Events: " + JSON.parse(response));
+          console.log("Posting User Life Event: " + response.status);
+          this.GetLifeEvents();
         })
         .catch(error=>
         {
@@ -2149,12 +2307,10 @@ export default {
         .post(baseURL + 'relationship', Data)
         .then(response =>
         {
-          console.log("Posting to User's Life Events: " + JSON.parse(response));
+          console.log("Posting User Relationship: " + response.status);
+          this.GetRelations();
         })
-        .catch(error=>
-        {
-          console.log('Posting Life Events Error: ' + error);
-        })
+        .catch(error=>{this.CatchError(error);})
       } else if( type == 2 )//New Event Type
       {
         //Create Object to send from Given Data
@@ -2166,17 +2322,156 @@ export default {
         .post(baseURL + 'valid_value', Data)
         .then(response =>
         {
-          console.log("Posting to Event Type: " + JSON.parse(response));
+          console.log("Posting to Event Type: " + JSON.parse(response.status));
+          this.GetValidValues();
         })
-        .catch(error=>
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 3 )//New Involement Type
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"involvement",
+          "value": object.type,
+        };
+        axios
+        .post(baseURL + 'valid_value', Data)
+        .then(response =>
         {
-          console.log('Posting Event Type Error: ' + error);
+          console.log("Posting to Involvement Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 4 )//New Ministry Area Type
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"ministry",
+          "value": object.type,
+        };
+        axios
+        .post(baseURL + 'valid_value', Data)
+        .then(response =>
+        {
+          console.log("Posting to Ministry Area Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      }
+    },
+    //Function for Puts
+    MakePut(object, type)
+    {
+      //Put will not have Relationships, Involvement, Hobbies/Interests, or Ministry Areas
+      var Data;
+      if( type == -1 )//New Phone
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "number": object.number,
+          "can_publish": object.can_publish,
+          "type": null,
+        };
+        //If statement for the Valid_values stuff for the phones
+        if(object.type == 'Home')
+          Data.type = 1;
+        else if(object.type == 'Work')
+          Data.type = 2;
+        else  
+          Data.type = 3;
+        axios
+        .put(baseURL + 'phone_number?id=' + object.ID, Data)
+        .then(response =>
+        {
+          console.log("Updating in Phones: " + JSON.parse(response.status));
+          this.GetPhones();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 0 )//updating Life Event
+      {
+        console.log(object.type.ID);
+        //Create Object to send from Given Data
+        Data = {
+          "person_ID":window.person.id,
+          "description":object.description,
+          "date":object.date,
+          "type":object.type.ID,
+          "visible": object.visible,
+        };
+        axios
+        .put(baseURL + 'life_event?id=' + object.ID, Data)
+        .then(response =>
+        {
+          console.log("Updating User's Life Events: " + JSON.parse(response.status));
+          this.GetLifeEvents();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 2 )//udpating Event Type
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"life_event",
+          "value": object.type,
+        };
+        axios
+        .put(baseURL + 'valid_value?id=' + object.ID, Data)
+        .then(response =>
+        {
+          console.log("Updating Event Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 3 )//updating Involement Type
+      {
+        console.log
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"involvement",
+          "value": object.type,
+        };
+        axios
+        .put(baseURL + 'valid_value?id=' + object.ID, Data)
+        .then(response =>
+        {
+          console.log("Updating Involvement Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 4 )//updating Ministry Area Type
+      {
+        //Create Object to send from Given Data
+        Data = {
+          "value_group":"ministry",
+          "value": object.type,
+        };
+        axios
+        .put(baseURL + 'valid_value?id=' + object.ID, Data)
+        .then(response =>
+        {
+          console.log("Posting to Ministry Area Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 5 )//updating User
+      {
+        Data = {
+          "ID": this.user.id,
+          "congregation_ID": this.user.congregation_id,
+          "f_name": this.user.f_name,
+          "l_name": this.user.l_name,
+          "occupation": this.user.occupation,
+          "employer": this.user.employer,
+          "family_ID": this.user.family_ID,
+          "email": this.user.email,
+          "gender": this.user.gender,
+          "preferred_name": this.user.preferred_name,
+          "role": this.user.role,
+        }
+        axios.put(baseURL + 'person?id=' + this.user.id,Data)
+        .finally(() => {
+            this.GetUser();
         })
       }
     }
-
-    //Function for making axios PUTS
-
     //Function for making axios DELETES
   },
 };
