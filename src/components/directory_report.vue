@@ -14,8 +14,10 @@ export default ({
     {
         axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
-        //this.pdfCreation(response.data,false);
-        this.csvCreation(response.data);
+        if (this.csv)
+            this.csvCreation(response.data);
+        else
+            this.pdfCreation(response.data,false);
         })
         .catch(error => {
         console.log(error);
