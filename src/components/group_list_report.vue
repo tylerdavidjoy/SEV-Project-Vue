@@ -1,16 +1,16 @@
 
 <template>
-  <v-btn color="green" @click.native="generateReport(1)">Generate <br/> Group Memeber Report</v-btn>
+  <v-btn color="green" @click.native="generateReport()">Generate <br/> Group List Report</v-btn>
 </template>
 
 <script>
 import axios from 'axios'
 import jsPDF  from "jspdf";
 export default ({
-    name: "GroupReportNoImg",
+    name: "GroupListReport",
     methods: 
     {
-    generateReport: function(id)
+    generateReport: function()
     {
         axios.get("http://team2.eaglesoftwareteam.com/group?report=1")
         .then(response => {
@@ -55,7 +55,7 @@ export default ({
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
-        doc.save('table.pdf');
+        doc.save('Group_List.pdf');
         }
     }
 })

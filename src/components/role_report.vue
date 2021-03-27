@@ -7,7 +7,7 @@
 import axios from 'axios'
 import jsPDF  from "jspdf";
 export default ({
-    name: "DirectoryReportNoImg",
+    name: "RoleReport",
     methods: 
     {
     generateReport: function()
@@ -55,7 +55,7 @@ export default ({
                 }
                 
                 doc.autoTable(columns, rows);
-                doc.save('table.pdf');
+                doc.save('Role_Report.pdf');
         }
     }
 })

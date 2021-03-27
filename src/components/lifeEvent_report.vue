@@ -33,7 +33,7 @@ export default ({
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
-        doc.save('table.pdf');
+        doc.save('Life_Events_Report.pdf');
         }
     }
 })

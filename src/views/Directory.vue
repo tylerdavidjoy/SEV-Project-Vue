@@ -91,7 +91,9 @@
                             ></v-pagination>
                           </v-container>
                           <DirectoryReportNoImg/>
+                          <RoleReport/>
                            <GroupReportNoImg/>
+                           <GroupListReport/>
                           <LifeEventReport/>
                           
                         </v-container>
@@ -111,13 +113,17 @@
 import axios from "axios";
 import DirectoryReportNoImg from "@/components/directory_report.vue";
 import GroupReportNoImg from "@/components/group_report.vue";
+import GroupListReport from "@/components/group_list_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
+import RoleReport from "@/components/role_report.vue";
 export default {
   name: "Home",
   components: {
     DirectoryReportNoImg,
     GroupReportNoImg,
-    LifeEventReport
+    LifeEventReport,
+    GroupListReport,
+    RoleReport
   },
   mounted() {
     //People

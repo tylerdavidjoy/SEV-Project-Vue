@@ -14,9 +14,7 @@ export default ({
     {
         axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
-        if (this.csv)
-            this.csvCreation(response.data);
-        else
+            //this.csvCreation(response.data);
             this.pdfCreation(response.data,false);
         })
         .catch(error => {
@@ -44,7 +42,7 @@ export default ({
 
     pdfCreation: function(people,img)
         {
-            var doc = new jsPDF('p', 'pt');
+            var doc = new jsPDF('l', 'pt');
             if(!img)
             {       
                 require('jspdf-autotable');
@@ -57,7 +55,7 @@ export default ({
                 }
                 
                 doc.autoTable(columns, rows);
-                doc.save('table.pdf');
+                doc.save('Directory.pdf');
             }
 
             else
@@ -71,7 +69,7 @@ export default ({
                     doc.text(people[i].f_name + " " + people[i].l_name, (35 + (i % 4) * 50), (50 + (i % 4) * 70))
                     doc.addImage(picture,"JPEG", 15,40,60,60);
                 }
-                doc.save('table.pdf');
+                doc.save('Directory.pdf');
             }
         }
     }

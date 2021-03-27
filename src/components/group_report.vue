@@ -55,7 +55,7 @@ export default ({
         }
         var doc = new jsPDF('p', 'pt');
         doc.autoTable(columns, rows);
-        doc.save('table.pdf');
+        doc.save('Group_Report.pdf');
         }
     }
 })
