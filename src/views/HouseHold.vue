@@ -7,7 +7,7 @@
             <v-col cols="6">
               <v-container>
                 <v-sheet width="600">
-                  <img src="../assets/dog.jpg" class="familyImg">
+                  <img :src="familyImgSrc"  class="familyImg" />
                   <br />
                   <PhotoUpload />
                   <!-- <input style="display: none"
@@ -233,6 +233,8 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         .get(this.baseURL + "family?person_ID=" + this.userId)
         .then(response => {
           this.familyId = response.data[0].ID;
+          this.familyImgSrc = this.baseURL + "images/" + response.data[0].image;
+          console.log(this.familyImgSrc)
           console.log("Family ID: " + response.data);
           console.log("Family ID: " + this.familyId)
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
