@@ -79,17 +79,15 @@
                       <v-divider></v-divider>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
-                          <v-list-item
+                          <v-checkbox
                             v-for="member in familyMembers"
-                            v-bind:key="member.ID" class="list" @click="deleteMemberFromFamily(member)">
-                            <!-- <v-list-item-icon>
-                              <img src="../assets/dog.jpg" class="smallUserImg">
-                            </v-list-item-icon> -->
-
-                            <v-list-item-content class="large">
-                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
+                            v-bind:key="member.ID"
+                            multiple
+                            :value="member"
+                            :label="member.f_name + ' ' + member.l_name"
+                            v-model="deleteList"
+                            >
+                          </v-checkbox>
                         </v-list>
                       </v-card-text>
                       <v-divider></v-divider>
@@ -104,7 +102,7 @@
                         <v-btn
                           color="blue darken-1"
                           text
-                          @click="dialogDelete = false"
+                          @click="deleteMemberFromFamily()"
                         >
                           Save
                         </v-btn>
@@ -136,17 +134,15 @@
                       <v-divider></v-divider>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
-                          <v-list-item
+                          <v-checkbox
                             v-for="member in churchMembers"
-                            v-bind:key="member.ID" class="list" @click="addMemberToFamily(member)">
-                            <!-- <v-list-item-icon>
-                              <img src="../assets/dog.jpg" class="smallUserImg">
-                            </v-list-item-icon> -->
-
-                            <v-list-item-content class="large">
-                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
+                            v-bind:key="member.ID"
+                            multiple
+                            :value="member"
+                            :label="member.f_name + ' ' + member.l_name"
+                            v-model="addList"
+                            >
+                          </v-checkbox>
                         </v-list>
                       </v-card-text>
                       <v-divider></v-divider>
@@ -161,7 +157,7 @@
                         <v-btn
                           color="blue darken-1"
                           text
-                          @click="dialogAdd = false"
+                          @click="addMemberToFamily()"
                         >
                           Save
                         </v-btn>
@@ -210,6 +206,8 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         ],
         familyMembers: [],
         churchMembers: [],
+        addList: [],
+        deleteList: [],
         userId: 1,
         familyId: "",
         address_ID: "",
@@ -364,12 +362,14 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       },
 
       addMemberDialog: function() {
+        var tempArr = [];
         console.log("member add dialog")
         axios
         .get(this.baseURL + "person")
         .then(response => {
           console.log(response.data)
-          this.churchMembers = response.data;
+          tempArr = response.data;
+          this.churchMembers = tempArr.filter(member => member.family_ID!=this.familyId)
         })
       },
 
@@ -384,57 +384,59 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         })
       },
 
-      addMemberToFamily(member) {
-        axios.put(this.baseURL + "person?id="  + member.ID, {
-          congregation_ID: member.congregation_ID,
-          f_name: member.f_name,
-          l_name: member.l_name,
-          occupation: member.occupation,
-          employer: member.employer,
-          family_ID: this.familyId,
-          email: member.email,
-          gender: member.gender,
-          preferred_name: member.preferred_name,
-          role: member.role
+      addMemberToFamily() {
+        this.dialogAdd = false;
+        this.addList.forEach(member => {
+          axios.put(this.baseURL + "person?id="  + member.ID, {
+            congregation_ID: member.congregation_ID,
+            f_name: member.f_name,
+            l_name: member.l_name,
+            occupation: member.occupation,
+            employer: member.employer,
+            family_ID: this.familyId,
+            email: member.email,
+            gender: member.gender,
+            preferred_name: member.preferred_name,
+            role: member.role,
+            image: member.image
+          })
+          .then(response => {
+            console.log(response.data)
+            console.log("Person added to family: " + member.f_name + ", " + member.l_name)
+          })
+          this.familyMembers.push(member);
+          this.$set(this.familyMembers, this.familyMembers.indexOf(member), member);
         })
-        .then(response => {
-          console.log(response.data)
-          console.log("Person added to family: " + member.f_name + ", " + member.l_name)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        })
-
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
-        })
-
       },
 
-      deleteMemberFromFamily(member) {
-        axios.put(this.baseURL + "person?id="  + member.ID, {
-          congregation_ID: member.congregation_ID,
-          f_name: member.f_name,
-          l_name: member.l_name,
-          occupation: member.occupation,
-          employer: member.employer,
-          family_ID: null,
-          email: member.email,
-          gender: member.gender,
-          preferred_name: member.preferred_name,
-          role: member.role
-        })
-        .then(response => {
-          console.log(response.data)
-          console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+      deleteMemberFromFamily() {
+        this.dialogDelete = false;
+        this.deleteList.forEach(member => {
+          axios.put(this.baseURL + "person?id="  + member.ID, {
+            congregation_ID: member.congregation_ID,
+            f_name: member.f_name,
+            l_name: member.l_name,
+            occupation: member.occupation,
+            employer: member.employer,
+            family_ID: null,
+            email: member.email,
+            gender: member.gender,
+            preferred_name: member.preferred_name,
+            role: member.role,
+            image: member.image
+          })
+          .then(response => {
+            console.log(response.data)
+            console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
+          })
+          this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
         })
 
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
-        })
+        // .then(response => {
+        //   this.familyMembers = response.data;
+        //   console.log(response.data)
+        //   console.log(this.familyMembers)
+        // })
       }
     }
   }
