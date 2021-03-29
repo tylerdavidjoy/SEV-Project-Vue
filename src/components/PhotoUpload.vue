@@ -22,6 +22,15 @@ export default {
         };
     },
 
+    props: {
+        familyId: {
+            type: Number
+        },
+        userId: {
+            type: Number
+        }
+    },
+
     methods: {
         onFileChange(e) {
             const selectedFile = e.target.files[0]; // accessed file
@@ -33,7 +42,7 @@ export default {
 
             // sending file to backend
             axios
-            .post(this.baseURL + "upload", formData, {
+            .post(this.baseURL + "upload?family_ID=" + this.familyId, formData, {
                 onUploadProgress: ProgressEvent => {
                     let progress = 
                         Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)

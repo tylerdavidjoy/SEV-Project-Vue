@@ -7,9 +7,12 @@
             <v-col cols="6">
               <v-container>
                 <v-sheet width="600">
+                  <!-- <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270"> -->
                   <img :src="familyImgSrc"  class="familyImg" />
+                        
+                  <!-- </v-avatar>  -->
                   <br />
-                  <PhotoUpload />
+                  <PhotoUpload v-bind:familyId="this.familyId"/>
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
@@ -53,6 +56,7 @@
                     v-model="dialogDelete"
                     scrollable
                     max-width="300px"
+                    v-if="isAdmin"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="deleteMemberDialog"
@@ -61,7 +65,6 @@
                         large
                         fab
                         color="red darken-4"
-                        v-if="isAdmin"
                         v-on="on"
                         v-bind="attrs"
                       >
@@ -74,7 +77,7 @@
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
                           <v-checkbox
-                            v-for="member in familyMembers"
+                            v-for="member in deletableMembers"
                             v-bind:key="member.ID"
                             multiple
                             :value="member"
@@ -108,6 +111,7 @@
                     v-model="dialogAdd"
                     scrollable
                     max-width="300px"
+                    v-if="isAdmin"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="addMemberDialog"
@@ -116,7 +120,6 @@
                         large
                         fab
                         color="red darken-4"
-                        v-if="isAdmin"
                         v-on="on"
                         v-bind="attrs"
                       >
@@ -199,6 +202,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
+        deletableMembers: [],
         churchMembers: [],
         addList: [],
         deleteList: [],
@@ -233,6 +237,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       // Get family members of the currently logged in user
         .then(response => {
           this.familyMembers = response.data;
+          this.deletableMembers = response.data;
           return axios.get(this.baseURL + "address?person_ID=" + this.userId)
         })
 
@@ -364,13 +369,14 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
       deleteMemberDialog: function() {
         console.log("member remove dialog")
-        axios
-        .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
-        })
+        // axios
+        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        // .then(response => {
+        //   this.familyMembers = response.data;
+        //   console.log(response.data)
+        //   console.log(this.familyMembers)
+        // })
+        this.deletableMembers = this.deletableMembers.filter(member => member.ID!=this.headOfFamilyID)
       },
 
       addMemberToFamily() {
@@ -457,8 +463,9 @@ img.smallUserImg {
 
 img.familyImg {
   margin: 20px;
-  height: 40%;
-  size: auto
+  max-height: 250px;
+  max-width: 250px;
+  size: auto;
 }
 
 h1 {
