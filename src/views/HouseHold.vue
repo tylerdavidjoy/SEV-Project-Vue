@@ -10,12 +10,6 @@
                   <img :src="familyImgSrc"  class="familyImg" />
                   <br />
                   <PhotoUpload />
-                  <!-- <input style="display: none"
-                    type="file"
-                    @change="onFileSelected"
-                    ref="fileInput">
-                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick Photo</v-btn>
-                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn> -->
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
@@ -216,7 +210,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         can_publish: "",
         editable: false,
         isHeadOfFamily: false,
-        isAdmin: true,
+        isAdmin: false,
         dialogAdd: false,
         dialogDelete: false
       }
@@ -232,20 +226,13 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         .then(response => {
           this.familyId = response.data[0].ID;
           this.familyImgSrc = this.baseURL + "images/" + response.data[0].image;
-          console.log(this.familyImgSrc)
-          console.log("Family ID: " + response.data);
-          console.log("Family ID: " + this.familyId)
+          // console.log(this.familyImgSrc);
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
         })
-        // .catch(error => {
-        //   console.log("ERROR: " + error.response)
-        // })
 
       // Get family members of the currently logged in user
         .then(response => {
           this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
           return axios.get(this.baseURL + "address?person_ID=" + this.userId)
         })
 
@@ -254,14 +241,11 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         // axios
         // .get(this.baseURL + "address?person_ID=" + this.userId)
         .then(response => {
-          console.log("Household address " + response.data)
           this.address = response.data[0].address;
           this.address_ID = response.data[0].ID;
           this.address_Type = response.data[0].type;
-          console.log("Address Type: " + this.address_Type)
-          console.log("Address ID: " + this.address_ID)
-          // return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-          return axios.get(this.baseURL + "person?id=" + this.userId)
+          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+          // return axios.get(this.baseURL + "person?id=" + this.userId)
         })
 
 
@@ -270,7 +254,6 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
         .then(response => {
           this.headOfFamilyID = response.data[0].ID;
-          console.log("Head of family ID" + this.headOfFamilyID)
           this.isHeadOfHousehold();
           return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
         })
@@ -278,42 +261,29 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         
       // Get the family email and store information for updating a person
         .then(response => {
-          console.log(response.data)
           this.email = response.data[0].email;
           this.congregationID = response.data[0].congregation_ID;
           this.f_name = response.data[0].f_name;
           this.l_name = response.data[0].l_name;
           this.occupation = response.data[0].occupation;
           this.employer = response.data[0].employer;
-          console.log(this.email)
           return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
         })
 
 
       // Get the family phone number
         .then(response => {
-          console.log(response.data)
           this.phone = response.data[0].number;
           this.phoneNumberID = response.data[0].ID;
           this.phoneNumber_Type = response.data[0].type;
           this.can_publish = response.data[0].can_publish;
-          console.log(this.phone)
-          console.log(this.phoneNumberID)
-          console.log(this.can_publish)
         })
 
-        
+        this.isAdminFunction();
           
     },
 
     methods: {
-      onFileSelected(event) {
-        console.log(event)
-        this.selectedFile = event.target.files[0]
-      },
-      onUpload() {
-
-      },
       onEdit: function() {
 
         // If the head of household is logged in give edit permission
@@ -348,11 +318,30 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       },
 
       isHeadOfHousehold: function() {
-        console.log("isHeadOfHousehold function")
         if(this.userId === this.headOfFamilyID) {
           this.isHeadOfFamily = true;
         }
         // return this.isHeadOfFamily;
+      },
+
+      isAdminFunction: function() {
+        var validValueId = "";
+        axios
+        .get(this.baseURL + "person?id=" + this.userId)
+        .then(response => {
+          console.log(response.data[0].role)
+          validValueId = response.data[0].role;
+          return(axios.get(this.baseURL + "valid_value?id=" + validValueId))
+        })
+        .then(response => {
+          console.log(response.data.value)
+            this.$nextTick(() => {
+              if(response.data.value === "admin")
+                console.log("True")
+                this.isAdmin = true;
+                console.log(this.isAdmin)
+          })
+        })
       },
 
       navToAccountPage: function(param) {
@@ -411,25 +400,28 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
       deleteMemberFromFamily() {
         this.dialogDelete = false;
+        console.log(this.deleteList);
         this.deleteList.forEach(member => {
-          axios.put(this.baseURL + "person?id="  + member.ID, {
-            congregation_ID: member.congregation_ID,
-            f_name: member.f_name,
-            l_name: member.l_name,
-            occupation: member.occupation,
-            employer: member.employer,
-            family_ID: null,
-            email: member.email,
-            gender: member.gender,
-            preferred_name: member.preferred_name,
-            role: member.role,
-            image: member.image
-          })
-          .then(response => {
-            console.log(response.data)
-            console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
-          })
-          this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
+          if(member.ID != this.headOfFamilyID) {
+            axios.put(this.baseURL + "person?id="  + member.ID, {
+              congregation_ID: member.congregation_ID,
+              f_name: member.f_name,
+              l_name: member.l_name,
+              occupation: member.occupation,
+              employer: member.employer,
+              family_ID: null,
+              email: member.email,
+              gender: member.gender,
+              preferred_name: member.preferred_name,
+              role: member.role,
+              image: member.image
+            })
+            .then(response => {
+              console.log(response.data)
+              console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
+            })
+            this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
+          }
         })
 
         // .then(response => {
