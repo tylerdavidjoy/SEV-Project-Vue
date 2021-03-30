@@ -3,9 +3,17 @@
   <v-btn color="green" @click.native="generateReport">Generate <br/> Directory</v-btn>
 </template>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js" integrity="sha512-HLbtvcctT6uyv5bExN/qekjQvFIl46bwjEq6PBvFogNfZ0YGVE+N3w6L+hGaJsGPWnMcAQ2qK8Itt43mGzGy8Q==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js" integrity="sha512-vv3EN6dNaQeEWDcxrKPFYSFba/kgm//IUnvLPMPadaUf5+ylZyx4cKxuc4HdBf0PPAlM7560DV63ZcolRJFPqA==" crossorigin="anonymous"></script>
+
 <script>
-import axios from 'axios'
+import axios from 'axios';
 import jsPDF  from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 export default ({
     name: "DirectoryReportNoImg",
     methods: 
@@ -15,7 +23,7 @@ export default ({
         axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
             //this.csvCreation(response.data);
-            this.pdfCreation(response.data,false);
+            this.pdfCreation(response.data,true);
         })
         .catch(error => {
         console.log(error);
@@ -61,15 +69,72 @@ export default ({
             else
             {
                 var picture = new Image();
-                picture.src = "../assets/dog.jpg";
-                doc.setFontSize(20);
-                
-                for(i = 0; i < people.length; i++)
+                picture.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png";
+
+                var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
+                var contentTemp = [];
+                for (i = 0; i < people.length; i++)
                 {
-                    doc.text(people[i].f_name + " " + people[i].l_name, (35 + (i % 4) * 50), (50 + (i % 4) * 70))
-                    doc.addImage(picture,"JPEG", 15,40,60,60);
+                   var tempImg = {
+                        columns: [
+                            {
+                                image: 'sample', //First IMG in row
+                                width: 150,
+                                height: 150
+                            },
+                            {}, //Spacing
+                            {
+                                image: 'sample', //Second IMG in row
+                                width: 150,
+                                height: 150
+                            },
+                            {}, //Spacing
+                            {
+                                image: 'sample', //Third IMG in row
+                                width: 150,
+                                height: 150
+                            }
+                        ]
+                    }
+
+                    var tempNames = {
+                        fontSize: 20,
+                        alignment: 'center',
+                        columns: [
+                            {
+                                text:people[i].f_name + " " + people[i].l_name
+                            },
+                             //Spacing
+                            {
+                                text:people[i + 1].f_name + " " + people[i + 1].l_name
+                            },
+                             //Spacing
+                            {
+                               text:people[i + 2].f_name + " " + people[i + 2].l_name
+                            }
+                        ]
+                    }
+
+                    contentTemp.push(tempImg);
+                    contentTemp.push(tempNames);
+                    i +=2;
                 }
-                doc.save('Directory.pdf');
+
+                var pdfContent = {
+                    content: contentTemp,
+                    images:{
+                        sample: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png"
+                    }
+                }
+                pdfMake.createPdf(pdfContent).open();
+                // doc.setFontSize(20);
+                
+                // for(i = 0; i < people.length; i++)
+                // {
+                //     doc.text(people[i].f_name + " " + people[i].l_name, (35 + (i % 4) * 50), (50 + (i % 4) * 70))
+                //     doc.addImage(imgData,"JPEG", 15,40,60,60);
+                // }
+                // doc.save('Directory.pdf');
             }
         }
     }
