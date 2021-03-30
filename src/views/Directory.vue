@@ -44,6 +44,10 @@
                                   <div>
                                     <v-btn @click='viewMode("person")' block elevation="2" outlined>Person View</v-btn>
                                   </div>
+                                  
+                                  <div>
+                                    <v-btn style="margin-top: 2%;" @click='addPerson()' elevation="2" outlined>+ Person</v-btn>
+                                  </div>
                                 </v-sheet>
                               </v-container>
                             </v-col>
@@ -52,6 +56,9 @@
                                 <v-sheet class="rounded-lg">
                                   <div>
                                     <v-btn @click='viewMode("family")' block elevation="2" outlined >Family View</v-btn>
+                                  </div>
+                                  <div>
+                                    <v-btn style="margin-top: 2%;" @click='addFamily()' elevation="2" outlined>+ Family</v-btn>
                                   </div>
                                 </v-sheet>
                               </v-container>
@@ -153,14 +160,14 @@ export default {
       console.log(error);
     })
 
-    axios.get("http://team2.eaglesoftwareteam.com/family")
+    axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
     .then(response => {
       console.log(response.data);
       for(var i = 0; i < response.data.length; i++)
       {
         this.family.push({
           id: response.data[i].ID,
-          name: response.data[i].f_name + " " + response.data[i].l_name
+          name: response.data[i].l_name
         })
       }
     })
@@ -183,6 +190,16 @@ export default {
     }
   },
   methods:{
+    addPerson()
+    {
+
+    },
+
+    addFamily()
+    {
+
+    },
+
     goToPage(ID)
     {
       if(this.displayMode == "person")
@@ -220,7 +237,10 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            x.name = split[0] + " " + split[1];
+            if(this.viewMode == "person")
+              x.name = split[0] + " " + split[1];
+            else 
+              x.name = split[0];
           })
           
 
