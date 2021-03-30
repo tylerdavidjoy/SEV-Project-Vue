@@ -3,10 +3,6 @@
   <v-btn color="green" @click.native="generateReport">Generate <br/> Directory</v-btn>
 </template>
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js" integrity="sha512-HLbtvcctT6uyv5bExN/qekjQvFIl46bwjEq6PBvFogNfZ0YGVE+N3w6L+hGaJsGPWnMcAQ2qK8Itt43mGzGy8Q==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js" integrity="sha512-vv3EN6dNaQeEWDcxrKPFYSFba/kgm//IUnvLPMPadaUf5+ylZyx4cKxuc4HdBf0PPAlM7560DV63ZcolRJFPqA==" crossorigin="anonymous"></script>
-
 <script>
 import axios from 'axios';
 import jsPDF  from "jspdf";
@@ -71,7 +67,7 @@ export default ({
                 var picture = new Image();
                 picture.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png";
 
-                var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
+                //var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
                 var contentTemp = [];
                 for (i = 0; i < people.length; i++)
                 {
