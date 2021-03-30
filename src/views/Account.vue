@@ -298,6 +298,15 @@
                                                 ></v-date-picker>
                                               </v-menu>
                                             </v-col>
+                                            <template v-if="isAdmin">
+                                              <v-col cols="12" sm="6" md="4">
+                                                <v-checkbox
+                                                  v-model="editedEvent.visible"
+                                                  label="Visible to User"
+                                                  hint="This is a private Life Event for the Admins to use"
+                                                ></v-checkbox>
+                                              </v-col>
+                                            </template>
                                           </v-row>
                                         </v-container>
                                       </v-card-text>
@@ -356,46 +365,48 @@
                                     v-for="LifeEvent in form.LifeEvents"
                                     v-bind:key="LifeEvent.ID"
                                   >
-                                    <v-list-item-content>
-                                      <v-list-item-title>{{
-                                        LifeEvent.type
-                                      }}</v-list-item-title>
-                                      <v-list-item-subtitle
-                                        >Description:
-                                        {{
-                                          LifeEvent.description
-                                        }}</v-list-item-subtitle
-                                      >
-                                      <v-list-item-subtitle>
-                                        Date:
-                                        {{
-                                          LifeEvent.date
-                                        }}</v-list-item-subtitle
-                                      >
-                                    </v-list-item-content>
-                                    <v-list-item-content>
-                                      <v-btn
-                                        fab
-                                        icon
-                                        tile
-                                        v-on:click="editEvent(LifeEvent, 0)"
-                                      >
-                                        <v-icon dark>
-                                          mdi-pencil-outline
-                                        </v-icon>
-                                      </v-btn>
+                                    <template v-if="LifeEvent.visible || (!LifeEvent.visible && isAdmin)">
+                                      <v-list-item-content>
+                                        <v-list-item-title>{{
+                                          LifeEvent.type
+                                        }}</v-list-item-title>
+                                        <v-list-item-subtitle
+                                          >Description:
+                                          {{
+                                            LifeEvent.description
+                                          }}</v-list-item-subtitle
+                                        >
+                                        <v-list-item-subtitle>
+                                          Date:
+                                          {{
+                                            LifeEvent.date
+                                          }}</v-list-item-subtitle
+                                        >
+                                      </v-list-item-content>
+                                      <v-list-item-content>
+                                        <v-btn
+                                          fab
+                                          icon
+                                          tile
+                                          v-on:click="editEvent(LifeEvent, 0)"
+                                        >
+                                          <v-icon dark>
+                                            mdi-pencil-outline
+                                          </v-icon>
+                                        </v-btn>
 
-                                      <v-btn
-                                        fab
-                                        icon
-                                        tile
-                                        v-on:click="deleteEvent(LifeEvent, 0)"
-                                      >
-                                        <v-icon dark>
-                                          mdi-trash-can-outline
-                                        </v-icon>
-                                      </v-btn>
-                                    </v-list-item-content>
+                                        <v-btn
+                                          fab
+                                          icon
+                                          tile
+                                          v-on:click="deleteEvent(LifeEvent, 0)"
+                                        >
+                                          <v-icon dark>
+                                            mdi-trash-can-outline
+                                          </v-icon>
+                                        </v-btn>
+                                      </v-list-item-content>
+                                    </template>
                                   </v-list-item>
                                 </v-list>
                               </v-card-text>
@@ -1228,10 +1239,6 @@
                           Reset
                         </v-btn>
                       </div>
-
-                      <!-- <div id="phone">
-                        <card-list></card-list>
-                      </div> -->
                     </v-form>
                   </div>
                 </v-sheet>
