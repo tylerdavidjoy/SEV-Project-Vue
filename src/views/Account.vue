@@ -250,6 +250,7 @@
                                                 v-model="editedEvent.type"
                                                 :items="form.LifeEventTypes"
                                                 item-text="type"
+                                                item-value="ID"
                                                 label="Select Event Type"
                                                 menu-props="auto"
                                                 return-object
@@ -280,11 +281,8 @@
                                                   }"
                                                 >
                                                   <v-text-field
-                                                    v-model="editedEvent.date"
-                                                    :label="
-                                                      'Date: ' +
-                                                      editedEvent.date
-                                                    "
+                                                    v-model="editedEvent.convertedDate"
+                                                    label="Date of the Event"
                                                     prepend-icon="mdi-calendar"
                                                     readonly
                                                     v-bind="attrs"
@@ -292,11 +290,11 @@
                                                   ></v-text-field>
                                                 </template>
                                                 <v-date-picker
+                                                  :show-current="new Date().toISOString().substr(0,10)"
                                                   ref="picker"
-                                                  v-model="editedEvent.date"
-                                                  :max="new Date().toISOString().substr(0, 10)"
-                                                  min="1950-01-01"
-                                                  @change="saveDate"
+                                                  :max="new Date().toISOString().substr(0,10)"
+                                                  :v-model="editedEvent.date"
+                                                  v-on:change="saveDate"
                                                 ></v-date-picker>
                                               </v-menu>
                                             </v-col>
@@ -356,20 +354,20 @@
                                 <v-list>
                                   <v-list-item
                                     v-for="LifeEvent in form.LifeEvents"
-                                    v-bind:key="LifeEvent.type"
+                                    v-bind:key="LifeEvent.ID"
                                   >
                                     <v-list-item-content>
                                       <v-list-item-title>{{
                                         LifeEvent.type
                                       }}</v-list-item-title>
                                       <v-list-item-subtitle
-                                        >Event Description:
+                                        >Description:
                                         {{
                                           LifeEvent.description
                                         }}</v-list-item-subtitle
                                       >
-                                      <v-list-item-subtitle
-                                        >Event Date:
+                                      <v-list-item-subtitle>
+                                        Date:
                                         {{
                                           LifeEvent.date
                                         }}</v-list-item-subtitle
@@ -377,7 +375,9 @@
                                     </v-list-item-content>
                                     <v-list-item-content>
                                       <v-btn
+                                        fab
                                         icon
+                                        tile
                                         v-on:click="editEvent(LifeEvent, 0)"
                                       >
                                         <v-icon dark>
@@ -386,7 +386,9 @@
                                       </v-btn>
 
                                       <v-btn
+                                        fab
                                         icon
+                                        tile
                                         v-on:click="deleteEvent(LifeEvent, 0)"
                                       >
                                         <v-icon dark>
@@ -505,34 +507,33 @@
                                 <v-list>
                                   <v-list-item
                                     v-for="Relation in form.Relations"
-                                    v-bind:key="Relation.type"
+                                    v-bind:key="Relation.person2_ID"
                                   >
                                     <v-list-item-content>
                                       <v-list-item-title
-                                        >Relationship Type:
+                                        >Relationship:
                                         {{ Relation.type }}</v-list-item-title
                                       >
-                                      <!-- <v-list-item-subtitle
-                                        >Person ID:
-                                        {{ Relation.person.id }}</v-list-item-subtitle
-                                      > -->
                                       <v-list-item-subtitle
-                                        >Relationship With:
-                                        {{ Relation.person.FullName }}</v-list-item-subtitle
+                                        >{{ Relation.person.FullName }}</v-list-item-subtitle
                                       >
                                     </v-list-item-content>
                                     <v-list-item-content>
-                                      <v-btn
+                                      <!-- <v-btn
                                         icon
+                                        fab
+                                        tile
                                         v-on:click="editEvent(Relation, 1)"
                                       >
                                         <v-icon dark>
                                           mdi-pencil-outline
                                         </v-icon>
-                                      </v-btn>
+                                      </v-btn> -->
 
                                       <v-btn
                                         icon
+                                        fab
+                                        tile
                                         v-on:click="deleteEvent(Relation, 1)"
                                       >
                                         <v-icon dark>
@@ -748,7 +749,7 @@
                           </v-list-item>
                           <v-list-item
                             v-for="phone in form.phones"
-                            v-bind:key="phone.type"
+                            v-bind:key="phone.number"
                           >
                             <v-list-item-content>
                               <div>
@@ -762,7 +763,7 @@
                                 </template>
                                 <template v-else>
                                   <v-icon>mdi-cellphone</v-icon>
-                                  <div>Cell</div>
+                                  <div>Mobile</div>
                                 </template>
                               </div>
                             </v-list-item-content>
@@ -899,7 +900,7 @@
                                               <div :class="'px-16'" class="mr-16">
                                                 <v-text-field
                                                   v-model="editedEvent.type"
-                                                  :label="'Involment Type Name:'"
+                                                  :label="'Involvement Type Name:'"
                                                 ></v-text-field>
                                               </div>
                                             </v-col>
@@ -1333,7 +1334,7 @@ export default {
                 //Assign Person to the temp variable
                 temp3.person = this.people[j];
                 //Remove the perosn from the array that a person can use.
-                this.people.splice(j, 1);
+                // this.people.splice(j, 1);
               }
           }
           /*Iterate through Relationship Types to assign the Relationship type*/
@@ -1422,9 +1423,9 @@ export default {
     valid: false,
     //Array for all the Valid_Values
     validvalues:[],
-    //Start array for the Invlovement list
+    //Start array for the Involvement list
     involmentlist:[],
-    //Dumbee data for the admin
+    //Flag data for the admin
     isAdmin: true,
     //Variables for the Datatable
     dialog: false,
@@ -1471,7 +1472,8 @@ export default {
       id: 0,
       person_id: 0,
       description: "",
-      date: new Date(),
+      date: new Date().toISOString().substr(0,10),
+      convertedDate:"",
       type: "",
       visible:true,
     },
@@ -1485,6 +1487,7 @@ export default {
     //Variables for the Date picker for the Life Events
     menu: false,
     menuBirthday: false,
+    currentDate: new Date().toISOString().substr(0,10),
     //Variables for the Form
     form: {
       id: 0,
@@ -1594,8 +1597,14 @@ export default {
     },
   },
   methods: {
-    saveDate(Event) {
-      Event.date = this.editedEvent.date;
+    saveDate (date) {
+      this.editedEvent.date = date;
+      //Convert the date to mm/dd/yyyy for editedEvent and then use that to display the converted date
+      if(this.editedEvent.date != null)
+      {
+        const [year, month, day] = this.editedEvent.date.split('-');
+        this.editedEvent.convertedDate = `${month}/${day}/${year}`;
+      }
     },
     chooseFiles() {
       if (this.newFile != "") {
@@ -1656,6 +1665,12 @@ export default {
     editItem(item) {
       this.editedIndex = this.form.phones.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      if(item.type == 1)
+        this.editedItem.type = this.form.cellPhoneTypes[0];
+      else if(item.type == 2)
+        this.editedItem.type = this.form.cellPhoneTypes[1];
+      else if(item.type == 3)
+        this.editedItem.type = this.form.cellPhoneTypes[2];
       this.dialog = true;
     },
 
@@ -1667,6 +1682,7 @@ export default {
 
     deleteItemConfirm() {
       this.form.phones.splice(this.editedIndex, 1);
+      this.MakeDeletes(this.editedItem,-1);
       this.closeDelete();
     },
 
@@ -1703,11 +1719,19 @@ export default {
       if (type == 0) {
         this.EventsIndex = this.form.LifeEvents.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
+        this.editedEvent.type = this.searchValidValue(this.editedEvent.type);
+        var [year, month, day] = this.editedEvent.date.split('-');
+        year = this.editedEvent.date.substr(0,4);
+        month = this.editedEvent.date.substr(5,2);//Skip the -
+        day = this.editedEvent.date.substr(8,2);
+        this.editedEvent.convertedDate = `${month}/${day}/${year}`;
         this.dialogEvents = true;
       } else if (type == 1) {
         //Assume that it is a relationship
         this.EventsIndex = this.form.Relations.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
+        this.editedEvent.type = this.searchValidValue(this.editedEvent.type);
+        console.log(this.editedEvent.person2_ID);
         this.dialogRelationship = true;
       } else if(type == 2){ //Event Types
         this.EventsIndex = this.form.LifeEventTypes.indexOf(Event);
@@ -1750,21 +1774,25 @@ export default {
         this.EventsIndex = this.form.MinistryTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogDeleteAdminMinistry = true;
-        print();
       }
     },
 
     deleteEventConfirm(type) {
       if (type == 0) {
         this.form.LifeEvents.splice(this.EventsIndex, 1);
+        this.MakeDeletes(this.editedEvent,type);
       } else if (type == 1) {
         this.form.Relations.splice(this.EventsIndex, 1);
+        this.MakeDeletes(this.editedEvent,type);
       } else if (type == 2) {
         this.form.LifeEventTypes.splice(this.EventsIndex, 1);
+        this.MakeDeletes(this.editedEvent,type);
       } else if (type == 3) {
         this.form.InvolmentTypes.splice(this.EventsIndex, 1);
+        this.MakeDeletes(this.editedEvent,type);
       } else {
         this.form.MinistryTypes.splice(this.EventsIndex, 1);
+        this.MakeDeletes(this.editedEvent,type);
       }
       this.closeDeleteEvent(type);
     },
@@ -1839,10 +1867,8 @@ export default {
     saveEvent(type) {
       if (type == 0) {
         if (this.EventsIndex > -1) {
-          Object.assign(
-            this.form.LifeEvents[this.EventsIndex],
-            this.editedEvent
-          );
+          Object.assign(this.form.LifeEvents[this.EventsIndex],this.editedEvent);
+          this.MakePut(this.editedEvent,type);
         } else {
           this.form.LifeEvents.push(this.editedEvent);
           // console.log("Making Post");
@@ -1851,10 +1877,7 @@ export default {
         this.closeEvent(type);
       } else if (type == 1) {
         if (this.EventsIndex > -1) {
-          Object.assign(
-            this.form.Relations[this.EventsIndex],
-            this.editedEvent
-          );
+          Object.assign(this.form.Relations[this.EventsIndex],this.editedEvent);
           this.MakePut(this.editedEvent,type);
         } else {
           this.form.Relations.push(this.editedEvent);
@@ -1914,6 +1937,18 @@ export default {
           " " +
           this.editedEvent.person_id.id
       );
+    },
+    //Function for finding the Valid Value for an edit to a Life Event or Relationship
+    searchValidValue(value)
+    {
+      var found = null;
+      //Should always find the valid value for ID given
+      for(var i = 0; i < this.validvalues.length; i++)
+      {
+        if(this.validvalues[i].value == value)
+          found = this.validvalues[i];
+      }
+      return found;
     },
     //Function for removing all from backend and posting all in list to backend
     //Function will also be called every time the list is changed
@@ -2085,6 +2120,7 @@ export default {
             {
               this.form.MinistryTypes.push(temp)
             }
+            // console.log(`Valid Value: ${temp.ID} ${temp.value_group} ${temp.value}`);
           }
         })
         .catch((error) => {this.CatchError(error);})
@@ -2120,14 +2156,17 @@ export default {
                 //Assign Person to the temp variable
                 temp.person = this.people[j];
                 //Remove the perosn from the array that a person can use.
-                this.people.splice(j, 1);
+                // this.people.splice(j, 1);
               }
           }
           /*Iterate through Relationship Types to assign the Relationship type*/
           for( var k = 0; k < this.form.RelationType.length; k++)
           {
-            if(this.RelationType[k].ID == temp.type_id)
-              console.log("Found Match");
+            if(this.form.RelationType[k].ID == temp.type_id)
+              {
+                temp.type = this.form.RelationType[k].type;
+                // console.log("Found Match");
+              }
           }
           this.form.Relations.push(temp);
         }
@@ -2199,6 +2238,8 @@ export default {
         .get(baseURL + "phone_number?person_ID=" + this.user.id)
         .then((response) => {
           this.form.phones = response.data;
+          // for( var i = 0; i< this.form.phones.length; i++)
+          //   console.log(`Phone Info ${this.form.phones[i].ID}`);
         })
         .catch((error) => {this.CatchError(error);});  
     },
@@ -2259,14 +2300,14 @@ export default {
           "type": null,
         };
         //If statement for the Valid_values stuff for the phones
-        if(object.type == 'Home')
+        if(object.type == 'Work')
           Data.type = 1;
-        else if(object.type == 'Work')
+        else if(object.type == 'Home')
           Data.type = 2;
         else  
           Data.type = 3;
         axios
-        .post(baseURL + 'phone_number?id=' + window.person.id, Data)
+        .post(baseURL + 'phone_number?id=' + this.user.id, Data)
         .then(response =>
         {
           console.log("Posting to Phones: " + JSON.parse(response.status));
@@ -2278,7 +2319,7 @@ export default {
         console.log(object.type.ID);
         //Create Object to send from Given Data
         Data = {
-          "person_ID":window.person.id,
+          "person_ID":this.user.id,
           "description":object.description,
           "date":object.date,
           "type":object.type.ID,
@@ -2291,10 +2332,7 @@ export default {
           console.log("Posting User Life Event: " + response.status);
           this.GetLifeEvents();
         })
-        .catch(error=>
-        {
-          console.log('Posting Life Events Error: ' + error);
-        })
+        .catch(error=>{this.CatchError(error);})
       } else if( type == 1 )//New Relationship
       {
         //Create Object to send from Given Data
@@ -2363,7 +2401,7 @@ export default {
     {
       //Put will not have Relationships, Involvement, Hobbies/Interests, or Ministry Areas
       var Data;
-      if( type == -1 )//New Phone
+      if( type == -1 )//Updating Phone
       {
         //Create Object to send from Given Data
         Data = {
@@ -2372,9 +2410,9 @@ export default {
           "type": null,
         };
         //If statement for the Valid_values stuff for the phones
-        if(object.type == 'Home')
+        if(object.type == 'Work')
           Data.type = 1;
-        else if(object.type == 'Work')
+        else if(object.type == 'Home')
           Data.type = 2;
         else  
           Data.type = 3;
@@ -2471,8 +2509,72 @@ export default {
             this.GetUser();
         })
       }
+    },
+    //Function for DELETES
+    MakeDeletes(object,type)
+    {
+      if( type == -1 )//New Phone
+      {
+        axios
+        .delete(baseURL + 'phone_number?id=' + object.ID)
+        .then(response =>
+        {
+          console.log("Deleting Phone: " + JSON.parse(response.status));
+          this.GetPhones();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 0 )//New Life Event
+      {
+        axios
+        .delete(baseURL + 'life_event?id=' + object.ID)
+        .then(response =>
+        {
+          console.log("Deleting User Life Event: " + response.status);
+          this.GetLifeEvents();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 1 )//New Relationship
+      {
+        axios
+        .delete(baseURL + 'relationship?person1_ID=' + object.person1_ID + '&person2_ID=' + object.person2_ID)
+        .then(response =>
+        {
+          console.log("Deleting User Relationship: " + response.status);
+          this.GetRelations();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 2 )//New Event Type
+      {
+        axios
+        .delete(baseURL + 'valid_value?id=' + object.ID)
+        .then(response =>
+        {
+          console.log("Deleting Event Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 3 )//New Involement Type
+      {
+        axios
+        .delete(baseURL + 'valid_value?id='+ object.ID)
+        .then(response =>
+        {
+          console.log("Delete Involvement Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      } else if( type == 4 )//New Ministry Area Type
+      {
+        axios
+        .delete(baseURL + 'valid_value?id=' + object.ID)
+        .then(response =>
+        {
+          console.log("Deleting Ministry Area Type: " + JSON.parse(response.status));
+          this.GetValidValues();
+        })
+        .catch(error=>{this.CatchError(error);})
+      }
     }
-    //Function for making axios DELETES
   },
 };
 </script>
