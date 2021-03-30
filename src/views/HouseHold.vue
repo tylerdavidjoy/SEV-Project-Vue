@@ -400,7 +400,9 @@ import PhotoUpload from "../components/PhotoUpload.vue";
             console.log("Person added to family: " + member.f_name + ", " + member.l_name)
           })
           this.familyMembers.push(member);
+          this.deletableMembers.push(member);
           this.$set(this.familyMembers, this.familyMembers.indexOf(member), member);
+          this.$set(this.deletableMembers, this.deletableMembers.indexOf(member), member);
         })
       },
 
@@ -463,8 +465,7 @@ img.smallUserImg {
 
 img.familyImg {
   margin: 20px;
-  max-height: 250px;
-  max-width: 250px;
+  max-height: 270px;
   size: auto;
 }
 
