@@ -42,12 +42,9 @@
                               <v-container>    
                                 <v-sheet class="rounded-lg">
                                   <div>
-                                    <v-btn @click='viewMode("person")' block elevation="2" outlined>Person View</v-btn>
+                                    <v-btn @click='viewMode()' block elevation="2" outlined>Toggle View</v-btn>
                                   </div>
                                   
-                                  <div>
-                                    <v-btn style="margin-top: 2%;" @click='addPerson()' elevation="2" outlined>+ Person</v-btn>
-                                  </div>
                                 </v-sheet>
                               </v-container>
                             </v-col>
@@ -55,10 +52,7 @@
                               <v-container>    
                                 <v-sheet class="rounded-lg">
                                   <div>
-                                    <v-btn @click='viewMode("family")' block elevation="2" outlined >Family View</v-btn>
-                                  </div>
-                                  <div>
-                                    <v-btn style="margin-top: 2%;" @click='addFamily()' elevation="2" outlined>+ Family</v-btn>
+                                    <v-btn @click='addItem()' block elevation="2" outlined>+ {{displayMode}}</v-btn>
                                   </div>
                                 </v-sheet>
                               </v-container>
@@ -190,14 +184,17 @@ export default {
     }
   },
   methods:{
-    addPerson()
+    addItem()
     {
+      if(this.displayMode == "person")
+      {
+        console.log("Add Person");
+      }
 
-    },
-
-    addFamily()
-    {
-
+      else
+      {
+        console.log("Add Family");
+      }
     },
 
     goToPage(ID)
@@ -266,8 +263,15 @@ export default {
         
     },
 
-    viewMode(mode)
+    viewMode()
     {
+      var mode;
+      if(this.displayMode == "person")
+        mode = "family";
+
+      else
+        mode = "person";
+
       console.log(this);
       this.displayMode = mode;
       if(mode == "person")
