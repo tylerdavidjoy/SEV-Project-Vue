@@ -22,10 +22,10 @@
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
                   <v-text-field v-model="email" label="Family Email" :readonly="true"></v-text-field>
-                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="hasEditPermission()">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="hasEditPermission()">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -111,7 +111,7 @@
                     v-model="dialogAdd"
                     scrollable
                     max-width="300px"
-                    v-if="isAdmin"
+                    v-if="hasEditPermission()"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="addMemberDialog"
@@ -437,6 +437,16 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         //   console.log(response.data)
         //   console.log(this.familyMembers)
         // })
+      },
+
+      hasEditPermission: function() {
+        var canEdit = false;
+        console.log("Is Head of Household: " + this.isHeadOfFamily);
+        console.log("Is Admin: " + this.isAdmin);
+        if(this.isHeadOfFamily || this.isAdmin) {
+          canEdit = true;
+        }
+        return canEdit;
       }
     }
   }
