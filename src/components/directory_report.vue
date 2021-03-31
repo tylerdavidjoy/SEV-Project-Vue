@@ -117,6 +117,10 @@ export default ({
                 }
 
                 var pdfContent = {
+                    info: {
+                        title: 'Directory',
+                        author: 'Wilshire Church Management System'
+                    },
                     content: contentTemp,
                     images:{
                         sample: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png"
