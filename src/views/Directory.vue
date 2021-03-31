@@ -220,7 +220,7 @@ export default {
 
     clearAPI()
     {
-      this.search = "";
+      this.search = " ";
       this.SearchAPI();
     },
     //Function for loading in the Events based on given API filters and Search Parameters
@@ -252,6 +252,8 @@ export default {
           })
          this.autoPagination(temp);
       }
+      else
+        this.viewMode(this.displayMode);
     },
 
     autoPagination(data)
