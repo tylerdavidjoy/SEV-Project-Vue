@@ -12,7 +12,7 @@
                         
                   <!-- </v-avatar>  -->
                   <br />
-                  <PhotoUpload v-bind:familyId="this.familyId"/>
+                  <PhotoUpload v-bind:familyId="this.familyId" v-bind:familyImgSrc="this.familyImgSrc" @onFileChange="familyImgSrc=$event"/>
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
@@ -194,6 +194,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         occupation: "",
         employer: "",
         baseURL: "http://team2.eaglesoftwareteam.com/",
+        familyImgSrc: "",
         members:[
           {name: 'Billy Bob jr.'},
           {name: 'Billy Bob sr.'},

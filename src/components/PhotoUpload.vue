@@ -18,7 +18,7 @@ export default {
             selectedFile: "",
             baseURL: "http://team2.eaglesoftwareteam.com/",
             progress: 0,
-            familyImgSrc: ""
+            // familyImgSrc: ""
         };
     },
 
@@ -28,6 +28,9 @@ export default {
         },
         userId: {
             type: Number
+        },
+        familyImgSrc: {
+            type: String
         }
     },
 
@@ -35,6 +38,16 @@ export default {
         onFileChange(e) {
             const selectedFile = e.target.files[0]; // accessed file
             this.selectedFile = selectedFile;
+
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(this.selectedFile)
+
+            fileReader.onload = (readerEvent) => {
+                console.log(readerEvent.target.result);
+                // var dataURL = fileReader.result;
+                this.$emit("onFileChange", readerEvent.target.result);
+                // this.familyImgSrc = readerEvent.target.result;
+            }
         },
         onUploadFile() {
             const formData = new FormData();
