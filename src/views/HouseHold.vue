@@ -230,6 +230,9 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         .get(this.baseURL + "family?person_ID=" + this.userId)
         .then(response => {
           this.familyId = response.data[0].ID;
+          console.log("Family ID: " + this.familyId)
+          this.address_ID = response.data[0].address_ID;
+          console.log("Address ID: " + this.address_ID)
           this.familyImgSrc = this.baseURL + "images/" + response.data[0].image;
           // console.log(this.familyImgSrc);
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
@@ -239,7 +242,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         .then(response => {
           this.familyMembers = response.data;
           this.deletableMembers = response.data;
-          return axios.get(this.baseURL + "address?person_ID=" + this.userId)
+          return axios.get(this.baseURL + "address?id=" + this.address_ID)
         })
 
 
@@ -247,9 +250,10 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         // axios
         // .get(this.baseURL + "address?person_ID=" + this.userId)
         .then(response => {
-          this.address = response.data[0].address;
-          this.address_ID = response.data[0].ID;
-          this.address_Type = response.data[0].type;
+          this.address = response.data.address;
+          console.log("Address: " + this.address)
+          // this.address_ID = response.data[0].ID;
+          this.address_Type = response.data.type;
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
           // return axios.get(this.baseURL + "person?id=" + this.userId)
         })
@@ -340,12 +344,12 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           return(axios.get(this.baseURL + "valid_value?id=" + validValueId))
         })
         .then(response => {
-          console.log(response.data.value)
+          // console.log(response.data.value)
             this.$nextTick(() => {
               if(response.data.value === "admin")
-                console.log("True")
+                // console.log("True")
                 this.isAdmin = true;
-                console.log(this.isAdmin)
+                // console.log(this.isAdmin)
           })
         })
       },
@@ -442,8 +446,8 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
       hasEditPermission: function() {
         var canEdit = false;
-        console.log("Is Head of Household: " + this.isHeadOfFamily);
-        console.log("Is Admin: " + this.isAdmin);
+        // console.log("Is Head of Household: " + this.isHeadOfFamily);
+        // console.log("Is Admin: " + this.isAdmin);
         if(this.isHeadOfFamily || this.isAdmin) {
           canEdit = true;
         }
