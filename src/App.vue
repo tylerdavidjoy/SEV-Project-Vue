@@ -35,9 +35,8 @@ export default {
   data() {
     return {
     login: true,
-    user: {
-
-    },
+    user: window.user,
+    person: window.person,
     polling: null,
     drawer: null,
     tabs:[

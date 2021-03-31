@@ -89,6 +89,7 @@
                             <GroupReport :selected.sync="fileType" :picture.sync="picture"/>
                             <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
                             <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
+                            <AddPersonDialog/>
                           </div>
                         </v-container>
                       </div>
@@ -111,6 +112,7 @@ import GroupReport from "@/components/group_report.vue";
 import GroupListReport from "@/components/group_list_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
+import AddPersonDialog from "@/components/add_person_dialog.vue";
 export default {
   name: "Home",
   components: {
@@ -119,7 +121,8 @@ export default {
     GroupReport,
     LifeEventReport,
     GroupListReport,
-    RoleReport
+    RoleReport,
+    AddPersonDialog
   },
   mounted() {
     //People
