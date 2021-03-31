@@ -90,6 +90,7 @@
                             <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
                             <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
                             <AddPersonDialog/>
+                            <AddFamilyDialog :people="people"/>
                           </div>
                         </v-container>
                       </div>
@@ -113,6 +114,7 @@ import GroupListReport from "@/components/group_list_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
 import AddPersonDialog from "@/components/add_person_dialog.vue";
+import AddFamilyDialog from "@/components/add_family_dialog.vue";
 export default {
   name: "Home",
   components: {
@@ -122,7 +124,8 @@ export default {
     LifeEventReport,
     GroupListReport,
     RoleReport,
-    AddPersonDialog
+    AddPersonDialog,
+    AddFamilyDialog
   },
   mounted() {
     //People
@@ -133,7 +136,7 @@ export default {
       {
         this.people.push({
           id: response.data[i].ID,
-          name: response.data[i].f_name + " " + response.data[i].l_name
+          name: response.data[i].f_name + " " + response.data[i].l_name,
         })
       }
       this.autoPagination(this.people);

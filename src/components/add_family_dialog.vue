@@ -13,7 +13,7 @@
         dark
         v-bind="attrs"
         v-on="on">
-        Add Person
+        Add Family
     </v-btn>
     </template>
 
@@ -21,88 +21,23 @@
 <!--Pop up Box -->
     <v-card>
         <v-card-title>
-          <span class="headline">Add Person</span>
+          <span class="headline">Add Family</span>
         </v-card-title>
         
         <v-card-text>
           <v-container>
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="First name*"
-                  v-model="person.f_name"
-                  required
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="Last name*"
-                  v-model="person.l_name"
-                  required
-                ></v-text-field>
-              </v-col>
-            
-            <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field label="Preferred name"
-                v-model="person.preferred_name"/>
-            </v-col>
-
-            
+            <v-row>          
               <v-col
                 cols="12"
                 sm="6"
               >
                 <v-select
-                  :items="['Male','Female','Other']"
-                  label="Gender*"
-                  v-model="person.gender"
+                  :items="people_names"
+                  label="Head of Family*"
+                  v-model="headOfFamily"
                   required/>
               </v-col>
 
-              <v-col cols="12">
-                <v-text-field label="Email"
-                v-model="person.email"/>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field label="Occupation"
-                v-model="person.occupation"/>
-              </v-col>
-
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field label="Employeer"
-                v-model="person.employer"/>
-              </v-col>
-
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-select
-                  :items="['User', 'Decan', 'Admin']"
-                  label="User Type*"
-                  v-model="person.role"
-                  required/>
-              </v-col>
             </v-row>
           </v-container>
           <small>*indicates required field</small>
@@ -120,7 +55,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="createPerson()"
+            @click="createfamily()"
           >
             Save
           </v-btn>
@@ -132,63 +67,41 @@
 <script>
 import axios from "axios";
 export default ({
-    name: "AddPersonDialog",
+    name: "AddFamilyDialog",
+    props:
+    {
+      people: Array
+    },
     mounted()
     {
-    axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=role")
-    .then(response => {
-      console.log(response.data);
-      for(var i = 0; i < response.data.length; i++)
+      for(var i = 0; i < this.people.length; i++)
       {
-        this.rolesObj.push(
-        {
-            ID: response.data[i].ID,
-            value_group: response.data[i].value_group,
-            value: response.data[i].value
-        })
-
-        this.roles.push(response.data[i].value);
+        this.people_names.push(this.people[i].name)
       }
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
     },
     methods: 
     {
-        createPerson()
+        createFamily()
         {
-            this.person.gender = this.person.gender.toLowerCase();
-            this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
-
-            axios.post('http://team2.eaglesoftwareteam.com/person', this.person)
-            .then((response) => {
-            response.use();
-            this.dialog = false;
-            }, (error) => {
-            this.err = error;
-            });
+          axios.post('http://team2.eaglesoftwareteam.com/family', this.family)
+          .then((response) => {
+          response.use();
+          this.dialog = false;
+          }, (error) => {
+          this.err = error;
+          });
         }
     },
 
     data() {
         return {
             dialog: false,
-            rolesObj:[],
-            roles:[],
-            person: 
+            headOfFamily:null,
+            people_names:[],
+            family: 
             {
-                congregation_ID: this.$person.congregation_id,
-                f_name:null,
-                l_name:null,
-                occupation: null,
-                employer:null,
-                family_ID:null,
-                email:null,
-                gender:null,
-                preferred_name:null,
-                role:null
+              congregation_ID: this.$person.congregation_id,
+              address_ID:null
             },
             err: ""
         }
