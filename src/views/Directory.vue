@@ -34,19 +34,38 @@
               <v-col cols="12">
                   <v-sheet class="rounded-lg">
                     <div class="px-4">
-                      <v-tabs
-                        v-model="tab"
-                            fixed-tabs
-                            background-color="white">
-                        <v-tabs-slider color="Blue"/>
-                        <v-tab
-                          v-for="item in items"
-                          :key="item"
-                          @click = "viewMode(item)">
-                          {{ item }}
-                        </v-tab>
-                      </v-tabs>
-                      <v-btn v-if="isAdmin" @click="addItem()">+ {{displayMode}}</v-btn>
+                      <!-- Switch for Pagenation and Calendar -->
+                      <div>
+                        <v-container>
+                          <v-row>
+                            <v-col cols="6">
+                              <v-container>    
+                                <v-sheet class="rounded-lg">
+                                  <div>
+                                    <v-btn @click='viewMode("person")' block elevation="2" outlined>Person View</v-btn>
+                                  </div>
+                                  
+                                  <div>
+                                    <v-btn style="margin-top: 2%;" @click='addPerson()' elevation="2" outlined>+ Person</v-btn>
+                                  </div>
+                                </v-sheet>
+                              </v-container>
+                            </v-col>
+                            <v-col cols="6">
+                              <v-container>    
+                                <v-sheet class="rounded-lg">
+                                  <div>
+                                    <v-btn @click='viewMode("family")' block elevation="2" outlined >Family View</v-btn>
+                                  </div>
+                                  <div>
+                                    <v-btn style="margin-top: 2%;" @click='addFamily()' elevation="2" outlined>+ Family</v-btn>
+                                  </div>
+                                </v-sheet>
+                              </v-container>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </div>
 
                       <!-- Results Bar -->
                       <div class="pt-2">
@@ -74,22 +93,16 @@
                             <v-pagination
                               v-model="page"
                               class="my-4"
-                              :length="numPages"
+                              :length="pageLength"
                               :total-visible="7"
-                              @next="pageChange('next')"
-                              @previous="pageChange('previous')"
-                              @input="pageChange(page)"
                             ></v-pagination>
                           </v-container>
-
-                          <div v-if="isAdmin">
-                            <ReportSettings/>
-                            <DirectoryReportNoImg/>
-                            <RoleReport/>
-                            <GroupReportNoImg/>
-                            <GroupListReport/>
-                            <LifeEventReport/>
-                          </div>
+                          <DirectoryReportNoImg/>
+                          <RoleReport/>
+                           <GroupReportNoImg/>
+                           <GroupListReport/>
+                          <LifeEventReport/>
+                          
                         </v-container>
                       </div>
                     </div>
@@ -105,7 +118,6 @@
 </template>
 <script>
 import axios from "axios";
-import ReportSettings from "@/components/report_settings.vue";
 import DirectoryReportNoImg from "@/components/directory_report.vue";
 import GroupReportNoImg from "@/components/group_report.vue";
 import GroupListReport from "@/components/group_list_report.vue";
@@ -114,7 +126,6 @@ import RoleReport from "@/components/role_report.vue";
 export default {
   name: "Home",
   components: {
-    ReportSettings,
     DirectoryReportNoImg,
     GroupReportNoImg,
     LifeEventReport,
@@ -133,7 +144,17 @@ export default {
           name: response.data[i].f_name + " " + response.data[i].l_name
         })
       }
-      this.autoPagination(this.people);
+      if(this.people.length > 20)
+        this.display = this.people.slice(0,19);
+      
+      else
+        this.display = this.people;
+
+      if(this.people.length == 20)
+        this.pageLength = 1;
+      
+      else
+        this.pageLength = (this.people.length / 20) + 1;
     })
     .catch(error => {
       console.log(error);
@@ -161,36 +182,14 @@ export default {
       isAdmin:true,
       search:'',
       page:1,
-      numPages:0,
-      maxPageLength: 20,
+      pageLength:20,
       display:[],
       people:[],
       family: [],
       displayMode: "person",
-      items: ["person", "family"]
     }
   },
   methods:{
-    pageChange(target)
-    {
-      switch(target) {
-        case "next":
-          if(this.page < this.numPages){
-            this.page++;
-          }
-          break;
-        case "previous":
-          if(this.page > 1){
-            this.page--;
-          }
-          break;
-        default:
-          this.page = target;
-      }
-
-      this.viewMode(this.displayMode)
-
-    },
     addPerson()
     {
 
@@ -227,6 +226,7 @@ export default {
         else
           temp = JSON.parse(JSON.stringify(this.family));
         
+
         temp.forEach(x => x.name = x.name.toLowerCase());
         temp = temp.filter(item => item.name.includes(this.search.toLowerCase()));
 
@@ -242,35 +242,65 @@ export default {
             else 
               x.name = split[0];
           })
-         this.autoPagination(temp);
-      }
-    },
+          
 
-    autoPagination(data)
-    {
-      console.log(data);
-      if(data.length > this.maxPageLength)
-          this.display = data.slice(((this.page - 1) * this.maxPageLength) ,((this.page * this.maxPageLength)));
-      
+        console.log(temp);
+        if(temp.length > 20)
+          this.display = temp.slice(0,19);
+  
         else
-          this.display = data;
+          this.display = temp;
 
-        if (this.maxPageLength % data.length == 0)
-          this.numPages = 1;
+        if(this.temp.length == 20)
+          this.pageLength = 1;
         
         else
-          this.numPages = Math.ceil(data.length / this.maxPageLength);
-      },
+          this.pageLength = (temp.length / 20) + 1;
+      }
+
+      else
+      {
+        console.log("People:",this.people);
+        this.viewMode(this.displayMode);
+      }
+        
+    },
 
     viewMode(mode)
     {
+      console.log(this);
       this.displayMode = mode;
-      if(this.displayMode == "person")
-        this.autoPagination(this.people);
+      if(mode == "person")
+      {
+        if(this.people.length > 20)
+          this.display = this.people.slice(0,19);
+      
+        else
+          this.display = this.people;
 
-      else 
-        this.autoPagination(this.family);
+        if(this.people.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (this.people.length / 20) + 1;
+      }
+
+      else
+      {
+        if(this.family.length > 20)
+          this.display = this.people.slice(0,19);
+      
+        else
+          this.display = this.family;
+
+        if(this.family.length == 20)
+          this.pageLength = 1;
+        
+        else
+          this.pageLength = (this.family.length / 20) + 1;
+      }
     }
-  }
+  },
+
 }
 </script>
