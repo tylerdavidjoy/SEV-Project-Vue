@@ -8,16 +8,21 @@ import axios from 'axios'
 import jsPDF  from "jspdf";
 export default ({
     name: "GroupReportNoImg",
+    props:
+    {
+        selected: String,
+        picture: Boolean
+    },
     methods: 
     {
     generateReport: function(id)
     {
         axios.get("http://team2.eaglesoftwareteam.com/group?id="+id+"&get_members=1")
         .then(response => {
-        if (this.csv)
+        if (this.selected == "CSV")
             this.csvCreation(response.data);
         else
-            this.pdfCreation(response.data,false);
+            this.pdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);

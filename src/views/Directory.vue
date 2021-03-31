@@ -83,12 +83,12 @@
                           </v-container>
 
                           <div v-if="isAdmin">
-                            <ReportSettings/>
-                            <DirectoryReportNoImg/>
-                            <RoleReport/>
-                            <GroupReportNoImg/>
-                            <GroupListReport/>
-                            <LifeEventReport/>
+                            <ReportSettings :selected.sync="fileType" :picture.sync="picture"/>
+                            <DirectoryReportNoImg :selected.sync="fileType" :picture.sync="picture"/>
+                            <RoleReport :selected.sync="fileType" :picture.sync="picture"/>
+                            <GroupReportNoImg :selected.sync="fileType" :picture.sync="picture"/>
+                            <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
+                            <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
                           </div>
                         </v-container>
                       </div>
@@ -167,7 +167,9 @@ export default {
       people:[],
       family: [],
       displayMode: "person",
-      items: ["person", "family"]
+      items: ["person", "family"],
+      fileType:"PDF",
+      picture:false
     }
   },
   methods:{

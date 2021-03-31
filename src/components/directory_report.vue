@@ -12,14 +12,21 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default ({
     name: "DirectoryReportNoImg",
+    props:
+    {
+        selected: String,
+        picture: Boolean
+    },
     methods: 
     {
     generateReport: function()
     {
         axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
-            //this.csvCreation(response.data);
-            this.pdfCreation(response.data,true);
+        if (this.selected == "CSV")
+            this.csvCreation(response.data);
+        else
+            this.pdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);

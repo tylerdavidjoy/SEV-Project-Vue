@@ -7,8 +7,8 @@
             :items="items"
             :rules="[v => !!v || 'Item is required']"
             label="File Format"
-            :item-value="items[0]"
             required
+            @change="$emit('update:selected', selected);"
             />
         </v-col>
         
@@ -16,6 +16,7 @@
             <v-checkbox
             v-model="picture"
             label="Include Pictures ?"
+            @change="$emit('update:picture', picture);"
             />
         </v-col>
     </v-row>
@@ -26,15 +27,18 @@
 
 export default ({
     name: "ReportSettings",
+    props:
+    {
+        selected: String,
+        picture: Boolean
+    },
     methods: 
     {
     
     },
     data() {
         return {
-            items: ["PDF","CSV"],
-            selected: "PDF",
-            picture: false
+            items: ["PDF","CSV"]
         }
     }
 })

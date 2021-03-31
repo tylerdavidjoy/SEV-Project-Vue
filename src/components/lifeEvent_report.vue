@@ -8,23 +8,28 @@ import axios from 'axios'
 import jsPDF  from "jspdf";
 export default ({
     name: "LifeEventReport",
+    props:
+    {
+        selected: String,
+        picture: Boolean
+    },
     methods: 
     {
     generateReport: function(date_start, date_end, type)
     {
         axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
         .then(response => {
-        this.pdfCreation(response.data);
+        this.pdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);
         })
     },
 
-    pdfCreation: function(life_event)
+    pdfCreation: function(life_event, img)
         {
         require('jspdf-autotable');
-        
+        img.use();
         var columns = ["Name", "Description", "Date" ];
         var rows = [];
 
