@@ -11,7 +11,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default ({
-    name: "DirectoryReportNoImg",
+    name: "DirectoryReport",
     props:
     {
         selected: String,

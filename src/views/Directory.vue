@@ -84,9 +84,9 @@
 
                           <div v-if="isAdmin">
                             <ReportSettings :selected.sync="fileType" :picture.sync="picture"/>
-                            <DirectoryReportNoImg :selected.sync="fileType" :picture.sync="picture"/>
+                            <DirectoryReport :selected.sync="fileType" :picture.sync="picture"/>
                             <RoleReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <GroupReportNoImg :selected.sync="fileType" :picture.sync="picture"/>
+                            <GroupReport :selected.sync="fileType" :picture.sync="picture"/>
                             <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
                             <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
                           </div>
@@ -106,8 +106,8 @@
 <script>
 import axios from "axios";
 import ReportSettings from "@/components/report_settings.vue";
-import DirectoryReportNoImg from "@/components/directory_report.vue";
-import GroupReportNoImg from "@/components/group_report.vue";
+import DirectoryReport from "@/components/directory_report.vue";
+import GroupReport from "@/components/group_report.vue";
 import GroupListReport from "@/components/group_list_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
@@ -115,8 +115,8 @@ export default {
   name: "Home",
   components: {
     ReportSettings,
-    DirectoryReportNoImg,
-    GroupReportNoImg,
+    DirectoryReport,
+    GroupReport,
     LifeEventReport,
     GroupListReport,
     RoleReport
