@@ -245,7 +245,7 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            if(this.viewMode == "person")
+            if(this.displayMode == "person")
               x.name = split[0] + " " + split[1];
             else 
               x.name = split[0];
