@@ -54,21 +54,45 @@ export default {
             formData.append("file", this.selectedFile); // appending file
 
             // sending file to backend
-            axios
-            .post(this.baseURL + "upload?family_ID=" + this.familyId, formData, {
-                onUploadProgress: ProgressEvent => {
-                    let progress = 
+            if(this.$route.name == "HouseHold" || (this.$route.name == "Directory" && true))
+            {
+                console.log("Uploading photo for household page")
+                axios
+                .post(this.baseURL + "upload?family_ID=" + this.familyId, formData, {
+                    onUploadProgress: ProgressEvent => {
+                        let progress = 
+                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+                            +"%";
+                            this.progress = progress;
+                    }
+                })
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            }
+
+            else if(this.$route.name == "Account")
+            {
+                console.log("Uploading photo for the account page")
+                axios
+                .post(this.baseURL + "upload?person_ID=" + this.userId, formData, {
+                    onUploadProgress: ProgressEvent => {
+                        let progress = 
                         Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
                         +"%";
                         this.progress = progress;
-                }
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+                    }
+                })
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
         }
     }
 
@@ -79,7 +103,7 @@ export default {
 .file-upload {
     box-shadow: 2px 2px 9px 2px #ccc;
     border-radius: 1rem;
-    padding: 2rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -94,11 +118,11 @@ input {
 
 input,
 button {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .upload-button {
-    width: 7rem;
+    width: 8rem;
     padding: 0.5rem;
     background-color: #278be9;
     color: #fff;
