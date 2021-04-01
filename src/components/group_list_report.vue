@@ -78,7 +78,7 @@ export default ({
 
                 //var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
                 var contentTemp = [];
-                contentTemp.push({text: 'List of Groups', fontSize:30, style:'header'})
+                contentTemp.push({text: 'List of Groups\n\n', fontSize:30, alignment: 'center', style:'header'})
                 for (i = 0; i < group.length; i++)
                 {
                     var tempImg = {
@@ -108,15 +108,15 @@ export default ({
                         alignment: 'center',
                         columns: [
                             {
-                                text:group[i].f_name + " " + group[i].l_name
+                                text:group[i].name + "\n" +group[i].f_name + " " + group[i].l_name
                             },
                                 //Spacing
                             {
-                                text:group[i + 1].f_name + " " + group[i + 1].l_name
+                                text:group[i + 1].name + "\n" + group[i + 1].f_name + " " + group[i + 1].l_name
                             },
                                 //Spacing
                             {
-                                text:group[i + 2].f_name + " " + group[i + 2].l_name
+                                text:group[i + 2].name + "\n" + group[i + 2].f_name + " " + group[i + 2].l_name
                             }
                         ]
                     }
