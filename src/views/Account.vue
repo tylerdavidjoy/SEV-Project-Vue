@@ -831,13 +831,17 @@
                         <v-combobox
                           :disabled="!editflag"
                           v-model="form.hobbies"
+                          :items="form.HobbyTypes"
+                          :search-input.sync="search"
+                          item-text="type"
                           label="Hobbies and Interests"
                           dense
                           filled
-                          clearable
                           multiple
                           small
                           chips
+                          return-object
+                          v-on:change="ListChanged(0)"
                         ></v-combobox>
                       </div>
 
@@ -846,7 +850,7 @@
                       <div :class="'px-6'">
                         <v-select
                           :disabled="!editflag"
-                          v-model="form.involment"
+                          v-model="form.involvement"
                           label="Involvment in the Church"
                           :items="form.InvolmentTypes"
                           item-text="type"
@@ -1041,6 +1045,7 @@
                           small
                           chips
                           return-object
+                          v-on:change="ListChanged(2)"
                         ></v-select>
                       </div>
 
@@ -1266,8 +1271,11 @@ export default {
       axios.get(baseURL + "relationship?person1_ID=" + this.user.id),
       axios.get(baseURL + "life_event?person_id=" + this.user.id),
       axios.get(baseURL + 'person?email='+ this.user.email),
+      axios.get(baseURL + 'person_involvement?person_id=' + this.user.id),
+      axios.get(baseURL + 'person_ministry?person_id=' + this.user.id),
+      axios.get(baseURL + 'person_hobby?person_id=' + this.user.id),
       ])
-      .then(axios.spread((validV, persons, relations, lifeEvents, user) => {
+      .then(axios.spread((validV, persons, relations, lifeEvents, user,involvement, ministry, hobby) => {
         //Section for Getting the User info first to use the ID for all calls.
 
         //Do a For loop to iterate through the list and then create an Object
@@ -1299,10 +1307,12 @@ export default {
           {
             this.form.MinistryTypes.push(temp)
           }
-          // console.log("Valid Values: " + this.validvalues[i].ID + " " + this.validvalues[i].value_group + " " + this.validvalues[i].value);
+          else if(temp.value_group == 'hobby')
+          {
+            this.form.HobbyTypes.push(temp)
+          console.log("Valid Values: " + temp.ID + " " + temp.value_group + " " + temp.value);
+          }
         }
-        //Assign start list for Involvement for 
-        this.involmentlist = this.form.involment;
 
         //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
         console.log("Loading Congregation Members...");
@@ -1403,6 +1413,78 @@ export default {
               this.isAdmin = true;
           }
         }
+
+        //Clear both of the arrays
+        this.involvementlist = [];
+        this.form.involvement = [];
+
+        console.log("Loading Involvement List");
+        //Iterate through the list and create new objects that have the ID and the valid_Value.type
+        for( k = 0; k < involvement.data.length; k++)
+        {
+          var involve = {
+            "person_ID": involvement.data[k].person_ID,
+            "involvement_ID": involvement.data[k].involvement_ID,
+          }
+          for( j = 0; j < this.form.InvolmentTypes.length; j++)
+          {
+            if(this.form.InvolmentTypes[j].ID == involve.involvement_ID)
+            {
+              //Add that Involement Type to the this.form.involvement array since it will just be the types
+              this.form.involvement.push(this.form.InvolmentTypes[j]);
+            }
+          }
+          // put into prechange list
+          this.involvementlist.push(involve);
+        }
+
+        //Clear both of the arrays
+        this.ministrylist = [];
+        this.form.ministry = [];
+
+        console.log("Loading Ministry Areas");
+        //Iterate through the list and create new objects that have the ID and the valid_Value.type
+        for(k = 0; k < ministry.data.length; k++)
+        {
+          temp = {
+            "person_ID": ministry.data[k].person_ID,
+            "ministry_ID": ministry.data[k].ministry_ID,
+          }
+          for(j = 0; j < this.form.MinistryTypes.length; j++)
+          {
+            if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
+            {
+              //Add that Involement Type to the this.form.ministry array since it will just be the types
+              this.form.ministry.push(this.form.MinistryTypes[k]);
+            }
+          }
+          // put into prechange list first
+          this.ministrylist.push(temp);
+        }
+
+        //Clear both of the arrays
+        this.hobbylist = [];
+        this.form.hobbies = [];
+
+        console.log("Loading Hobbies and Interests");
+        //Iterate through the list and create new objects that have the ID and the valid_Value.type
+        for(k = 0; k < hobby.data.length; k++)
+        {
+          temp = {
+            "person_ID": hobby.data[k].person_ID,
+            "hobby_ID": hobby.data[k].hobby_ID,
+          }
+          for(j = 0; j < this.form.HobbyTypes.length; j++)
+          {
+            if(this.form.HobbyTypes[j].ID == temp.hobby_ID)
+            {
+              //Add that Involement Type to the this.form.involvement array since it will just be the types
+              this.form.hobbies.push(this.form.HobbyTypes[j]);
+            }
+          }
+          // put into prechange list first
+          this.hobbylist.push(temp);
+        }
       }
     )); 
 
@@ -1418,7 +1500,7 @@ export default {
     this.form.occupation = this.user.occupation;
     this.form.employer = this.user.employer;
     this.form.ministry = this.user.ministry;
-    this.form.involment = this.user.involment;
+    this.form.involvement = this.user.involvement;
     this.form.phones = this.user.phones;
     this.form.workPhone = this.user.workPhone;
     this.form.hobbies = this.user.hobbies;
@@ -1431,7 +1513,13 @@ export default {
     //Array for all the Valid_Values
     validvalues:[],
     //Start array for the Involvement list
-    involmentlist:[],
+    involvementlist:[],
+    //Start Array for the Ministry Areas
+    ministrylist:[],
+    //Start Array for the Hobbies/Interests
+    hobbylist:[],
+    //Variable for the search function
+    search: null,
     //Flag data for the admin
     isAdmin: true,
     //Variables for the Datatable
@@ -1513,9 +1601,10 @@ export default {
       RelationType: [],
       InvolmentTypes: [],
       MinistryTypes: [],
+      HobbyTypes: [],
       GenderTypes: ["male","female","other"],
       ministry: [],
-      involment: [],
+      involvement: [],
       phones: [],
       hobbies: [], //Should be comma seperating to keep it all in one field
       LifeEvents: [],
@@ -1538,7 +1627,7 @@ export default {
       occupation: "",
       employer: "",
       ministry: [],
-      involment: [],
+      involvement: [],
       phones: [],
       hobbies: [], //Should be comma seperating to keep it all in one field
       LifeEvents: [],
@@ -1961,127 +2050,465 @@ export default {
     //Function will also be called every time the list is changed
     ListChanged(type)
     {
-      console.log(this.form.involment.length);
+      var deletes = null;
+      var adds = null;
+      var flag = false;
+      var k;
+      var i;
+      var j;
+      var temp;
+      var Data;
       if(type == 0) { //Hobbies and Interests List
-
-      } else if(type == 1) { //Involvement List
         //determine if we need to delete or if we need to add to the current list
-        if(this.involmentlist.length > this.form.involment.length)
+        if(this.hobbylist.length > this.form.hobbies.length)
         {
-          var deletes = null;
-          if(this.form.involment.length == 0 )
+          if(this.form.hobbies.length == 0 )
           {
-            deletes = this.involmentlist[0]; //Set if the base array is zero
+
+            deletes = this.hobbylist[0]; //Set if the base array is zero
           }
           else
           {
-            for(var i = 0; i < this.involmentlist.length; i++)
+            flag = false;
+            for(i = 0; i < this.hobbylist.length && !flag; i++)
             {
-              if(this.form.involment[i] == undefined)
+              if(this.form.hobbies[i] == undefined)
                 {
-                  deletes = this.involmentlist[i];
+                  deletes = this.hobbylist[i];
                 }
-              else if(this.involmentlist[i].involvement_ID != this.form.involment[i].ID)//If the arrays do not match up at a certain point, then that element should be the removed on
+              else if(this.hobbylist[i].hobby_ID != this.form.hobbies[i].ID)//If the arrays do not match up at a certain point, then that element should be the removed on
                 {
-                  deletes = this.involmentlist[i];
-                  console.log("Assigning value");
+                  deletes = this.hobbylist[i];
+                  flag = true;
+                } 
+            }
+          }
+          //Clear both of the arrays
+          this.hobbylist = [];
+          this.form.hobbies = [];
+          console.log("Deletes: ");
+          axios.delete(baseURL + 'person_hobby?person_id=' + this.user.id + '&hobby_id=' + deletes.hobby_ID)
+          .finally(() => {
+            console.log("Deletes status: ");
+            axios.get(baseURL + 'person_hobby?person_id=' + this.user.id)
+            .then(get =>{
+              console.log("Getting current List");
+              //Iterate through the list and create new objects that have the ID and the valid_Value.type
+              for(k = 0; k < get.data.length; k++)
+              {
+                temp = {
+                  "person_ID": get.data[k].person_ID,
+                  "hobby_ID": get.data[k].hobby_ID,
+                }
+                for(j = 0; j < this.form.HobbyTypes.length; j++)
+                {
+                  if(this.form.HobbyTypes[j].ID == temp.hobby_ID)
+                  {
+                    console.log("Hobby Type: " + this.form.HobbyTypes[j].ID + " " + this.form.HobbyTypes[j].value);
+                    //Add that Hobby Type to the this.form.involvement array since it will just be the types
+                    this.form.hobbies.push(this.form.HobbyTypes[j]);
+                  }
+                }
+                // put into prechange list first
+                this.hobbylist.push(temp);
+              }
+            })
+          })
+          this.form.hobbies = this.hobbylist;
+        }
+        else { //The array is bigger than the prechange list
+          //If the user adds one from the autocomplete feature
+          if(this.search != null)
+          {
+            // console.log(this.search);
+            Data = {
+              ID: -1,
+              value_group:null,
+              value: this.search,
+              type: this.search,
+            }
+            this.form.hobbies[this.form.hobbies.length-1] = Data;
+            this.search = null;
+            // console.log(this.form.hobbies.length);
+          }
+          //If the user adds one from the checkbox feature
+          else
+          {
+            if(this.hobbylist.length == 0 )
+            {
+              adds = this.form.hobbies[0]; //Set if the base array is zero
+            }
+            else{
+              flag = false;
+              for(j = 0; j < this.form.hobbies.length && !flag; j++)//Will be the bigger list to check from
+              {
+                if(this.hobbylist[j] == undefined)
+                  {
+                    adds = this.form.hobbies[j];
+                  }
+                else if( this.form.hobbies[j].ID != this.hobbylist[j].hobby_ID)//If the arrays do not match up at a certain point, then that element should be the added
+                  {
+                    adds = this.form.hobbies[j];//Will do opposite of Delete side
+                    flag = true;
+                  }
+              }
+            }
+            Data = {
+              ID: adds.ID,
+              value_group:adds.value_group,
+              value: adds.value,
+              type: adds.type,
+            }
+          }
+          //Iterate through and find the Hobbytype for it else post a new type
+          flag = false;
+          for(j = 0; j < this.form.HobbyTypes.length; j++)
+          {
+            if(this.form.HobbyTypes[j].value == Data.value)
+            {
+              //Add that Involement Type to the this.form.involvement array since it will just be the types
+              flag = true;
+            }
+          }
+          if(!flag)//Will be true if the Type is never found, which will mean that we do a Post for a new type
+          {
+            Data = {
+                "person_ID": this.user.id,
+                "hobby": Data.value,
+            }
+            //Make Axios call
+            //Post if the Hobby is not already a type
+            axios.post(baseURL + 'person_hobby?isNewHobby=1',Data)
+            .catch(error =>{this.CatchError(error);})
+            .finally(() =>{
+              console.log("Posting New status: ");
+              //Get the Valid Values for the hobby group
+              axios.all([
+                axios.get(baseURL + 'valid_value?value_group=hobby'),
+                axios.get(baseURL + 'person_hobby?person_id=' + this.user.id),
+              ])
+              .then(axios.spread((response, get)=>{
+                //Clear the HobbyTypes array to get the new types
+                this.form.HobbyTypes = [];
+                console.log("Getting Valid Values for hobby: " + response.status);
+                for(var r = 0; r < response.data.length; r++)
+                {
+                  temp = { //setup variable for getting the Valid_values from the array
+                      ID: response.data[r].ID,
+                      value_group:response.data[r].value_group,
+                      value:response.data[r].value,
+                      type: response.data[r].value,//Set to the value to make the type that value and then switch on a Put
+                  }
+                  this.form.HobbyTypes.push(temp);
+                  console.log(`Hobby Types: ${temp.ID} ${temp.value_group} ${temp.value}`);
+                }
+                //Clear both of the arrays
+                this.hobbylist = [];
+                this.form.hobbies = [];
+
+                console.log("Getting Hobbies List: " + get.status);
+                //Iterate through the list and create new objects that have the ID and the valid_Value.type
+                for(k = 0; k < get.data.length; k++)
+                {
+                  temp = {
+                    "person_ID": get.data[k].person_ID,
+                    "hobby_ID": get.data[k].hobby_ID,
+                  }
+                  for(j = 0; j < this.form.HobbyTypes.length; j++)
+                  {
+                    if(this.form.HobbyTypes[j].ID == temp.hobby_ID)
+                    {
+                      console.log(`Hobby Type Comparison: ${this.form.HobbyTypes[j].ID} ${this.form.HobbyTypes[j].value} : ${temp.hobby_ID}`)
+                      //Add that Involement Type to the this.form.involvement array since it will just be the types
+                      this.form.hobbies.push(this.form.HobbyTypes[j]);
+                    }
+                  }
+                  // put into prechange list first
+                  this.hobbylist.push(temp);
+                }
+              }))
+              .catch(error=>{this.CatchError(error);})
+            })
+
+          }
+          else
+          {     
+            Data = {
+                "person_ID": this.user.id,
+                "hobby_ID": adds.ID,
+            }
+            //Post if the Hobby is already a type
+            axios.post(baseURL + 'person_hobby?isNewHobby=0',Data)
+            .catch(error =>{this.CatchError(error);})
+            .finally(() =>{
+              console.log("Posting Existing Hobby");
+              axios.get(baseURL + 'person_hobby?person_id=' + this.user.id)
+              .then(get => {
+                //Clear both of the arrays
+                this.hobbylist = [];
+                this.form.hobbies = [];
+
+                console.log("Getting current List");
+                //Iterate through the list and create new objects that have the ID and the valid_Value.type
+                for(k = 0; k < get.data.length; k++)
+                {
+                  console.log("Data: " + get.data[k].hobby_ID);
+                  var rtrn = {
+                    "person_ID": get.data[k].person_ID,
+                    "hobby_ID": get.data[k].hobby_ID,
+                  }
+                  for(j = 0; j < this.form.HobbyTypes.length; j++)
+                  {
+                    if(this.form.HobbyTypes[j].ID == rtrn.hobby_ID)
+                    {
+                      // console.log(`Hobby Types: ${rtrn.hobby_ID}:  ${this.form.HobbyTypes[j].ID} ${this.form.HobbyTypes[j].value}`);
+                      //Add that Involement Type to the this.form.involvement array since it will just be the types
+                      this.form.hobbies.push(this.form.HobbyTypes[j]);
+                    }
+                  }
+                  // put into prechange list first
+                  this.hobbylist.push(rtrn);
+                }
+              })
+              .catch(error =>{this.CatchError(error);})
+            });
+          }
+
+        }
+      } else if(type == 1) { //Involvement List
+        //determine if we need to delete or if we need to add to the current list
+        if(this.involvementlist.length > this.form.involvement.length)
+        {
+          if(this.form.involvement.length == 0 )
+          {
+            deletes = this.involvementlist[0]; //Set if the base array is zero
+          }
+          else
+          {
+            flag = false;
+            for(i = 0; i < this.involvementlist.length && !flag; i++)
+            {
+              if(this.form.involvement[i] == undefined)
+                {
+                  deletes = this.involvementlist[i];
+                }
+              else if(this.involvementlist[i].involvement_ID != this.form.involvement[i].ID)//If the arrays do not match up at a certain point, then that element should be the removed on
+                {
+                  deletes = this.involvementlist[i];
+                  console.log(this.involvementlist[i].involvement_ID);
+                  flag = true;
                 } 
             }
             console.log(deletes.involvement_ID);
           }
           console.log("Deletes: ");
-          //perform an axios all to resolve the deletes, posts, and the Get for all of the Involvement stuff
-          // axios.all([
-            axios.delete(baseURL + 'person_involvement?person_id=' + this.user.id + '&involvement_id=' + deletes.involvement_ID)
-            .finally(() => {
+          axios.delete(baseURL + 'person_involvement?person_id=' + this.user.id + '&involvement_id=' + deletes.involvement_ID)
+          .finally(() => {
               console.log("Deletes status: ");
               axios.get(baseURL + 'person_involvement?person_id=' + this.user.id)
               .then(get =>{
                 //Clear both of the arrays
-                this.involmentlist = [];
-                this.form.involment = [];
+                this.involvementlist = [];
+                this.form.involvement = [];
 
                 console.log("Getting current List");
                 //Iterate through the list and create new objects that have the ID and the valid_Value.type
-                for(var k = 0; k < get.data.length; k++)
+                for(k = 0; k < get.data.length; k++)
                 {
-                  var temp = {
+                  temp = {
                     "person_ID": get.data[k].person_ID,
                     "involvement_ID": get.data[k].involvement_ID,
                   }
-                  for(var j = 0; j < this.form.InvolmentTypes.length; j++)
+                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
                   {
                     if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
                     {
-                      //Add that Involement Type to the this.form.involment array since it will just be the types
-                      this.form.involment.push(this.form.InvolmentTypes[k]);
+                      //Add that Involement Type to the this.form.involvement array since it will just be the types
+                      this.form.involvement.push(this.form.InvolmentTypes[j]);
                     }
                   }
                   // put into prechange list first
-                  this.involmentlist.push(temp);
+                  this.involvementlist.push(temp);
                 }
               })
             })
-
-          // }));
-          //Assign the using list
-          this.form.involment = this.involmentlist;
+          this.form.involvement = this.involvementlist;
         }
         else { //The array is bigger than the prechange list
-          var adds = null;
-          if(this.involmentlist.length == 0 )
+          if(this.involvementlist.length == 0 )
           {
-            adds = this.form.involment[0]; //Set if the base array is zero
+            adds = this.form.involvement[0]; //Set if the base array is zero
           }
           else{
-            for(i = 0; i < this.form.involment.length; i++)
+            flag = false;
+            for(j = 0; j < this.form.involvement.length && !flag; j++)//Will be the bigger list to check from
             {
-              if(this.involmentlist[i].involvement_ID == undefined)
-                adds = this.form.involment[i];
-              else if(this.involmentlist[i].involvement_ID != this.form.involment[i].ID)//If the arrays do not match up at a certain point, then that element should be the added
-                adds = this.form.involment[i];//Will do opposite of Delete side
+              if(this.involvementlist[j] == undefined)
+                {
+                  adds = this.form.involvement[j];
+                }
+              else if( this.form.involvement[j].ID != this.involvementlist[j].involvement_ID)//If the arrays do not match up at a certain point, then that element should be the added
+                {
+                  adds = this.form.involvement[j];//Will do opposite of Delete side
+                  flag = true;
+                }
             }
           }
           //create the Data var to send to the backend
-          var Data = {
+          Data = {
               "person_ID": this.user.id,
               "involvement_ID": adds.ID,
           }
           //perform an axios all to resolve the post, and the Get for all of the Involvement stuff
-          // axios.all([
           axios.post(baseURL + 'person_involvement',Data)
           .finally(() =>{
             console.log("Posting status: ");
             axios.get(baseURL + 'person_involvement?person_id=' + this.user.id)
             .then(get => {
-          // ])
-          // .then(axios.spread((ad,get) => {
               //Clear both of the arrays
-              this.involmentlist = [];
-              this.form.involment = [];
+              this.involvementlist = [];
+              this.form.involvement = [];
 
               console.log("Getting current List");
               //Iterate through the list and create new objects that have the ID and the valid_Value.type
-              for(var k = 0; k < get.data.length; k++)
+              for(k = 0; k < get.data.length; k++)
               {
-                var temp = {
+                temp = {
                   "person_ID": get.data[k].person_ID,
                   "involvement_ID": get.data[k].involvement_ID,
                 }
-                for(var j = 0; j < this.form.InvolmentTypes.length; j++)
+                for(j = 0; j < this.form.InvolmentTypes.length; j++)
                 {
                   if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
                   {
-                    //Add that Involement Type to the this.form.involment array since it will just be the types
-                    this.form.involment.push(this.form.InvolmentTypes[k]);
+                    //Add that Involement Type to the this.form.involvement array since it will just be the types
+                    this.form.involvement.push(this.form.InvolmentTypes[k]);
                   }
                 }
                 // put into prechange list first
-                this.involmentlist.push(temp);
+                this.involvementlist.push(temp);
               }
             })
           });
 
+        }
+      } else if(type == 2) { //Ministry Area
+        //determine if we need to delete or if we need to add to the current list
+        if(this.ministrylist.length > this.form.ministry.length)
+        {
+          deletes = null;
+          if(this.form.ministry.length == 0 )
+          {
+            deletes = this.ministrylist[0]; //Set if the base array is zero
+          }
+          else
+          {
+            flag = false;
+            for(i = 0; i < this.ministrylist.length && !flag; i++)
+            {
+              if(this.form.ministry[i] == undefined)
+                {
+                  deletes = this.ministrylist[i];
+                }
+              else if(this.ministrylist[i].ministry_ID != this.form.ministry[i].ID)//If the arrays do not match up at a certain point, then that element should be the removed on
+                {
+                  deletes = this.ministrylist[i];
+                  console.log(this.ministrylist[i].ministry_ID);
+                  flag = true;
+                } 
+            }
+            console.log(deletes.ministry_ID);
+          }
+          console.log("Deletes: ");
+          axios.delete(baseURL + 'person_ministry?person_id=' + this.user.id + '&ministry_id=' + deletes.ministry_ID)
+          .finally(() => {
+              console.log("Deletes status: ");
+              axios.get(baseURL + 'person_ministry?person_id=' + this.user.id)
+              .then(get =>{
+                //Clear both of the arrays
+                this.ministrylist = [];
+                this.form.ministry = [];
+
+                console.log("Getting current List");
+                //Iterate through the list and create new objects that have the ID and the valid_Value.type
+                for(k = 0; k < get.data.length; k++)
+                {
+                  temp = {
+                    "person_ID": get.data[k].person_ID,
+                    "ministry_ID": get.data[k].ministry_ID,
+                  }
+                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                  {
+                    if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
+                    {
+                      //Add that Involement Type to the this.form.ministry array since it will just be the types
+                      this.form.ministry.push(this.form.MinistryTypes[j]);
+                    }
+                  }
+                  // put into prechange list first
+                  this.ministrylist.push(temp);
+                }
+              })
+            })
+          this.form.ministry = this.ministrylist;
+        }
+        else { //The array is bigger than the prechange list
+          adds = null;
+          if(this.ministrylist.length == 0 )
+          {
+            adds = this.form.ministry[0]; //Set if the base array is zero
+          }
+          else{
+            flag = false;
+            for(j = 0; j < this.form.ministry.length && !flag; j++)//Will be the bigger list to check from
+            {
+              if(this.ministrylist[j] == undefined)
+                {
+                  adds = this.form.ministry[j];
+                }
+              else if( this.form.ministry[j].ID != this.ministrylist[j].ministry_ID)//If the arrays do not match up at a certain point, then that element should be the added
+                {
+                  adds = this.form.ministry[j];//Will do opposite of Delete side
+                  flag = true;
+                }
+            }
+          }
+          //create the Data var to send to the backend
+          Data = {
+              "person_ID": this.user.id,
+              "ministry_ID": adds.ID,
+          }
+          //perform an axios all to resolve the post, and the Get for all of the Involvement stuff
+          axios.post(baseURL + 'person_ministry',Data)
+          .finally(() =>{
+            console.log("Posting status: ");
+            axios.get(baseURL + 'person_ministry?person_id=' + this.user.id)
+            .then(get => {
+              //Clear both of the arrays
+              this.ministrylist = [];
+              this.form.ministry = [];
+
+              console.log("Getting Ministry Areas");
+              //Iterate through the list and create new objects that have the ID and the valid_Value.type
+              for(k = 0; k < get.data.length; k++)
+              {
+                temp = {
+                  "person_ID": get.data[k].person_ID,
+                  "ministry_ID": get.data[k].ministry_ID,
+                }
+                for(j = 0; j < this.form.MinistryTypes.length; j++)
+                {
+                  if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
+                  {
+                    //Add that Ministry Area  to the this.form.ministry array since it will just be the types
+                    this.form.ministry.push(this.form.MinistryTypes[k]);
+                  }
+                }
+                // put into prechange list first
+                this.ministrylist.push(temp);
+              }
+            })
+          });
         }
       }
     },
