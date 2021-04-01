@@ -54,7 +54,7 @@ export default {
             formData.append("file", this.selectedFile); // appending file
 
             // sending file to backend
-            if(this.$route.name == "HouseHold" || (this.$route.name == "Directory" && true))
+            if(this.$route.name == "HouseHold")
             {
                 console.log("Uploading photo for household page")
                 axios
