@@ -38,12 +38,12 @@
     name:"", 
     drawer: null,
     tabs:[
-    {icon:'mdi-account',text:'Account', path:'/account'},
-    {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
-    {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
-    {icon:'mdi-calendar',text:'Events', path:'/events'},
-    {icon:'mdi-church',text:'Directory', path:'/directory'},
-    {icon:'mdi-help',text:'Help', path:'/help'},
+    {icon:'mdi-account',text:'Account', path:'/account', params: { id:window.user.id}},
+    {icon:'mdi-home-group',text:'HouseHold', path:'/household', params: { id:window.user.id}},
+    {icon:'mdi-account-group',text:'Groups', path:'/grouplist', params: { id:window.user.id}},
+    {icon:'mdi-calendar',text:'Events', path:'/events', params: { id:window.user.id}},
+    {icon:'mdi-church',text:'Directory', path:'/directory', params: { id:window.user.id}},
+    {icon:'mdi-help',text:'Help', path:'/help', params: { id:window.user.id}},
     ],
     }),
   }

@@ -1486,8 +1486,7 @@ export default {
           this.hobbylist.push(temp);
         }
       }
-    )); 
-
+    )) 
     //axios call to get phones
     this.GetPhones();
     
@@ -2564,7 +2563,7 @@ export default {
     {
       //Axios call for all users for Relationships
       axios
-      .get(baseURL + "relationship?person1_ID=" + window.person.id)
+      .get(baseURL + "relationship?person1_ID=" + this.user.id)
       .then((response) => {
         this.form.Relations = [];//Null out array
         //Loop through and make another axios call for each of the person_ids to get that person with their full name
@@ -2675,7 +2674,10 @@ export default {
           // for( var i = 0; i< this.form.phones.length; i++)
           //   console.log(`Phone Info ${this.form.phones[i].ID}`);
         })
-        .catch((error) => {this.CatchError(error);});  
+        .catch((error) => {
+          this.CatchError(error);
+          this.form.phones = [];
+        });  
     },
     async GetUser()
     {
