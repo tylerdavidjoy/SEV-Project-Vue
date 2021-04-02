@@ -12,13 +12,21 @@
                   </button>
               </v-col>
         </v-row>
+        <AnnouncementViewer v-if="announcements.length" :announcements="announcements"/>
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import axios from 'axios';
+
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+import AnnouncementViewer from '@/components/Announcements.vue'
   export default {
+    components: {
+      AnnouncementViewer
+    },
     data: () => ({ 
     drawer: null,
     tabs:[
@@ -28,6 +36,21 @@
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'},
     ],
+    announcements: [],
     }),
+    beforeCreate(){
+      axios.get(`${apiBaseUrl}/valid_value`)
+      .then(values => {
+        let messageTypeID = values.data.find(x => x.value_group === "message" && x.value === "congregation").id;
+
+        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
+        .then(messages => {
+          this.announcements = messages;
+        })
+        .catch(error => {
+          console.error(error);
+        })
+      })
+    }
   }
 </script>
