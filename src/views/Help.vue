@@ -43,7 +43,6 @@
     {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
     {icon:'mdi-calendar',text:'Events', path:'/events'},
     {icon:'mdi-church',text:'Directory', path:'/directory'},
-    {icon:'mdi-help',text:'Help', path:'/help'},
     ],
     }),
   }
