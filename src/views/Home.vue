@@ -12,7 +12,7 @@
                   </button>
               </v-col>
         </v-row>
-        <AnnouncementViewer v-if="announcements.length" :announcements="announcements"/>
+        <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" class="mt-5"/>
       </v-container>
     </v-main>
   </v-app>
@@ -41,11 +41,16 @@ import AnnouncementViewer from '@/components/Announcements.vue'
     beforeCreate(){
       axios.get(`${apiBaseUrl}/valid_value`)
       .then(values => {
-        let messageTypeID = values.data.find(x => x.value_group === "message" && x.value === "congregation").id;
+        let messageTypeID = values.data.find(x => x.value_group === "message" && x.value === "congregation").ID;
 
-        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
+        console.log(this.$person.congregation_id, values.data.find(x => x.value_group === "message" && x.value === "congregation").ID)
+        console.log(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_id})&receipient_type=${messageTypeID}`)
+
+        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_id})&receipient_type=${messageTypeID}`)
         .then(messages => {
-          this.announcements = messages;
+          this.announcements = messages.data;
+          console.log(this.announcements)
+          
         })
         .catch(error => {
           console.error(error);
