@@ -34,7 +34,7 @@
             <v-col cols="auto">
               <v-container>
                 <v-sheet width="600">
-                  <img src="../assets/dog.jpg" class="userImg">
+                  <!-- <img src="../assets/dog.jpg" class="userImg"> -->
                   <br />
                   <h1>Family Members</h1>
                   <br />
@@ -43,7 +43,7 @@
                       v-for="member in familyMembers"
                       v-bind:key="member.ID" class="list" @click="navToAccountPage(member.ID)">
                       <v-list-item-icon>
-                        <img src="../assets/dog.jpg" class="smallUserImg">
+                        <img :src="baseURL + 'images/' + member.image" class="smallUserImg">
                       </v-list-item-icon>
 
                       <v-list-item-content class="large">
@@ -474,7 +474,7 @@ img.userImg {
 }
 
 img.smallUserImg {
-  height: 80px;
+  max-height: 120px;
   size: auto
 }
 
