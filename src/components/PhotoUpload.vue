@@ -31,6 +31,12 @@ export default {
         },
         familyImgSrc: {
             type: String
+        },
+        personImgSrc: {
+            type: String
+        },
+        isCreateFamily: {
+            type: Boolean
         }
     },
 
@@ -54,7 +60,7 @@ export default {
             formData.append("file", this.selectedFile); // appending file
 
             // sending file to backend
-            if(this.$route.name == "HouseHold")
+            if(this.$route.name == "HouseHold" || (this.$route.name == "Directory" && this.isCreateFamily))
             {
                 console.log("Uploading photo for household page")
                 axios
@@ -74,16 +80,16 @@ export default {
                 });
             }
 
-            else if(this.$route.name == "Account")
+            else if(this.$route.name == "Account" || (this.$route.name == "Directory" && !this.isCreateFamily))
             {
                 console.log("Uploading photo for the account page")
                 axios
                 .post(this.baseURL + "upload?person_ID=" + this.userId, formData, {
                     onUploadProgress: ProgressEvent => {
                         let progress = 
-                        Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-                        +"%";
-                        this.progress = progress;
+                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+                            +"%";
+                            this.progress = progress;
                     }
                 })
                 .then(response => {
