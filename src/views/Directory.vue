@@ -90,8 +90,8 @@
                             <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
                             <DirectoryReport :selected.sync="fileType" :picture.sync="picture"/>
                             
-                            <!-- <RoleReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <GroupReport :selected.sync="fileType" :picture.sync="picture"/> -->
+                             <!-- <RoleReport :selected.sync="fileType" :picture.sync="picture"/> -->
+                            <GroupReport :selected.sync="fileType" :picture.sync="picture"/>
                             <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
                             <!-- <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>  -->
 
@@ -114,7 +114,7 @@ import axios from "axios";
 import ReportSettings from "@/components/report_settings.vue";
 import DirectoryReport from "@/components/directory_report.vue";
 
-// import GroupReport from "@/components/group_report.vue";
+import GroupReport from "@/components/group_report.vue";
  import GroupListReport from "@/components/group_list_report.vue";
 // import LifeEventReport from "@/components/lifeEvent_report.vue";
 // import RoleReport from "@/components/role_report.vue";
@@ -125,12 +125,12 @@ export default {
   components: {
     ReportSettings,
     DirectoryReport,
-    // GroupReport,
+    GroupReport,
     // LifeEventReport,
-     GroupListReport,
+    GroupListReport,
     // RoleReport,
-     AddPersonDialog,
-     AddFamilyDialog
+    AddPersonDialog,
+    AddFamilyDialog
   },
   mounted() {
     //People
