@@ -90,10 +90,10 @@
                             <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
                             <DirectoryReport :selected.sync="fileType" :picture.sync="picture"/>
                             
-                             <!-- <RoleReport :selected.sync="fileType" :picture.sync="picture"/> -->
+                            <RoleReport :selected.sync="fileType" :picture.sync="picture"/>
                             <GroupReport :selected.sync="fileType" :picture.sync="picture"/>
                             <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <!-- <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>  -->
+                            <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
 
                           </div>
                         </v-container>
@@ -116,8 +116,8 @@ import DirectoryReport from "@/components/directory_report.vue";
 
 import GroupReport from "@/components/group_report.vue";
  import GroupListReport from "@/components/group_list_report.vue";
-// import LifeEventReport from "@/components/lifeEvent_report.vue";
-// import RoleReport from "@/components/role_report.vue";
+import LifeEventReport from "@/components/lifeEvent_report.vue";
+import RoleReport from "@/components/role_report.vue";
  import AddPersonDialog from "@/components/add_person_dialog.vue";
  import AddFamilyDialog from "@/components/add_family_dialog.vue";
 export default {
@@ -126,9 +126,9 @@ export default {
     ReportSettings,
     DirectoryReport,
     GroupReport,
-    // LifeEventReport,
+    LifeEventReport,
     GroupListReport,
-    // RoleReport,
+    RoleReport,
     AddPersonDialog,
     AddFamilyDialog
   },
@@ -142,6 +142,7 @@ export default {
         this.people.push({
           id: response.data[i].ID,
           name: response.data[i].f_name + " " + response.data[i].l_name,
+          image: response.data[i].image
         })
       }
       this.autoPagination(this.people);
