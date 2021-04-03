@@ -82,46 +82,17 @@ export default ({
                         columns: [
                             {
                                 image: 'sample', //First IMG in row
-                                width: 150,
-                                height: 150
+                                width: 75,
+                                height: 75
                             },
                             {}, //Spacing
-                            {
-                                image: 'sample', //Second IMG in row
-                                width: 150,
-                                height: 150
-                            },
-                            {}, //Spacing
-                            {
-                                image: 'sample', //Third IMG in row
-                                width: 150,
-                                height: 150
-                            }
-                        ]
-                    }
-
-                    var tempNames = {
-                        fontSize: 20,
-                        alignment: 'center',
-                        width:150,
-                        columns: [
                             {
                                 text:group[i].f_name + " " + group[i].l_name + "\n" + group[i].email,
-                            },
-                                //Spacing
-                            {
-                                text: group[i + 1].f_name + " " + group[i + 1].l_name + "\n" + group[i+1].email,
-                            },
-                                //Spacing
-                            {
-                                text: group[i + 2].f_name + " " + group[i + 2].l_name + "\n" + group[i+2].email,
+                                fontSize: 15,
                             }
                         ]
                     }
-
                     contentTemp.push(tempImg);
-                    contentTemp.push(tempNames);
-                    i +=2;
                 }
 
                 var pdfContent = {
