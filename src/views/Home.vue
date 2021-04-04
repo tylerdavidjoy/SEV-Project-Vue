@@ -57,7 +57,10 @@ import AnnouncementViewer from '@/components/Announcements.vue'
 
         axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
         .then(messages => {
-          this.announcements = messages.data;
+          if(messages.data > 0)
+            this.announcements = messages.data;
+          else
+            this.announcements.push({message: "No announcements to show."})
           console.log(this.announcements)
           
         })

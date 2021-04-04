@@ -338,9 +338,11 @@ export default {
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
         .then(messages => {
-          this.announcements = messages.data;
+          if(messages.data > 0)
+            this.announcements = messages.data;
+          else
+            this.announcements.push({message: "No announcements to show."})
           console.log(this.announcements)
-          
         })
         .catch(error => {
           console.error(error);
