@@ -697,6 +697,7 @@
                                         <v-col cols="12" sm="6" md="4">
                                           <v-text-field
                                             v-model="editedItem.number"
+                                            :rules="phoneRules"
                                             label="Phone Number"
                                           ></v-text-field>
                                         </v-col>
@@ -1646,6 +1647,15 @@ export default {
     emailRules: [
       (v) => !!v || "E-mail is required",
       (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    phoneRules: [
+      value => !!value || 'Required.',
+      value => (value || '').length <= 14 || 'Number is too long.',
+      value => (value || '').length >= 10 || 'Number is too short.',
+      value => {
+        const pattern = /^([0-9]{10,11})|(.*[0-9]{3,4}.[0-9]{3}.[0-9]{4})|(\([0-9]{3}\).[0-9]{3}.[0-9]{4})/
+        return pattern.test(value) || 'Invalid Phone Number. ###-###-####'
+      },
     ],
   }),
   watch: {
