@@ -23,7 +23,7 @@
                           label="Search"
                           hint="Search for a group"
                           clearable
-                          @change="SearchAPI()"
+                          @input="SearchAPI()"
                           @click:clear="ClearAPI()"
                         ></v-text-field>
                       </div>
