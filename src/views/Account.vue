@@ -58,7 +58,9 @@
                             <v-card flat>
                               <v-card-title class="headline">
                                 <v-list-item-content>
-                                  {{ user.f_name }}'s Life Events
+                                  {{ user.f_name }}'s 
+                                  <br/>
+                                  Life Events
                                 </v-list-item-content>
                                 <v-list-item-content>
                                   <template v-if="isAdmin">
@@ -416,7 +418,9 @@
                           <v-tab-item>
                             <v-card flat>
                               <v-card-title class="headline">
-                                {{ user.f_name }}'s Relationships
+                                {{ user.f_name }}'s 
+                                <br/>
+                                Relationships
                                 <v-spacer></v-spacer>
                                 <v-list-item-content>
                                   <v-dialog
@@ -572,7 +576,7 @@
                       <div :class="'px-6'" class="pt-6">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.f_name"
+                          v-model="user.f_name"
                           :counter="15"
                           :rules="nameRules"
                           :label="'First Name: ' + user.f_name"
@@ -585,7 +589,7 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.l_name"
+                          v-model="user.l_name"
                           :counter="15"
                           :rules="nameRules"
                           :label="'Last Name: ' + user.l_name"
@@ -598,10 +602,10 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.preferred_name"
-                          :counter="10"
+                          v-model="user.preferred_name"
+                          :counter="15"
                           :rules="nameRules"
-                          :label="'Preferred Name: ' + user.occupation"
+                          :label="'Preferred Name: ' + user.preferred_name"
                           required
                         ></v-text-field>
                       </div>
@@ -610,7 +614,7 @@
 
                       <div :class="'px-6'">
                         <v-text-field
-                          v-model="form.email"
+                          v-model="user.email"
                           :label="'E-mail: ' + user.email"
                           disabled
                         ></v-text-field>
@@ -621,9 +625,7 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.occupation"
-                          :counter="30"
-                          :rules="nameRules"
+                          v-model="user.occupation"
                           :label="'Occupation: ' + user.occupation"
                           required
                         ></v-text-field>
@@ -634,7 +636,7 @@
                       <div :class="'px-6'">
                         <v-select
                           :disabled="!editflag"
-                          v-model="form.gender"
+                          v-model="user.gender"
                           :items="form.GenderTypes"
                           label="Gender"
                           menu-props="auto"
@@ -648,7 +650,7 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.employer"
+                          v-model="user.employer"
                           :label="'Employer: ' + user.employer"
                           required
                         ></v-text-field>
@@ -1229,10 +1231,9 @@
 
                         <v-btn
                           :disabled="!valid || !editflag"
-                          type="submit"
                           color="primary"
                           class="mr-4"
-                          @click="submit"
+                          v-on:click="submit"
                         >
                           Save
                         </v-btn>
@@ -1241,7 +1242,7 @@
                           :disabled="!editflag"
                           color="secondary" 
                           class="mr-4" 
-                          @click="reset">
+                          v-on:click="reset">
                           Reset
                         </v-btn>
                       </div>
@@ -1262,8 +1263,8 @@ var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
     //Get User Info from window.person
-    this.user.id = window.person.id;//Figure out some way to set this value before loading page
-    this.user.email = window.person.email//Set value before loading page 
+    this.user.id = 5;//Figure out some way to set this value before loading page
+    this.user.email = 'garrett.wagner@eagles.oc.edu';//Set value before loading page 
 
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
@@ -1324,7 +1325,7 @@ export default {
               FullName: persons.data[c].f_name + " " + persons.data[c].l_name,
           };
           //If the ID is not the User ID
-          if(temp2.ID != window.person.id)
+          if(temp2.ID != this.user.id)
           {
             this.people.push(temp2);
             // console.log("Adding Person");
@@ -1394,10 +1395,10 @@ export default {
 
         console.log("Loading User Info: ");
         //Set user Info for the V-Form
-        if(user.data[0].f_name)
+        if(user.data[0].ID)
         {
           //Section for setting Form data from user data
-          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
           this.user.gender = user.data[0].gender;
@@ -1413,6 +1414,7 @@ export default {
             if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
+          console.log(this.user.congregation_ID);
         }
 
         //Clear both of the arrays
@@ -1492,18 +1494,10 @@ export default {
     this.GetPhones();
     
     //Section for setting Form data from user data
-    this.form.f_name = this.user.f_name;
-    this.form.l_name = this.user.l_name;
-    this.form.gender = this.user.gender;
-    this.form.preferred_name = this.user.preferred_name;
-    this.form.email = this.user.email;
-    this.form.occupation = this.user.occupation;
-    this.form.employer = this.user.employer;
+    this.form.hobbies = this.user.hobbies;
     this.form.ministry = this.user.ministry;
     this.form.involvement = this.user.involvement;
     this.form.phones = this.user.phones;
-    this.form.workPhone = this.user.workPhone;
-    this.form.hobbies = this.user.hobbies;
     this.editedItem = this.defaultItem;
   },
 
@@ -1585,17 +1579,6 @@ export default {
     currentDate: new Date().toISOString().substr(0,10),
     //Variables for the Form
     form: {
-      id: 0,
-      f_name: "",
-      l_name: "",
-      gender:'',
-      preferred_name:'',
-      email: "",
-      immersed: false,
-      data_Immersed: "",
-      birthday: "",
-      occupation: "",
-      employer: "",
       cellPhoneTypes: ["Work", "Home", "Mobile"],
       LifeEventTypes: [],
       RelationType: [],
@@ -1615,7 +1598,7 @@ export default {
     //User Info Class
     user: {
       id: null,
-      congregation_id: null,
+      congregation_ID: null,
       f_name: "",
       l_name: "",
       gender:'',
@@ -1732,27 +1715,19 @@ export default {
       console.log("PreSubmit");
       if (this.$refs.form.validate()) {
         console.log("PostSubmit");
-        this.user.f_name = this.form.f_name;
-        this.user.l_name = this.form.l_name;
-        this.user.gender = this.form.gender;
-        this.user.preferred_name = this.form.preferred_name;
-        this.user.email = this.form.email;
-        this.user.occupation = this.form.occupation;
-        this.user.employer = this.form.employer;
-        this.user.ministry = this.form.ministry;
         this.MakePut(null,5);
       }
     },
     reset() {
       this.$refs.form.reset();
       //Section for setting Form data from user data
-      this.form.f_name = this.user.f_name;
-      this.form.l_name = this.user.l_name;
-      this.form.gender = this.user.gender;
-      this.form.preferred_name = this.user.preferred_name;
-      this.form.email = this.user.email;
-      this.form.occupation = this.user.occupation;
-      this.form.employer = this.user.employer;
+      // this.form.f_name = this.user.f_name;
+      // this.form.l_name = this.user.l_name;
+      // this.form.gender = this.user.gender;
+      // this.form.preferred_name = this.user.preferred_name;
+      // this.form.email = this.user.email;
+      // this.form.occupation = this.user.occupation;
+      // this.form.employer = this.user.employer;
     },
     resetValidation() {
       this.$refs.form.resetValidation();
@@ -2391,7 +2366,7 @@ export default {
                   if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
                   {
                     //Add that Involement Type to the this.form.involvement array since it will just be the types
-                    this.form.involvement.push(this.form.InvolmentTypes[k]);
+                    this.form.involvement.push(this.form.InvolmentTypes[j]);
                   }
                 }
                 // put into prechange list first
@@ -2510,7 +2485,7 @@ export default {
                   if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
                   {
                     //Add that Ministry Area  to the this.form.ministry array since it will just be the types
-                    this.form.ministry.push(this.form.MinistryTypes[k]);
+                    this.form.ministry.push(this.form.MinistryTypes[j]);
                   }
                 }
                 // put into prechange list first
@@ -2662,7 +2637,7 @@ export default {
                 FullName: response.data[i].f_name + " " + response.data[i].l_name,
             };
             //If the ID is not the User ID
-            if(temp.ID != window.person.id)
+            if(temp.ID != this.user.id)
               {
                 this.people.push(temp);
                 console.log("Adding Person");
@@ -2681,8 +2656,6 @@ export default {
         .get(baseURL + "phone_number?person_ID=" + this.user.id)
         .then((response) => {
           this.form.phones = response.data;
-          // for( var i = 0; i< this.form.phones.length; i++)
-          //   console.log(`Phone Info ${this.form.phones[i].ID}`);
         })
         .catch((error) => {
           this.CatchError(error);
@@ -2698,14 +2671,14 @@ export default {
         if(user.data[0].f_name)
         {
           //Section for setting Form data from user data
-          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
           this.user.gender = user.data[0].gender;
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
           this.user.employer = user.data[0].employer;
-          this.user.role = user.data[0].role
+          this.user.role = user.data[0].role;
           this.user.family_ID = user.data[0].family_ID;
           
         }
@@ -2875,7 +2848,7 @@ export default {
         console.log(object.type.ID);
         //Create Object to send from Given Data
         Data = {
-          "person_ID":window.person.id,
+          "person_ID":this.user.id,
           "description":object.description,
           "date":object.date,
           "type":object.type.ID,
@@ -2939,7 +2912,7 @@ export default {
       {
         Data = {
           "ID": this.user.id,
-          "congregation_ID": this.user.congregation_id,
+          "congregation_ID": this.user.congregation_ID,
           "f_name": this.user.f_name,
           "l_name": this.user.l_name,
           "occupation": this.user.occupation,
@@ -2950,7 +2923,9 @@ export default {
           "preferred_name": this.user.preferred_name,
           "role": this.user.role,
         }
+        console.log(Data);
         axios.put(baseURL + 'person?id=' + this.user.id,Data)
+        .catch(error =>{this.CatchError(error);})
         .finally(() => {
             this.GetUser();
         })
