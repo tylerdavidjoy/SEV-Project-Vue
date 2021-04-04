@@ -122,6 +122,7 @@
                   </v-sheet>
                 </v-col>
           </v-row>
+            <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="userHasPerms" class="mt-5"/>
           <v-row>
             <v-col>
               <v-container>
@@ -240,13 +241,18 @@
 
 <script>
 import axios from 'axios'
+import AnnouncementViewer from '@/components/Announcements.vue'
 
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 
 export default {
   name: "GroupMembers",
+  components:{
+    AnnouncementViewer
+  },
   data() {
     return {
+        announcements: [],
         possibleAddList: [],
         addList: [],
         user: this.$person,
@@ -329,6 +335,17 @@ export default {
       axios.get(`${apiBaseUrl}/person`)
       ])
       .then(axios.spread((group, groupMembers, types, churchMembers) => {
+      let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
+      axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
+        .then(messages => {
+          this.announcements = messages.data;
+          console.log(this.announcements)
+          
+        })
+        .catch(error => {
+          console.error(error);
+        })
+      
       // Setting the currentAddress id for grabbing a member's current address later.
       let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
       
