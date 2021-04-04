@@ -317,6 +317,7 @@ export default {
         this.possibleAddList.splice(this.possibleAddList.indexOf(person), 1);
       })
       this.dialog = false;
+      this.renderMembers = true;
     },
   },
   beforeCreate()
