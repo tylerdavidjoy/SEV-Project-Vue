@@ -12,7 +12,7 @@
                   </button>
               </v-col>
         </v-row>
-        <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" class="mt-5"/>
+        <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="isAdmin" class="mt-5"/>
       </v-container>
     </v-main>
   </v-app>
@@ -37,11 +37,20 @@ import AnnouncementViewer from '@/components/Announcements.vue'
     {icon:'mdi-church',text:'Directory', path:'/directory'},
     ],
     announcements: [],
+    isAdmin: false,
     }),
     beforeCreate(){
       axios.get(`${apiBaseUrl}/valid_value`)
       .then(values => {
         let messageTypeID = values.data.find(x => x.value_group === "message" && x.value === "congregation").ID;
+
+        let adminID = values.data.find(x => x.value === "admin").ID
+
+        this.$nextTick(() => {
+          if(this.$person.role === adminID){
+            this.isAdmin = true;
+          }
+        })
 
         console.log(this.$person.congregation_id, values.data.find(x => x.value_group === "message" && x.value === "congregation").ID)
         console.log(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_id})&receipient_type=${messageTypeID}`)
