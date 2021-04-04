@@ -61,6 +61,7 @@ import AnnouncementViewer from '@/components/Announcements.vue'
             this.announcements = messages.data;
           else
             this.announcements.push({message: "No announcements to show."})
+            //adding a comment to test pushing
           console.log(this.announcements)
           
         })
