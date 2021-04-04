@@ -293,8 +293,8 @@
                                                 </template>
                                                 <v-date-picker
                                                   :show-current="new Date().toISOString().substr(0,10)"
-                                                  ref="picker"
                                                   :max="new Date().toISOString().substr(0,10)"
+                                                  ref="picker"
                                                   :v-model="editedEvent.date"
                                                   v-on:change="saveDate"
                                                 ></v-date-picker>
@@ -680,33 +680,41 @@
                                 </template>
                                 <v-card>
                                   <v-card-text>
-                                    <v-container>
-                                      <v-row>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-select
-                                            v-model="editedItem.type"
-                                            :items="form.cellPhoneTypes"
-                                            label="Phone Type"
-                                            menu-props="auto"
-                                            single-line
-                                          ></v-select>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-text-field
-                                            v-model="editedItem.number"
-                                            :rules="phoneRules"
-                                            label="Phone Number"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-checkbox
-                                            v-model="editedItem.can_publish"
-                                            label="Include in Directory?"
-                                            hint="This phone will be used public information for things like Events, or Directory listings."
-                                          ></v-checkbox>
-                                        </v-col>
-                                      </v-row>
-                                    </v-container>
+                                    <!-- <v-form ref="form" v-model="ValidPhone" lazy-validation> -->
+                                      <v-container>
+                                        <v-row>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-form ref="form" v-model="ValidPhone" lazy-validation>
+                                              <v-select
+                                                v-model="editedItem.type"
+                                                :items="form.cellPhoneTypes"
+                                                label="Phone Type"
+                                                menu-props="auto"
+                                                single-line
+                                                required
+                                              ></v-select>
+                                            </v-form>
+                                          </v-col>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-form ref="form" v-model="ValidPhone" lazy-validation>
+                                              <v-text-field
+                                                v-model="editedItem.number"
+                                                :rules="phoneRules"
+                                                label="Phone Number"
+                                                required
+                                              ></v-text-field>
+                                            </v-form>
+                                          </v-col>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-checkbox
+                                              v-model="editedItem.can_publish"
+                                              label="Include in Directory?"
+                                              hint="This phone will be used public information for things like Events, or Directory listings."
+                                            ></v-checkbox>
+                                          </v-col>
+                                        </v-row>
+                                      </v-container>
+                                    <!-- </v-form> -->
                                   </v-card-text>
                                   <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -721,6 +729,7 @@
                                       color="blue darken-1"
                                       text
                                       @click="save"
+                                      :disabled="!ValidPhone"
                                     >
                                       Save
                                     </v-btn>
@@ -1497,6 +1506,8 @@ export default {
   },
 
   data: () => ({
+    //Validation for phone
+    ValidPhone: false,
     //For v-form
     valid: false,
     //Array for all the Valid_Values
@@ -1628,10 +1639,10 @@ export default {
     ],
     phoneRules: [
       value => !!value || 'Required.',
-      value => (value || '').length <= 14 || 'Number is too long.',
-      value => (value || '').length >= 10 || 'Number is too short.',
+      // value => (value || '').length <= 12 || 'Number is too long.',
+      // value => (value || '').length >= 10 || 'Number is too short.',
       value => {
-        const pattern = /^([0-9]{10,11})|(.*[0-9]{3,4}.[0-9]{3}.[0-9]{4})|(\([0-9]{3}\).[0-9]{3}.[0-9]{4})/
+        const pattern = /(1{0,1}[ \-.]{0,1}\({0,1}[0-9]{3}\){0,1}[ \-.]{0,1}[0-9]{3}[ \-.]{0,1}[0-9]{4})/g
         return pattern.test(value) || 'Invalid Phone Number. ###-###-####'
       },
     ],
@@ -1712,6 +1723,7 @@ export default {
         console.log("PostSubmit");
         this.MakePut(null,5);
       }
+      alert('Your information has been saved');
     },
     reset() {
       this.$refs.form.reset();
