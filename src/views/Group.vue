@@ -234,17 +234,24 @@
           </v-row>
         </v-container>
       </v-main>
+              <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+        <GroupReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
     </div>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+import GroupReport from "@/components/group_report.vue";
+import ReportSettings from "@/components/report_settings.vue";
 
 export default {
   name: "GroupMembers",
+    components: {
+      ReportSettings,
+      GroupReport
+  },
   data() {
     return {
         possibleAddList: [],

@@ -155,6 +155,8 @@
                         </v-container>
                       </div>
                     </div>
+                    <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+                    <GroupListReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
                   </v-sheet>
               </v-col>
             </v-row>
@@ -168,10 +170,15 @@
 
 <script>
 import axios from "axios";
-
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+import GroupListReport from "@/components/group_list_report.vue";
+import ReportSettings from "@/components/report_settings.vue";
 
 export default {
+  components: {
+    ReportSettings,
+    GroupListReport
+  },
   data() {
     return {
       isAdmin: false,

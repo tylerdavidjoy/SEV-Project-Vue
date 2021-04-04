@@ -86,14 +86,14 @@
                             ></v-pagination>
                           </v-container>
 
-                          <div v-if="isAdmin">
+                          <div v-if="isAdmin" style="margin:auto">
                             <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
-                            <DirectoryReport :selected.sync="fileType" :picture.sync="picture"/>
+                            <DirectoryReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
                             
-                            <RoleReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <GroupReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <GroupListReport :selected.sync="fileType" :picture.sync="picture"/>
-                            <LifeEventReport :selected.sync="fileType" :picture.sync="picture"/>
+                            <RoleReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+
+
+                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
 
                           </div>
                         </v-container>
@@ -113,9 +113,6 @@
 import axios from "axios";
 import ReportSettings from "@/components/report_settings.vue";
 import DirectoryReport from "@/components/directory_report.vue";
-
-import GroupReport from "@/components/group_report.vue";
- import GroupListReport from "@/components/group_list_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
  import AddPersonDialog from "@/components/add_person_dialog.vue";
@@ -125,9 +122,7 @@ export default {
   components: {
     ReportSettings,
     DirectoryReport,
-    GroupReport,
     LifeEventReport,
-    GroupListReport,
     RoleReport,
     AddPersonDialog,
     AddFamilyDialog
