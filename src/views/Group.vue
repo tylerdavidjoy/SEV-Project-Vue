@@ -234,7 +234,7 @@
           </v-row>
         </v-container>
       </v-main>
-              <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+        <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
         <GroupReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
     </div>
   </v-app>
