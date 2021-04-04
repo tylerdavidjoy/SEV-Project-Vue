@@ -42,7 +42,7 @@ window.onSignIn = function (googleUser) {
       {
         Vue.prototype.$person = window.person = {
           id: response.data[0].ID,
-          congregation_id: response.data[0].congregation_ID,
+          congregation_ID: response.data[0].congregation_ID,
           f_name: response.data[0].f_name,
           l_name: response.data[0].l_name,
           occupation: response.data[0].occupation,
