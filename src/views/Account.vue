@@ -2742,8 +2742,10 @@ export default {
         .catch(error=>{this.CatchError(error);})
       } else if( type == 0 )//New Life Event
       {
-        console.log(object.type.ID);
+        console.log("Mysterious Object:", object);
         //Create Object to send from Given Data
+        if(object.visible == null || object.visible == false)
+          object.visible = false;
         Data = {
           "person_ID":this.user.id,
           "description":object.description,
@@ -2751,6 +2753,7 @@ export default {
           "type":object.type.ID,
           "visible": object.visible,
         };
+        console.log("Data for Life Event: ", Data)
         axios
         .post(baseURL + 'life_event', Data)
         .then(response =>
@@ -2854,6 +2857,9 @@ export default {
       {
         console.log(object.type.ID);
         //Create Object to send from Given Data
+
+        if(object.visible == null || object.visible == false)
+          object.visible = false;
         Data = {
           "person_ID":this.user.id,
           "description":object.description,
