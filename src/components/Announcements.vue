@@ -131,7 +131,7 @@ export default {
                     message: this.dialogm1message,
                     type: this.isEmail?this.messageTypes.find(x => x.value==="email").ID:this.messageTypes.find(x => x.value==="text").ID,
                     timesent: null,
-                    receipient: this.$person.congregation_id,
+                    receipient: this.$person.congregation_ID,
                     receipient_type: this.recipientTypes.find(x => x.value === "congregation").ID
                 })
             }

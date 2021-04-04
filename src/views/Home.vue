@@ -52,10 +52,10 @@ import AnnouncementViewer from '@/components/Announcements.vue'
           }
         })
 
-        console.log(this.$person.congregation_id, values.data.find(x => x.value_group === "message" && x.value === "congregation").ID)
-        console.log(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_id})&receipient_type=${messageTypeID}`)
+        console.log(this.$person.congregation_ID, values.data.find(x => x.value_group === "message" && x.value === "congregation").ID)
+        console.log(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
 
-        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_id})&receipient_type=${messageTypeID}`)
+        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
         .then(messages => {
           this.announcements = messages.data;
           console.log(this.announcements)
