@@ -374,16 +374,11 @@
                                         }}</v-list-item-title>
                                         <v-list-item-subtitle
                                           >Description:
-                                          {{
-                                            LifeEvent.description
-                                          }}</v-list-item-subtitle
+                                          <br/>
+                                          {{LifeEvent.description}}
+                                          </v-list-item-subtitle
                                         >
-                                        <v-list-item-subtitle>
-                                          Date:
-                                          {{
-                                            LifeEvent.date
-                                          }}</v-list-item-subtitle
-                                        >
+                                        <v-list-item-subtitle>Date:{{new Date(LifeEvent.date).toDateString()}}</v-list-item-subtitle>
                                       </v-list-item-content>
                                       <v-list-item-content>
                                         <v-btn
@@ -579,7 +574,7 @@
                           v-model="user.f_name"
                           :counter="15"
                           :rules="nameRules"
-                          :label="'First Name: ' + user.f_name"
+                          :label="'First Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -592,7 +587,7 @@
                           v-model="user.l_name"
                           :counter="15"
                           :rules="nameRules"
-                          :label="'Last Name: ' + user.l_name"
+                          :label="'Last Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -605,7 +600,7 @@
                           v-model="user.preferred_name"
                           :counter="15"
                           :rules="nameRules"
-                          :label="'Preferred Name: ' + user.preferred_name"
+                          :label="'Preferred Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -615,7 +610,7 @@
                       <div :class="'px-6'">
                         <v-text-field
                           v-model="user.email"
-                          :label="'E-mail: ' + user.email"
+                          :label="'E-mail: '"
                           disabled
                         ></v-text-field>
                       </div>
@@ -626,7 +621,7 @@
                         <v-text-field
                           :disabled="!editflag"
                           v-model="user.occupation"
-                          :label="'Occupation: ' + user.occupation"
+                          :label="'Occupation: '"
                           required
                         ></v-text-field>
                       </div>
@@ -638,7 +633,7 @@
                           :disabled="!editflag"
                           v-model="user.gender"
                           :items="form.GenderTypes"
-                          label="Gender"
+                          label="Gender: "
                           menu-props="auto"
                           return-object
                           single-line
@@ -651,7 +646,7 @@
                         <v-text-field
                           :disabled="!editflag"
                           v-model="user.employer"
-                          :label="'Employer: ' + user.employer"
+                          :label="'Employer: '"
                           required
                         ></v-text-field>
                       </div>
@@ -854,8 +849,8 @@
                         <v-select
                           :disabled="!editflag"
                           v-model="form.involvement"
-                          label="Involvment in the Church"
-                          :items="form.InvolmentTypes"
+                          label="Involvement in the Church"
+                          :items="form.InvolvementTypes"
                           item-text="type"
                           dense
                           filled
@@ -884,12 +879,12 @@
                                 v-bind="attrs"
                                 v-on="on"
                               >
-                                Open Involment Types
+                                Open Involvement Types
                               </v-btn>
                             </template>
                             <v-card>
                               <v-card-title>
-                                Involment types
+                                Involvement types
                                 <v-list-item-content>
                                   <v-dialog
                                     v-model="dialogAdminInvolvment"
@@ -954,7 +949,7 @@
                                     <v-card>
                                       <v-card-title class="headline"
                                         >Are you sure you want to
-                                        delete this Involment
+                                        delete this Involvement
                                         Type?</v-card-title
                                       >
                                       <v-card-actions>
@@ -983,7 +978,7 @@
                                     <v-col cols="12">
                                       <v-list>
                                         <v-list-item
-                                          v-for="InvolvmentType in form.InvolmentTypes"
+                                          v-for="InvolvmentType in form.InvolvementTypes"
                                           v-bind:key="InvolvmentType.type"
                                         >
                                           <v-list-item-content>
@@ -1263,8 +1258,8 @@ var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
     //Get User Info from window.person
-    this.user.id = 5;//Figure out some way to set this value before loading page
-    this.user.email = 'garrett.wagner@eagles.oc.edu';//Set value before loading page 
+    this.user.id = window.person.id;//Figure out some way to set this value before loading page
+    this.user.email = window.person.email;//Set value before loading page 
 
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
@@ -1303,7 +1298,7 @@ export default {
           }
           else if(temp.value_group == 'involvement')
           {
-            this.form.InvolmentTypes.push(temp)
+            this.form.InvolvementTypes.push(temp)
           }
           else if(temp.value_group == 'ministry')
           {
@@ -1429,12 +1424,12 @@ export default {
             "person_ID": involvement.data[k].person_ID,
             "involvement_ID": involvement.data[k].involvement_ID,
           }
-          for( j = 0; j < this.form.InvolmentTypes.length; j++)
+          for( j = 0; j < this.form.InvolvementTypes.length; j++)
           {
-            if(this.form.InvolmentTypes[j].ID == involve.involvement_ID)
+            if(this.form.InvolvementTypes[j].ID == involve.involvement_ID)
             {
               //Add that Involement Type to the this.form.involvement array since it will just be the types
-              this.form.involvement.push(this.form.InvolmentTypes[j]);
+              this.form.involvement.push(this.form.InvolvementTypes[j]);
             }
           }
           // put into prechange list
@@ -1458,7 +1453,7 @@ export default {
             if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
             {
               //Add that Involement Type to the this.form.ministry array since it will just be the types
-              this.form.ministry.push(this.form.MinistryTypes[k]);
+              this.form.ministry.push(this.form.MinistryTypes[j]);
             }
           }
           // put into prechange list first
@@ -1582,7 +1577,7 @@ export default {
       cellPhoneTypes: ["Work", "Home", "Mobile"],
       LifeEventTypes: [],
       RelationType: [],
-      InvolmentTypes: [],
+      InvolvementTypes: [],
       MinistryTypes: [],
       HobbyTypes: [],
       GenderTypes: ["male","female","other"],
@@ -1818,7 +1813,7 @@ export default {
         this.editedEvent = Object.assign({}, Event);
         this.dialogAdminEvent = true;
       } else if (type == 3){ //Involvment Types
-        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.EventsIndex = this.form.InvolvementTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogAdminInvolvment = true;
       } else{ //Ministery Areas
@@ -1846,7 +1841,7 @@ export default {
         this.dialogDeleteAdminEvent = true;
       } else if(type == 3){
         //Else the Event is a EventType
-        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.EventsIndex = this.form.InvolvementTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogDeleteAdminInvolvment = true;
       } else {
@@ -1868,7 +1863,7 @@ export default {
         this.form.LifeEventTypes.splice(this.EventsIndex, 1);
         this.MakeDeletes(this.editedEvent,type);
       } else if (type == 3) {
-        this.form.InvolmentTypes.splice(this.EventsIndex, 1);
+        this.form.InvolvementTypes.splice(this.EventsIndex, 1);
         this.MakeDeletes(this.editedEvent,type);
       } else {
         this.form.MinistryTypes.splice(this.EventsIndex, 1);
@@ -1980,12 +1975,12 @@ export default {
       } else if (type == 3){
         if (this.EventsIndex > -1) {
           Object.assign(
-            this.form.InvolmentTypes[this.EventsIndex],
+            this.form.InvolvementTypes[this.EventsIndex],
             this.editedEvent
           );
           this.MakePut(this.editedEvent,type);
         } else {
-          this.form.InvolmentTypes.push(this.editedEvent);
+          this.form.InvolvementTypes.push(this.editedEvent);
           this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
@@ -2303,12 +2298,12 @@ export default {
                     "person_ID": get.data[k].person_ID,
                     "involvement_ID": get.data[k].involvement_ID,
                   }
-                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                  for(j = 0; j < this.form.InvolvementTypes.length; j++)
                   {
-                    if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                    if(this.form.InvolvementTypes[j].ID == temp.involvement_ID)
                     {
                       //Add that Involement Type to the this.form.involvement array since it will just be the types
-                      this.form.involvement.push(this.form.InvolmentTypes[j]);
+                      this.form.involvement.push(this.form.InvolvementTypes[j]);
                     }
                   }
                   // put into prechange list first
@@ -2361,12 +2356,12 @@ export default {
                   "person_ID": get.data[k].person_ID,
                   "involvement_ID": get.data[k].involvement_ID,
                 }
-                for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                for(j = 0; j < this.form.InvolvementTypes.length; j++)
                 {
-                  if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                  if(this.form.InvolvementTypes[j].ID == temp.involvement_ID)
                   {
                     //Add that Involement Type to the this.form.involvement array since it will just be the types
-                    this.form.involvement.push(this.form.InvolmentTypes[j]);
+                    this.form.involvement.push(this.form.InvolvementTypes[j]);
                   }
                 }
                 // put into prechange list first
@@ -2421,7 +2416,7 @@ export default {
                     "person_ID": get.data[k].person_ID,
                     "ministry_ID": get.data[k].ministry_ID,
                   }
-                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                  for(j = 0; j < this.form.InvolvementTypes.length; j++)
                   {
                     if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
                     {
@@ -2507,7 +2502,7 @@ export default {
           this.validvalues = [];
           this.form.RelationType = [];
           this.form.LifeEventTypes = [];
-          this.form.InvolmentTypes =[];
+          this.form.InvolvementTypes =[];
           this.form.MinistryTypes = [];
           //Do a For loop to iterate through the list and then create an Object
           console.log("Loading Valid Values...");
@@ -2532,7 +2527,7 @@ export default {
             }
             else if(temp.value_group == 'involvement')
             {
-              this.form.InvolmentTypes.push(temp)
+              this.form.InvolvementTypes.push(temp)
             }
             else if(temp.value_group == 'ministry')
             {
