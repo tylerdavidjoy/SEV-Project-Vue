@@ -1640,10 +1640,10 @@ export default {
     phoneRules: [
       value => !!value || 'Required.',
       // value => (value || '').length <= 12 || 'Number is too long.',
-      // value => (value || '').length >= 10 || 'Number is too short.',
+      value => (value || '').length <= 10 || 'Number is too short.',
       value => {
         const pattern = /(1{0,1}[ \-.]{0,1}\({0,1}[0-9]{3}\){0,1}[ \-.]{0,1}[0-9]{3}[ \-.]{0,1}[0-9]{4})/g
-        return pattern.test(value) || 'Invalid Phone Number. ###-###-####'
+        return pattern.test(value) || 'Invalid Phone Number. 5554443232'
       },
     ],
   }),
