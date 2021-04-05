@@ -74,10 +74,14 @@
                     <v-card>
                       <v-card-title>Select Person</v-card-title>
                       <v-divider></v-divider>
+                      <div class="search-wrapper">
+                        <input type="text" v-model="searchDelete" placeholder="Search title.."/>
+                          <label>Search title:</label>
+                      </div>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
                           <v-checkbox
-                            v-for="member in deletableMembers"
+                            v-for="member in filteredDeleteList"
                             v-bind:key="member.ID"
                             multiple
                             :value="member"
@@ -129,10 +133,14 @@
                     <v-card>
                       <v-card-title>Select Person</v-card-title>
                       <v-divider></v-divider>
+                      <div class="search-wrapper">
+                        <input type="text" v-model="searchAdd" placeholder="Search title.."/>
+                          <label>Search title:</label>
+                      </div>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
                           <v-checkbox
-                            v-for="member in churchMembers"
+                            v-for="member in filteredAddList"
                             v-bind:key="member.ID"
                             multiple
                             :value="member"
@@ -183,6 +191,8 @@ import PhotoUpload from "../components/PhotoUpload.vue";
     data() { 
       return {
         selectedFile: null,
+        searchAdd: "",
+        searchDelete: "",
         address: "",
         phone: "",
         email: "",
@@ -229,11 +239,11 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         axios
         .get(this.baseURL + "family?person_ID=" + this.userId)
         .then(response => {
-          this.familyId = response.data[0].ID;
+          this.familyId = response.data.ID;
           console.log("Family ID: " + this.familyId)
-          this.address_ID = response.data[0].address_ID;
+          this.address_ID = response.data.address_ID;
           console.log("Address ID: " + this.address_ID)
-          this.familyImgSrc = this.baseURL + "images/" + response.data[0].image;
+          this.familyImgSrc = this.baseURL + "images/" + response.data.image;
           // console.log(this.familyImgSrc);
           return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
         })
@@ -453,6 +463,20 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         }
         return canEdit;
       }
+    },
+
+    computed: {
+      filteredAddList() {
+        return this.churchMembers.filter(member => {
+          return member.f_name.toLowerCase().includes(this.searchAdd.toLowerCase())
+        })
+      },
+
+      filteredDeleteList() {
+        return this.deletableMembers.filter(member => {
+          return member.f_name.toLowerCase().includes(this.searchDelete.toLowerCase())
+        })
+      }
     }
   }
 </script>
@@ -482,6 +506,40 @@ img.familyImg {
   margin: 20px;
   max-height: 270px;
   size: auto;
+}
+
+input.search {
+  padding: 4px 12px;
+  color: rgba(0,0,0,.70);
+  border: 1px solid rgba(0,0,0,.12);
+  transition: .15s all ease-in-out;
+  background: white;
+  &:focus {
+    outline: none;
+    transform: scale(1.05);
+    & + label  {
+      font-size: 10px;
+      transform: translateY(-24px) translateX(-12px);
+    }
+  }
+  &::-webkit-input-placeholder {
+    font-size: 12px;
+    color: rgba(0,0,0,.50);
+    font-weight: 100;
+  }
+}
+
+div.search-wrapper {
+  position: relative;
+  label {
+    position: absolute;
+    font-size: 12px;
+    color: rgba(0,0,0,.50);
+    top: 8px;
+    left: 12px;
+    z-index: -1;
+    transition: .15s all ease-in-out;
+  }
 }
 
 h1 {
