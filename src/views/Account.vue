@@ -1550,7 +1550,7 @@ export default {
     },
     defaultItem: {
       ID:0,
-      number: "000-000-0000",
+      number: "0000000000",
       can_publish: false,
       type: "",
     },
@@ -1655,14 +1655,18 @@ export default {
     ],
     phoneRules: [
       value => !!value || 'Required.',
-      value => (value || '').length <= 14 || 'Number is too long.',
-      value => (value || '').length <= 10 || 'Number is too short.',
+      // value => (value || '').length <= 14 || 'Number is too long.',
+      value => (value || '').length == 10 || 'Number is not correct length',
       value => {
-        const pattern = /(1{0,1}[ \-.]{0,1}\({0,1}[0-9]{3}\){0,1}[ \-.]{0,1}[0-9]{3}[ \-.]{0,1}[0-9]{4})/g
-        return pattern.test(value) || 'Invalid Phone Number. (111)-111-1111'
+        const pattern = /(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/g
+        return pattern.test(value) || 'Invalid Phone Number. 1111111111'
       },
-      value => { value.contains(`\\w`) == true || 'String in Number'
-      }
+      // value => {
+      //   const pattern2 = /([^A-Z]|[^a-z])/g
+      //   return pattern2.test(value) || 'Number contains Letters.'
+
+      // },
+      
     ],
   }),
   watch: {
