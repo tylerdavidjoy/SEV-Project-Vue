@@ -15,7 +15,7 @@
         <v-row style="margin-top:2%;">
               <v-col v-for="tab in tabs" v-bind:key="tab.icon" :link="tab.path" cols="auto" md="4" lg="4" xl="4">
                   <!-- <button @click="$router.push(tab.path)"> -->
-                    <v-btn  v-on:click="$router.push(tab.path)" height="250" width="250">
+                    <v-btn  v-on:click="$router.push({name: tab.name, params: tab.params})" height="250" width="250">
                       <div>
                         <div style="margin-top:5%;"><v-icon size="800%">{{tab.icon}}</v-icon></div>
                         <div style="font-size:270%">{{tab.text}}</div>
@@ -40,12 +40,12 @@
     name:"", 
     drawer: null,
     tabs:[
-    {icon:'mdi-account',text:'Account', path:'/account', params: { id:window.user.id}},
-    {icon:'mdi-home-group',text:'HouseHold', path:'/household', params: { id:window.user.id}},
-    {icon:'mdi-account-group',text:'Groups', path:'/grouplist', params: { id:window.user.id}},
-    {icon:'mdi-calendar',text:'Events', path:'/events', params: { id:window.user.id}},
-    {icon:'mdi-church',text:'Directory', path:'/directory', params: { id:window.user.id}},
-    {icon:'mdi-help',text:'Help', path:'/help', params: { id:window.user.id}},
+    {icon:'mdi-account',text:'Account', name:'Account', params: { id:window.person.id}},
+    {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params: { id:window.person.id}},
+    {icon:'mdi-account-group',text:'Groups', name:'Group List', params: { id:window.person.id}},
+    {icon:'mdi-calendar',text:'Events', name:'Events', params: { id:window.person.id}},
+    {icon:'mdi-church',text:'Directory', name:'Directory', params: { id:window.person.id}},
+    {icon:'mdi-help',text:'Help', name:'Help', params: { id:window.person.id}},
     ],
     }),
   }

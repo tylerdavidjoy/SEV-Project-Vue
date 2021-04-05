@@ -1266,9 +1266,9 @@ import axios from "axios";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
+    console.log("Params: ", this.$route.params);
     //Get User Info from window.person
-    this.user.id = window.person.id;//Figure out some way to set this value before loading page
-    this.user.email = window.person.email;//Set value before loading page 
+    this.user.id = this.$route.params.id;//Figure out some way to set this value before loading page
 
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
@@ -1276,7 +1276,7 @@ export default {
       axios.get(baseURL + "person"),
       axios.get(baseURL + "relationship?person1_ID=" + this.user.id),
       axios.get(baseURL + "life_event?person_id=" + this.user.id),
-      axios.get(baseURL + 'person?email='+ this.user.email),
+      axios.get(baseURL + 'person?id='+ this.user.id),
       axios.get(baseURL + 'person_involvement?person_id=' + this.user.id),
       axios.get(baseURL + 'person_ministry?person_id=' + this.user.id),
       axios.get(baseURL + 'person_hobby?person_id=' + this.user.id),
@@ -1405,6 +1405,7 @@ export default {
           this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
+          this.user.email = user.data[0].email;
           this.user.gender = user.data[0].gender;
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
@@ -1418,7 +1419,7 @@ export default {
             if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
-          console.log(this.user.congregation_ID);
+          // console.log(this.user.congregation_ID);
         }
 
         //Clear both of the arrays

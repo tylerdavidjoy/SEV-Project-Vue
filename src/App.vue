@@ -12,7 +12,7 @@
             <v-list-item
               v-for="tab in tabs"
               v-bind:key="tab.icon"
-              router :to="tab.path">
+              router-link :to="tab.route">
               <v-list-item-icon>
                 <v-icon>{{ tab.icon }}</v-icon>
               </v-list-item-icon>
@@ -42,13 +42,14 @@ export default {
     polling: null,
     drawer: null,
     tabs:[
-    {icon:'mdi-home',text:'Home', path:'/home'},
-    {icon:'mdi-account',text:'Account', path:'/account'},
-    {icon:'mdi-home-group',text:'HouseHold', path:'/household'},
-    {icon:'mdi-account-group',text:'Groups', path:'/grouplist'},
-    {icon:'mdi-calendar',text:'Events', path:'/events'},
-    {icon:'mdi-church',text:'Directory', path:'/directory'},
-    {icon:'mdi-help',text:'Help', path:'/help'},],
+      {icon:'mdi-home',text:'Home', route:{name:'Home'}},
+      {icon:'mdi-account',text:'Account', route:{name:'Account', params:{ id:window.person.id }}},
+      {icon:'mdi-home-group',text:'HouseHold', route:{name:'HouseHold', params:{ id:window.person.id}}},
+      {icon:'mdi-account-group',text:'Groups', route:{name:'Group List'}},
+      {icon:'mdi-calendar',text:'Events', route:{name:'Events'}},
+      {icon:'mdi-church',text:'Directory', route:{name:'Directory'}},
+      {icon:'mdi-help',text:'Help', route:{name:'Help'}},
+    ],
     logoutIcon : {icon:'mdi-logout',text:'Logout', path:'/logout'}
     }
   },
