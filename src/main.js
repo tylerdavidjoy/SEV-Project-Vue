@@ -3,14 +3,15 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify';
 import router from './router'
 import store from './store'
-import MenuTile from './components/MenuTile.vue'
+// import cardlist from './components/card-list.vue'
 import axios from 'axios'
 
 Vue.config.productionTip = false
 
+
 new Vue({
   components: {
-    'Menu-Tile' : MenuTile,
+    // 'card-list':cardlist,
   },
   vuetify,
   router,
@@ -42,7 +43,7 @@ window.onSignIn = function (googleUser) {
       {
         Vue.prototype.$person = window.person = {
           id: response.data[0].ID,
-          congregation_id: response.data[0].congregation_ID,
+          congregation_ID: response.data[0].congregation_ID,
           f_name: response.data[0].f_name,
           l_name: response.data[0].l_name,
           occupation: response.data[0].occupation,
@@ -57,7 +58,13 @@ window.onSignIn = function (googleUser) {
       }
       })
     .catch(error => {
-      console.log(error)
-      this.errored = true
+      console.log("User Fetch Error: " + error);
+      this.errored = true;
       })
+    // .finally(() => {
+    //   if(window.person == null)
+    //     console.log("Not a Valid Congregation Member");
+    //   //Set the name variable that will load on the Home page to greet the user
+    // });
 }
+
