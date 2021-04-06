@@ -14,6 +14,13 @@
                   <br />
                   <PhotoUpload v-bind:familyId="this.familyId" v-bind:familyImgSrc="this.familyImgSrc" @onFileChange="familyImgSrc=$event"/>
                   <br />
+                  <input style="display: none"
+                    type="file"
+                    @change="onFileSelected"
+                    ref="fileInput">
+                  <v-btn @click="$refs.fileInput.click()" class="ma-2">Pick Photo</v-btn>
+                  <v-btn @click="onUpload" class="ma-2">Upload</v-btn>
+                  <br />
                   <h1>HouseHold Information</h1>
                   <br />
                   <label>Address</label>
@@ -116,6 +123,7 @@
                     scrollable
                     max-width="300px"
                     v-if="hasEditPermission()"
+
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="addMemberDialog"
@@ -163,6 +171,7 @@
                           color="blue darken-1"
                           text
                           @click="addMemberToFamily()"
+
                         >
                           Save
                         </v-btn>
@@ -217,6 +226,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         churchMembers: [],
         addList: [],
         deleteList: [],
+
         userId: 1,
         familyId: "",
         address_ID: "",
@@ -337,6 +347,13 @@ import PhotoUpload from "../components/PhotoUpload.vue";
     },
 
     methods: {
+      onFileSelected(event) {
+        console.log(event)
+        this.selectedFile = event.target.files[0]
+      },
+      onUpload() {
+
+      },
       onEdit: function() {
 
         // If the head of household is logged in give edit permission
