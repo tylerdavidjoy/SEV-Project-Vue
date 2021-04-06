@@ -229,76 +229,85 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         dialogAdd: false,
         dialogDelete: false
       }
-
-    
-    
     },
-    created() {
+  async created() {
+      //Get Family for a person
+      let myPromise = new Promise((Resolve,Reject) => axios.get(this.baseURL + "family?person_ID=" + this.userId) //Gets family for a person
+      .then(response => {
+        this.familyId = response.data.ID;
+        this.address_ID = response.data.address_ID;
+        this.familyImgSrc = this.baseURL + "images/" + response.data.image;
+        this.headOfFamilyID = response.data.head_ID;
+        this.isHeadOfHousehold();
 
-      // Get family ID of the currently logged in user
-        axios
-        .get(this.baseURL + "family?person_ID=" + this.userId)
-        .then(response => {
-          this.familyId = response.data.ID;
-          console.log("Family ID: " + this.familyId)
-          this.address_ID = response.data.address_ID;
-          console.log("Address ID: " + this.address_ID)
-          this.familyImgSrc = this.baseURL + "images/" + response.data.image;
-          // console.log(this.familyImgSrc);
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        console.log("Address ID: ", this.address_ID)
+        console.log("Family ID: ", this.familyId)
+        console.log("Image SRC:", this.familyImgSrc);
+        console.log("Head_ID: ", this.headOfFamilyID)
+        Resolve();
+      })
+      .catch(error => {
+        console.log(error);
+        Reject();
+      }))
+
+      myPromise
+        .then(() => {
+            //Gets members of family
+          axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+          .then(response => {
+            this.familyMembers = response.data;
+            this.deletableMembers = response.data;
+          })
+          .catch(error => {
+            console.log(error);
+          })
         })
 
-      // Get family members of the currently logged in user
-        .then(response => {
-          this.familyMembers = response.data;
-          this.deletableMembers = response.data;
-          return axios.get(this.baseURL + "address?id=" + this.address_ID)
+        .then(() =>{
+          // Gets address of family
+          axios.get(this.baseURL + "address?id=" + this.address_ID)
+          .then(response => {
+            this.address = response.data.address;
+            console.log("Address: " + this.address)
+            // this.address_ID = response.data[0].ID;
+            this.address_Type = response.data.type;
+          })
+          .catch(error => {
+            console.log(error);
+          })
         })
 
-
-      // Get the household address
-        // axios
-        // .get(this.baseURL + "address?person_ID=" + this.userId)
-        .then(response => {
-          this.address = response.data.address;
-          console.log("Address: " + this.address)
-          // this.address_ID = response.data[0].ID;
-          this.address_Type = response.data.type;
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-          // return axios.get(this.baseURL + "person?id=" + this.userId)
+        .then(() => {
+          //Gets person who is head of house
+          axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+          .then(response => {
+            this.email = response.data[0].email;
+            this.congregationID = response.data[0].congregation_ID;
+            this.f_name = response.data[0].f_name;
+            this.l_name = response.data[0].l_name;
+            this.occupation = response.data[0].occupation;
+            this.employer = response.data[0].employer;
+          })
+          .catch(error => {
+            console.log(error);
+          })
         })
 
-
-      // Find the head of the family
-        // axios
-        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-        .then(response => {
-          this.headOfFamilyID = response.data[0].ID;
-          this.isHeadOfHousehold();
-          return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
+        .then(() => {
+          //Gets phone number of head of family
+          axios.get("http://team2.eaglesoftwareteam.com/phone_number?person_ID=1" + this.headOfFamilyID)
+          .then(response => {
+           this.phone = response.data[0].number;
+           this.phoneNumberID = response.data[0].ID;
+           this.phoneNumber_Type = response.data[0].type;
+           this.can_publish = response.data[0].can_publish;
+          })
+          .catch(error => {
+            console.log(error);
+          })
         })
-
         
-      // Get the family email and store information for updating a person
-        .then(response => {
-          this.email = response.data[0].email;
-          this.congregationID = response.data[0].congregation_ID;
-          this.f_name = response.data[0].f_name;
-          this.l_name = response.data[0].l_name;
-          this.occupation = response.data[0].occupation;
-          this.employer = response.data[0].employer;
-          return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
-        })
-
-
-      // Get the family phone number
-        .then(response => {
-          this.phone = response.data[0].number;
-          this.phoneNumberID = response.data[0].ID;
-          this.phoneNumber_Type = response.data[0].type;
-          this.can_publish = response.data[0].can_publish;
-        })
-
         this.isAdminFunction();
           
     },
@@ -346,20 +355,32 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
       isAdminFunction: function() {
         var validValueId = "";
-        axios
-        .get(this.baseURL + "person?id=" + this.userId)
-        .then(response => {
-          console.log(response.data[0].role)
-          validValueId = response.data[0].role;
-          return(axios.get(this.baseURL + "valid_value?id=" + validValueId))
+        let MyPromise = new Promise((Resolve,Reject) => {
+          axios.get(this.baseURL + "person?id=" + this.userId)
+          .then(response => {
+            console.log(response.data[0].role)
+            validValueId = response.data[0].role;
+            Resolve()
+          })
+          .catch((error) => {
+            console.log(error)
+            Reject()
+          })
         })
-        .then(response => {
-          // console.log(response.data.value)
+
+        MyPromise
+        .then(() => {
+          axios.get(this.baseURL + "valid_value?id=" + validValueId)
+          .then(response => {
             this.$nextTick(() => {
-              if(response.data.value === "admin")
-                // console.log("True")
-                this.isAdmin = true;
-                // console.log(this.isAdmin)
+                if(response.data.value === "admin")
+                  // console.log("True")
+                  this.isAdmin = true;
+                  // console.log(this.isAdmin)
+            })
+          })
+          .catch((error) => {
+            console.log(error)
           })
         })
       },
