@@ -28,10 +28,7 @@
             <v-tab-item>
               <v-card color="dark" flat>
                 <v-container>
-                  <div>
-                    <v-img :src="content.account.image"/>
-                  </div>
-                  <div>
+                  <div class="px-6">
                     <v-stepper >
                       <v-stepper-header>
                         <template v-for="n in content.account.steps">
@@ -43,7 +40,8 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.account.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="grey lighten-1" height="200px">
+                          <v-card class="mb-12" color="primary">
+                          <v-img contain :height="300" :src="getImgUrl('account',n)"/>
                           <v-card-title>Step {{n}}</v-card-title>
                           <v-card-text>{{content.account.info[n-1]}}</v-card-text>
                           </v-card>
@@ -69,7 +67,8 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="grey lighten-1" height="200px">
+                        <v-card class="mb-12" color="primary">
+                        <v-img contain :height="300" :src="getImgUrl('account',n)"/>
                         <v-card-title>Step {{n}}</v-card-title>
                         <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
@@ -94,7 +93,8 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.group.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="grey lighten-1" height="200px">
+                          <v-card class="mb-12" color="primary">
+                          <v-img contain :height="300" :src="getImgUrl('group',n)"/>
                           <v-card-title>Step {{n}}</v-card-title>
                           <v-card-text>{{content.group.info[n-1]}}</v-card-text>
                           </v-card>
@@ -119,7 +119,8 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="grey lighten-1" height="200px">
+                        <v-card class="mb-12" color="primary">
+                          <v-img contain :height="300" :src="getImgUrl('account',n)"/>
                         <v-card-title>Step {{n}}</v-card-title>
                         <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
@@ -144,7 +145,8 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.reports.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="grey lighten-1" height="200px">
+                        <v-card class="mb-12" color="primary">
+                          <v-img contain :height="300" :src="getImgUrl('report',n)"/>
                         <v-card-title>Step {{n}}</v-card-title>
                         <v-card-text>{{content.reports.info[n-1]}}</v-card-text>
                         </v-card>
@@ -169,7 +171,8 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.directory.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="grey lighten-1" height="200px">
+                        <v-card class="mb-12" color="primary">
+                          <v-img contain :height="300" :src="getImgUrl('directory',n)"/>
                         <v-card-title>Step {{n}}</v-card-title>
                         <v-card-text>{{content.directory.info[n-1]}}</v-card-text>
                         </v-card>
@@ -194,7 +197,8 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="grey lighten-1" height="200px">
+                        <v-card class="mb-12" color="primary">
+                        <v-img contain :height="300" :src="getImgUrl('account',n)"/>
                         <v-card-title>Step {{n}}</v-card-title>
                         <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
@@ -215,7 +219,7 @@
 <script>
   export default {
     mounted() {
-      // console.log(this.content[0].steps)
+      console.log(this.content.account.image);
     },
     data: () => ({
       tab: null,
@@ -236,7 +240,6 @@
             'If you want to delete a Life Event, then you can click the Trashcan icon next to the Event. This will prompt you to make sure that you want to delete the Event. If you confirm, then you will notice that the Life Event is no longer showing on your account page.',
             'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
         fileuploading:{id:0, steps:[1,2,3,4,5,6],
           info:[
@@ -247,7 +250,6 @@
             'Test 5',
             'Test 6',
           ],
-          image:'../assets/logo.png',
         },
         group:{id:0, steps:[1,2,3,4,5],
           info:[
@@ -266,7 +268,6 @@
             Below the Announcements panel you will find a list of all group members and their public contact information.`,
             'If you are having trouble with Groups Selection or any other feature for the Groups page, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
         event:{id:0, steps:[1,2,3,4,5,6],
           info:[
@@ -277,7 +278,6 @@
             'If you want to delete a Life Event, then you can click the Trashcan icon next to the Event. This will prompt you to make sure that you want to delete the Event. If you confirm, then you will notice that the Life Event is no longer showing on your account page.',
             'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
         reports:{id:0, steps:[1,2,3,4,5,6],
           info:[
@@ -302,7 +302,6 @@
             `After you have finalized your settings, just click the generate report button and the file should download automatically and be ready for viewing.`,
             'If you are having trouble with Printing Reports, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
         directory:{id:0, steps:[1,2,3,4,5,],
           info:[
@@ -312,7 +311,6 @@
             'If you wish to see more information on an individual or a family, simply click on the individual or family and you will be navigated to a page with more info.',
             'If you are having trouble with searching the directory or any other feature for the Directory page, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
         administrator:{id:0, steps:[1,2,3,4,5,6],
           info:[
@@ -323,9 +321,14 @@
             'If you want to delete a Life Event, then you can click the Trashcan icon next to the Event. This will prompt you to make sure that you want to delete the Event. If you confirm, then you will notice that the Life Event is no longer showing on your account page.',
             'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
           ],
-          image:'../assets/logo.png',
         },
       }
     }),
+    methods:{
+      getImgUrl(type,n) {
+        // console.log(type + " " + n);
+          return require('../assets/HelpPageResources/' + type + n + '.png');
+      },
+    },
   }
 </script>
