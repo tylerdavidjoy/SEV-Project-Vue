@@ -64,8 +64,8 @@
                                     <v-img
                                       height="175px"
                                       width="175px"
-                                      lazy-src="../assets/logo.png"
-                                      src="../assets/logo.png"
+                                      :lazy-src="person.image"
+                                      :src="person.image"
                                     ></v-img>
                                   </v-avatar>
                                   <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
@@ -89,12 +89,8 @@
                           <div v-if="isAdmin" style="margin:auto">
                             <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
                             <DirectoryReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
-                            
                             <RoleReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
-
-
                             <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
-
                           </div>
                         </v-container>
                       </div>
@@ -137,7 +133,7 @@ export default {
         this.people.push({
           id: response.data[i].ID,
           name: response.data[i].f_name + " " + response.data[i].l_name,
-          image: response.data[i].image
+          image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
         })
       }
       this.autoPagination(this.people);
@@ -153,7 +149,8 @@ export default {
       {
         this.family.push({
           id: response.data[i].ID,
-          name: response.data[i].l_name
+          name: response.data[i].l_name,
+          image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
         })
       }
     })

@@ -71,10 +71,7 @@ export default ({
 
             else
             {
-                var picture = new Image();
-                picture.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png";
 
-                //var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
                 var contentTemp = [];
                 for (i = 0; i < people.length; i++)
                 {
@@ -122,6 +119,15 @@ export default ({
                     contentTemp.push(tempNames);
                     i +=2;
                 }
+
+                var imgList = {}
+
+                for (var x = 0; x < people.length; x++)
+                {
+                    imgList[x] = people[x].image;
+                }
+
+                console.log(imgList);
 
                 var pdfContent = {
                     content: contentTemp,
