@@ -34,7 +34,7 @@
             <v-col cols="auto">
               <v-container>
                 <v-sheet width="600">
-                  <img src="../assets/dog.jpg" class="userImg">
+                  <!-- <img src="../assets/dog.jpg" class="userImg"> -->
                   <br />
                   <h1>Family Members</h1>
                   <br />
@@ -43,7 +43,7 @@
                       v-for="member in familyMembers"
                       v-bind:key="member.ID" class="list" @click="navToAccountPage(member.ID)">
                       <v-list-item-icon>
-                        <img src="../assets/dog.jpg" class="smallUserImg">
+                        <img :src="baseURL + 'images/' + member.image" class="smallUserImg">
                       </v-list-item-icon>
 
                       <v-list-item-content class="large">
@@ -217,7 +217,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         churchMembers: [],
         addList: [],
         deleteList: [],
-        userId: 1,
+        userId: window.person.id,
         familyId: "",
         address_ID: "",
         address_Type: "",
@@ -235,6 +235,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
     },
     created() {
       console.log(this.$route.params.familyID)
+      console.log("Logged in user ID: " + this.userId)
         axios.all([
           axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=0`), // gets family object
           axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=1&isGetHeadOfFamily=0`), // this gets all persons of family
@@ -250,6 +251,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           this.deletableMembers = familyMembers.data;
 
           this.email = headOfFamily.data[0].email;
+          this.headOfFamilyID = headOfFamily.data[0].ID;
 
           axios.all([
             axios.get(`${this.baseURL}address?id=${family.data.address_ID}`), // Address object from family address ID
