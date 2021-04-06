@@ -234,10 +234,10 @@ import PhotoUpload from "../components/PhotoUpload.vue";
     
     },
     created() {
-
+      console.log(this.$route.param)
         axios.all([
-          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}`), // gets family object
-          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=1isGetHeadOfFamily=0`), // this gets all persons of family
+          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=0`), // gets family object
+          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=1&isGetHeadOfFamily=0`), // this gets all persons of family
           axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=1`), // this gets the person of head of family
         ])
         .then(axios.spread((family, familyMembers, headOfFamily) => {
@@ -249,11 +249,11 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           this.familyMembers = familyMembers.data;
           this.deletableMembers = familyMembers.data;
 
-          this.email = headOfFamily.data.email;
+          this.email = headOfFamily.data[0].email;
 
           axios.all([
             axios.get(`${this.baseURL}address?id=${family.data.address_ID}`), // Address object from family address ID
-            axios.get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data.ID}`), // Gets array of phone #s
+            axios.get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`), // Gets array of phone #s
           ])
           .then(axios.spread((familyAddress, headOfFamilyPhones) => {
             this.address = familyAddress.data.address;
