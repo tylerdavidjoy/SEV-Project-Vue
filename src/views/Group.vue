@@ -323,6 +323,7 @@ export default {
   beforeCreate()
   {
     axios.all([
+
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=${this.$route.params.groupLeaderID}`),
       axios.get(`${apiBaseUrl}/valid_value`),
