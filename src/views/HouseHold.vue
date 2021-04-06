@@ -7,7 +7,12 @@
             <v-col cols="6">
               <v-container>
                 <v-sheet width="600">
-                  <img src="../assets/dog.jpg" class="familyImg">
+                  <!-- <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270"> -->
+                  <img :src="familyImgSrc"  class="familyImg" />
+                        
+                  <!-- </v-avatar>  -->
+                  <br />
+                  <PhotoUpload v-bind:familyId="this.familyId" v-bind:familyImgSrc="this.familyImgSrc" @onFileChange="familyImgSrc=$event"/>
                   <br />
                   <input style="display: none"
                     type="file"
@@ -24,10 +29,10 @@
                   <v-text-field v-model="phone" label="Family Phone Number" :readonly="!editable"></v-text-field>
                   <label>Email</label>
                   <v-text-field v-model="email" label="Family Email" :readonly="true"></v-text-field>
-                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
+                  <v-btn @click="onEdit" class="ma-2" outlined large fab color="red darken-4" v-if="hasEditPermission()">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
-                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="isHeadOfFamily">
+                  <v-btn @click="onSave" class="ma-2" outlined large fab color="red darken-4" v-if="hasEditPermission()">
                     <v-icon>mdi-content-save</v-icon>
                   </v-btn>
                 </v-sheet>
@@ -58,6 +63,7 @@
                     v-model="dialogDelete"
                     scrollable
                     max-width="300px"
+                    v-if="isAdmin"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="deleteMemberDialog"
@@ -66,7 +72,6 @@
                         large
                         fab
                         color="red darken-4"
-                        v-if="isAdmin"
                         v-on="on"
                         v-bind="attrs"
                       >
@@ -76,19 +81,21 @@
                     <v-card>
                       <v-card-title>Select Person</v-card-title>
                       <v-divider></v-divider>
+                      <div class="search-wrapper">
+                        <input type="text" v-model="searchDelete" placeholder="Search title.."/>
+                          <label>Search title:</label>
+                      </div>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
-                          <v-list-item
-                            v-for="member in familyMembers"
-                            v-bind:key="member.ID" class="list" @click="deleteMemberFromFamily(member)">
-                            <!-- <v-list-item-icon>
-                              <img src="../assets/dog.jpg" class="smallUserImg">
-                            </v-list-item-icon> -->
-
-                            <v-list-item-content class="large">
-                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
+                          <v-checkbox
+                            v-for="member in filteredDeleteList"
+                            v-bind:key="member.ID"
+                            multiple
+                            :value="member"
+                            :label="member.f_name + ' ' + member.l_name"
+                            v-model="deleteList"
+                            >
+                          </v-checkbox>
                         </v-list>
                       </v-card-text>
                       <v-divider></v-divider>
@@ -103,7 +110,7 @@
                         <v-btn
                           color="blue darken-1"
                           text
-                          @click="dialogDelete = false"
+                          @click="deleteMemberFromFamily()"
                         >
                           Save
                         </v-btn>
@@ -115,6 +122,8 @@
                     v-model="dialogAdd"
                     scrollable
                     max-width="300px"
+                    v-if="hasEditPermission()"
+
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="addMemberDialog"
@@ -123,7 +132,6 @@
                         large
                         fab
                         color="red darken-4"
-                        v-if="isAdmin"
                         v-on="on"
                         v-bind="attrs"
                       >
@@ -133,19 +141,21 @@
                     <v-card>
                       <v-card-title>Select Person</v-card-title>
                       <v-divider></v-divider>
+                      <div class="search-wrapper">
+                        <input type="text" v-model="searchAdd" placeholder="Search title.."/>
+                          <label>Search title:</label>
+                      </div>
                       <v-card-text style="height: 300px;">
                         <v-list class="list">
-                          <v-list-item
-                            v-for="member in churchMembers"
-                            v-bind:key="member.ID" class="list" @click="addMemberToFamily(member)">
-                            <!-- <v-list-item-icon>
-                              <img src="../assets/dog.jpg" class="smallUserImg">
-                            </v-list-item-icon> -->
-
-                            <v-list-item-content class="large">
-                              <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
+                          <v-checkbox
+                            v-for="member in filteredAddList"
+                            v-bind:key="member.ID"
+                            multiple
+                            :value="member"
+                            :label="member.f_name + ' ' + member.l_name"
+                            v-model="addList"
+                            >
+                          </v-checkbox>
                         </v-list>
                       </v-card-text>
                       <v-divider></v-divider>
@@ -160,7 +170,8 @@
                         <v-btn
                           color="blue darken-1"
                           text
-                          @click="dialogAdd = false"
+                          @click="addMemberToFamily()"
+
                         >
                           Save
                         </v-btn>
@@ -179,12 +190,18 @@
 
 <script>
 
-import axios from 'axios'
+import axios from 'axios';
+import PhotoUpload from "../components/PhotoUpload.vue";
 
   export default {
+    components: {
+      PhotoUpload
+    },
     data() { 
       return {
         selectedFile: null,
+        searchAdd: "",
+        searchDelete: "",
         address: "",
         phone: "",
         email: "",
@@ -196,6 +213,7 @@ import axios from 'axios'
         occupation: "",
         employer: "",
         baseURL: "http://team2.eaglesoftwareteam.com/",
+        familyImgSrc: "",
         members:[
           {name: 'Billy Bob jr.'},
           {name: 'Billy Bob sr.'},
@@ -204,7 +222,11 @@ import axios from 'axios'
           {name: 'Junior Bob jr.'},
         ],
         familyMembers: [],
+        deletableMembers: [],
         churchMembers: [],
+        addList: [],
+        deleteList: [],
+
         userId: 1,
         familyId: "",
         address_ID: "",
@@ -213,7 +235,7 @@ import axios from 'axios'
         can_publish: "",
         editable: false,
         isHeadOfFamily: false,
-        isAdmin: true,
+        isAdmin: false,
         dialogAdd: false,
         dialogDelete: false
       }
@@ -222,82 +244,105 @@ import axios from 'axios'
     
     },
     created() {
+      console.log(this.$route.params.familyID)
+        axios.all([
+          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=0`), // gets family object
+          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=1&isGetHeadOfFamily=0`), // this gets all persons of family
+          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=1`), // this gets the person of head of family
+        ])
+        .then(axios.spread((family, familyMembers, headOfFamily) => {
 
-      // Get family ID of the currently logged in user
-        axios
-        .get(this.baseURL + "family?person_ID=" + this.userId)
-        .then(response => {
-          this.familyId = response.data[0].ID;
-          console.log("Family ID: " + response.data);
-          console.log("Family ID: " + this.familyId)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        })
-        // .catch(error => {
-        //   console.log("ERROR: " + error.response)
-        // })
+          this.familyId = family.data.ID;
+          this.address_ID = family.data.address_ID;
+          this.familyImgSrc = this.baseURL + "images/" + family.data.image;
 
-      // Get family members of the currently logged in user
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
-          return axios.get(this.baseURL + "address?person_ID=" + this.userId)
-        })
+          this.familyMembers = familyMembers.data;
+          this.deletableMembers = familyMembers.data;
+
+          this.email = headOfFamily.data[0].email;
+
+          axios.all([
+            axios.get(`${this.baseURL}address?id=${family.data.address_ID}`), // Address object from family address ID
+            axios.get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`), // Gets array of phone #s
+          ])
+          .then(axios.spread((familyAddress, headOfFamilyPhones) => {
+            this.address = familyAddress.data.address;
+            this.address_Type = familyAddress.data.type;
+            this.address_ID = familyAddress.data.ID;
+            
+            let tempPhone = headOfFamilyPhones.data.find(x => x.can_publish === 1);
+            this.phone = tempPhone.number;
+            this.phoneNumber_Type = tempPhone.type;
+            this.phoneNumberID = tempPhone.ID;
+            this.can_publish = 1;
+          }))
+        }))
+
+      // // Get family ID of the currently logged in user
+      //   axios
+      //   .get(this.baseURL + "family?person_ID=" + this.userId)
+      //   .then(response => {
+      //     this.familyId = response.data.ID;
+      //     console.log("Family ID: " + this.familyId)
+      //     this.address_ID = response.data.address_ID;
+      //     console.log("Address ID: " + this.address_ID)
+      //     this.familyImgSrc = this.baseURL + "images/" + response.data.image;
+      //     // console.log(this.familyImgSrc);
+      //     return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+      //   })
+
+      // // Get family members of the currently logged in user
+      //   .then(response => {
+      //     this.familyMembers = response.data;
+      //     this.deletableMembers = response.data;
+      //     return axios.get(this.baseURL + "address?id=" + this.address_ID)
+      //   })
 
 
-      // Get the household address
-        // axios
-        // .get(this.baseURL + "address?person_ID=" + this.userId)
-        .then(response => {
-          console.log("Household address " + response.data)
-          this.address = response.data[0].address;
-          this.address_ID = response.data[0].ID;
-          this.address_Type = response.data[0].type;
-          console.log("Address Type: " + this.address_Type)
-          console.log("Address ID: " + this.address_ID)
-          // return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-          return axios.get(this.baseURL + "person?id=" + this.userId)
-        })
+      // // Get the household address
+      //   // axios
+      //   // .get(this.baseURL + "address?person_ID=" + this.userId)
+      //   .then(response => {
+      //     this.address = response.data.address;
+      //     console.log("Address: " + this.address)
+      //     // this.address_ID = response.data[0].ID;
+      //     this.address_Type = response.data.type;
+      //     return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+      //     // return axios.get(this.baseURL + "person?id=" + this.userId)
+      //   })
 
 
-      // Find the head of the family
-        // axios
-        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-        .then(response => {
-          this.headOfFamilyID = response.data[0].ID;
-          console.log("Head of family ID" + this.headOfFamilyID)
-          this.isHeadOfHousehold();
-          return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID)
-        })
+      // // Find the head of the family
+      //   // axios
+      //   // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
+      //   .then(response => {
+      //     this.headOfFamilyID = response.data[0].ID;
+      //     this.isHeadOfHousehold();
+      //     return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID) // do not need this call, we got the person already.
+      //   })
 
         
-      // Get the family email and store information for updating a person
-        .then(response => {
-          console.log(response.data)
-          this.email = response.data[0].email;
-          this.congregationID = response.data[0].congregation_ID;
-          this.f_name = response.data[0].f_name;
-          this.l_name = response.data[0].l_name;
-          this.occupation = response.data[0].occupation;
-          this.employer = response.data[0].employer;
-          console.log(this.email)
-          return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
-        })
+      // // Get the family email and store information for updating a person
+      //   .then(response => {
+      //     this.email = response.data[0].email;
+      //     this.congregationID = response.data[0].congregation_ID;
+      //     this.f_name = response.data[0].f_name;
+      //     this.l_name = response.data[0].l_name;
+      //     this.occupation = response.data[0].occupation;
+      //     this.employer = response.data[0].employer;
+      //     return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
+      //   })
 
 
-      // Get the family phone number
-        .then(response => {
-          console.log(response.data)
-          this.phone = response.data[0].number;
-          this.phoneNumberID = response.data[0].ID;
-          this.phoneNumber_Type = response.data[0].type;
-          this.can_publish = response.data[0].can_publish;
-          console.log(this.phone)
-          console.log(this.phoneNumberID)
-          console.log(this.can_publish)
-        })
+      // // Get the family phone number
+      //   .then(response => {
+      //     this.phone = response.data[0].number;
+      //     this.phoneNumberID = response.data[0].ID;
+      //     this.phoneNumber_Type = response.data[0].type;
+      //     this.can_publish = response.data[0].can_publish;
+      //   })
 
-        
+         this.isAdminFunction();
           
     },
 
@@ -343,11 +388,30 @@ import axios from 'axios'
       },
 
       isHeadOfHousehold: function() {
-        console.log("isHeadOfHousehold function")
         if(this.userId === this.headOfFamilyID) {
           this.isHeadOfFamily = true;
         }
         // return this.isHeadOfFamily;
+      },
+
+      isAdminFunction: function() {
+        var validValueId = "";
+        axios
+        .get(this.baseURL + "person?id=" + this.userId)
+        .then(response => {
+          console.log(response.data[0].role)
+          validValueId = response.data[0].role;
+          return(axios.get(this.baseURL + "valid_value?id=" + validValueId))
+        })
+        .then(response => {
+          // console.log(response.data.value)
+            this.$nextTick(() => {
+              if(response.data.value === "admin")
+                // console.log("True")
+                this.isAdmin = true;
+                // console.log(this.isAdmin)
+          })
+        })
       },
 
       navToAccountPage: function(param) {
@@ -357,76 +421,110 @@ import axios from 'axios'
       },
 
       addMemberDialog: function() {
+        var tempArr = [];
         console.log("member add dialog")
         axios
         .get(this.baseURL + "person")
         .then(response => {
           console.log(response.data)
-          this.churchMembers = response.data;
+          tempArr = response.data;
+          this.churchMembers = tempArr.filter(member => member.family_ID!=this.familyId)
         })
       },
 
       deleteMemberDialog: function() {
         console.log("member remove dialog")
-        axios
-        .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
+        // axios
+        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+        // .then(response => {
+        //   this.familyMembers = response.data;
+        //   console.log(response.data)
+        //   console.log(this.familyMembers)
+        // })
+        this.deletableMembers = this.deletableMembers.filter(member => member.ID!=this.headOfFamilyID)
+      },
+
+      addMemberToFamily() {
+        this.dialogAdd = false;
+        this.addList.forEach(member => {
+          axios.put(this.baseURL + "person?id="  + member.ID, {
+            congregation_ID: member.congregation_ID,
+            f_name: member.f_name,
+            l_name: member.l_name,
+            occupation: member.occupation,
+            employer: member.employer,
+            family_ID: this.familyId,
+            email: member.email,
+            gender: member.gender,
+            preferred_name: member.preferred_name,
+            role: member.role,
+            image: member.image
+          })
+          .then(response => {
+            console.log(response.data)
+            console.log("Person added to family: " + member.f_name + ", " + member.l_name)
+          })
+          this.familyMembers.push(member);
+          this.deletableMembers.push(member);
+          this.$set(this.familyMembers, this.familyMembers.indexOf(member), member);
+          this.$set(this.deletableMembers, this.deletableMembers.indexOf(member), member);
         })
       },
 
-      addMemberToFamily(member) {
-        axios.put(this.baseURL + "person?id="  + member.ID, {
-          congregation_ID: member.congregation_ID,
-          f_name: member.f_name,
-          l_name: member.l_name,
-          occupation: member.occupation,
-          employer: member.employer,
-          family_ID: this.familyId,
-          email: member.email,
-          gender: member.gender,
-          preferred_name: member.preferred_name,
-          role: member.role
-        })
-        .then(response => {
-          console.log(response.data)
-          console.log("Person added to family: " + member.f_name + ", " + member.l_name)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
+      deleteMemberFromFamily() {
+        this.dialogDelete = false;
+        console.log(this.deleteList);
+        this.deleteList.forEach(member => {
+          if(member.ID != this.headOfFamilyID) {
+            axios.put(this.baseURL + "person?id="  + member.ID, {
+              congregation_ID: member.congregation_ID,
+              f_name: member.f_name,
+              l_name: member.l_name,
+              occupation: member.occupation,
+              employer: member.employer,
+              family_ID: null,
+              email: member.email,
+              gender: member.gender,
+              preferred_name: member.preferred_name,
+              role: member.role,
+              image: member.image
+            })
+            .then(response => {
+              console.log(response.data)
+              console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
+            })
+            this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
+          }
         })
 
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
-        })
-
+        // .then(response => {
+        //   this.familyMembers = response.data;
+        //   console.log(response.data)
+        //   console.log(this.familyMembers)
+        // })
       },
 
-      deleteMemberFromFamily(member) {
-        axios.put(this.baseURL + "person?id="  + member.ID, {
-          congregation_ID: member.congregation_ID,
-          f_name: member.f_name,
-          l_name: member.l_name,
-          occupation: member.occupation,
-          employer: member.employer,
-          family_ID: null,
-          email: member.email,
-          gender: member.gender,
-          preferred_name: member.preferred_name,
-          role: member.role
-        })
-        .then(response => {
-          console.log(response.data)
-          console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
-          return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        })
+      hasEditPermission: function() {
+        var canEdit = false;
+        // console.log("Is Head of Household: " + this.isHeadOfFamily);
+        // console.log("Is Admin: " + this.isAdmin);
+        if(this.isHeadOfFamily || this.isAdmin) {
+          canEdit = true;
+        }
+        return canEdit;
+      }
+    },
 
-        .then(response => {
-          this.familyMembers = response.data;
-          console.log(response.data)
-          console.log(this.familyMembers)
+    computed: {
+      filteredAddList() {
+        return this.churchMembers.filter(member => {
+          return member.f_name.toLowerCase().includes(this.searchAdd.toLowerCase())
+        })
+      },
+
+      filteredDeleteList() {
+        return this.deletableMembers.filter(member => {
+          return member.f_name.toLowerCase().includes(this.searchDelete.toLowerCase())
         })
       }
     }
@@ -456,8 +554,42 @@ img.smallUserImg {
 
 img.familyImg {
   margin: 20px;
-  height: 40%;
-  size: auto
+  max-height: 270px;
+  size: auto;
+}
+
+input.search {
+  padding: 4px 12px;
+  color: rgba(0,0,0,.70);
+  border: 1px solid rgba(0,0,0,.12);
+  transition: .15s all ease-in-out;
+  background: white;
+  &:focus {
+    outline: none;
+    transform: scale(1.05);
+    & + label  {
+      font-size: 10px;
+      transform: translateY(-24px) translateX(-12px);
+    }
+  }
+  &::-webkit-input-placeholder {
+    font-size: 12px;
+    color: rgba(0,0,0,.50);
+    font-weight: 100;
+  }
+}
+
+div.search-wrapper {
+  position: relative;
+  label {
+    position: absolute;
+    font-size: 12px;
+    color: rgba(0,0,0,.50);
+    top: 8px;
+    left: 12px;
+    z-index: -1;
+    transition: .15s all ease-in-out;
+  }
 }
 
 h1 {
