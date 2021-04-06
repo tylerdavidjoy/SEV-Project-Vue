@@ -161,14 +161,10 @@ export default ({
         {
             this.person.gender = this.person.gender.toLowerCase();
             this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
-
-            axios.post('http://team2.eaglesoftwareteam.com/person', this.person)
-            .then((response) => {
-            response.use();
+            
+            //axios.post('http://team2.eaglesoftwareteam.com/person', this.person);
             this.dialog = false;
-            }, (error) => {
-            this.err = error;
-            });
+            this.$parent.$parent.$parent.$parent.getData();
         }
     },
 
@@ -179,7 +175,7 @@ export default ({
             roles:[],
             person: 
             {
-                congregation_ID: this.$person.congregation_id,
+                congregation_ID: this.$person.congregation_ID,
                 f_name:null,
                 l_name:null,
                 occupation: null,
@@ -188,7 +184,8 @@ export default ({
                 email:null,
                 gender:null,
                 preferred_name:null,
-                role:null
+                role:null,
+                image:"default.jpg"
             },
             err: ""
         }

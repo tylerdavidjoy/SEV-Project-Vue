@@ -55,7 +55,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="createfamily()"
+            @click="createFamily()"
           >
             Save
           </v-btn>
@@ -81,14 +81,31 @@ export default ({
     },
     methods: 
     {
-        createFamily()
+        async createFamily()
         {
+
+        this.family.head_ID = this.people.filter(x => x.name == this.headOfFamily)[0].id;
+        axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID)
+        .then(response => {
+          console.log(response)
+          this.family.address_ID = response.data[0].ID
           axios.post('http://team2.eaglesoftwareteam.com/family', this.family)
-          .then((response) => {
-          response.use();
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+          await this.resolveAfter2Seconds(200)
           this.dialog = false;
-          }, (error) => {
-          this.err = error;
+          this.$parent.$parent.$parent.$parent.getData();
+          console.log(this.family)
+        },
+
+        resolveAfter2Seconds(x) {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve(x);
+            }, x);
           });
         }
     },
@@ -100,8 +117,10 @@ export default ({
             people_names:[],
             family: 
             {
-              congregation_ID: this.$person.congregation_id,
-              address_ID:null
+              congregation_ID: window.person.congregation_ID,
+              address_ID: null,
+              head_ID: null,
+              image: "default.jpg"
             },
             err: ""
         }

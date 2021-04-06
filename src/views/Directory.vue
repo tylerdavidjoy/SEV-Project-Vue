@@ -111,8 +111,9 @@ import ReportSettings from "@/components/report_settings.vue";
 import DirectoryReport from "@/components/directory_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
- import AddPersonDialog from "@/components/add_person_dialog.vue";
- import AddFamilyDialog from "@/components/add_family_dialog.vue";
+import AddPersonDialog from "@/components/add_person_dialog.vue";
+import AddFamilyDialog from "@/components/add_family_dialog.vue";
+
 export default {
   name: "Home",
   components: {
@@ -124,41 +125,7 @@ export default {
     AddFamilyDialog
   },
   mounted() {
-    //People
-    axios.get("http://team2.eaglesoftwareteam.com/person")
-    .then(response => {
-      console.log("people Res:", response.data);
-      for(var i = 0; i < response.data.length; i++)
-      {
-        this.people.push({
-          id: response.data[i].ID,
-          name: response.data[i].f_name + " " + response.data[i].l_name,
-          image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
-        })
-      }
-      this.autoPagination(this.people);
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
-    axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
-    .then(response => {
-      console.log(response.data);
-      for(var i = 0; i < response.data.length; i++)
-      {
-        this.family.push({
-          id: response.data[i].ID,
-          name: response.data[i].l_name,
-          image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
-        })
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
-
+    this.getData()
   },
     data() {
     return {
@@ -177,6 +144,47 @@ export default {
     }
   },
   methods:{
+    getData()
+    {
+      console.log("TEST");
+      this.people = []
+      this.family = []
+      this.display = []
+    //People
+        axios.get("http://team2.eaglesoftwareteam.com/person")
+        .then(response => {
+          console.log("people Res:", response.data);
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.people.push({
+              id: response.data[i].ID,
+              name: response.data[i].f_name + " " + response.data[i].l_name,
+              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+            })
+          }
+          this.autoPagination(this.people);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+        axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
+        .then(response => {
+          console.log(response.data);
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.family.push({
+              id: response.data[i].ID,
+              name: response.data[i].l_name,
+              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    },
+
     pageChange(target)
     {
       switch(target) {
