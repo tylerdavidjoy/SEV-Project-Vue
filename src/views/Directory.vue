@@ -202,6 +202,7 @@ export default {
 
     goToPage(ID)
     {
+      console.log("ID: " + ID);
       if(this.displayMode == "person")
         this.$router.push({name: 'Account', params: {personID: ID}})
 

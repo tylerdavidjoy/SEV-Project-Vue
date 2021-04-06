@@ -1261,9 +1261,12 @@ var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
     //Get User Info from window.person
-    this.user.id = window.person.id;//Figure out some way to set this value before loading page
-    this.user.email = window.person.email//Set value before loading page 
-
+    if(this.$route.params.personID == undefined)
+      this.user.id = window.person.id;
+    else
+      this.user.id = this.$route.params.personID;//Figure out some way to set this value before loading page
+    if(this.user.id != window.person.personID)
+      this.isViewing = true;
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
       axios.get(baseURL + "valid_value"),
@@ -1412,6 +1415,8 @@ export default {
             if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
+          if(this.isAdmin || this.user.id == window.person.id)
+            this.isViewing = false;
         }
 
         //Clear both of the arrays
