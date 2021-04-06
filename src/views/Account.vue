@@ -34,6 +34,7 @@
                           small-chips
                           truncate-length="50"
                           @change="getFileObject($event)"
+                          :disabled="isViewing"
                         ></v-file-input>
                       </div>
                       <div :class="'px-6'">
@@ -43,6 +44,7 @@
                           color="primary"
                           width="auto"
                           v-on:click="chooseFiles()"
+                          :disabled="isViewing"
                         >
                           <v-icon left>mdi-pencil</v-icon>Upload Profile Picture
                         </v-btn>
@@ -58,7 +60,9 @@
                             <v-card flat>
                               <v-card-title class="headline">
                                 <v-list-item-content>
-                                  {{ user.f_name }}'s Life Events
+                                  {{ user.f_name }}'s 
+                                  <br/>
+                                  Life Events
                                 </v-list-item-content>
                                 <v-list-item-content>
                                   <template v-if="isAdmin">
@@ -237,6 +241,7 @@
                                         class="mb-2"
                                         v-bind="attrs"
                                         v-on="on"
+                                        :disabled="isViewing"
                                       >
                                         Add Event
                                       </v-btn>
@@ -291,8 +296,8 @@
                                                 </template>
                                                 <v-date-picker
                                                   :show-current="new Date().toISOString().substr(0,10)"
-                                                  ref="picker"
                                                   :max="new Date().toISOString().substr(0,10)"
+                                                  ref="picker"
                                                   :v-model="editedEvent.date"
                                                   v-on:change="saveDate"
                                                 ></v-date-picker>
@@ -372,16 +377,11 @@
                                         }}</v-list-item-title>
                                         <v-list-item-subtitle
                                           >Description:
-                                          {{
-                                            LifeEvent.description
-                                          }}</v-list-item-subtitle
+                                          <br/>
+                                          {{LifeEvent.description}}
+                                          </v-list-item-subtitle
                                         >
-                                        <v-list-item-subtitle>
-                                          Date:
-                                          {{
-                                            LifeEvent.date
-                                          }}</v-list-item-subtitle
-                                        >
+                                        <v-list-item-subtitle>Date:{{new Date(LifeEvent.date).toDateString()}}</v-list-item-subtitle>
                                       </v-list-item-content>
                                       <v-list-item-content>
                                         <v-btn
@@ -389,6 +389,7 @@
                                           icon
                                           tile
                                           v-on:click="editEvent(LifeEvent, 0)"
+                                          :disabled="isViewing"
                                         >
                                           <v-icon dark>
                                             mdi-pencil-outline
@@ -400,6 +401,7 @@
                                           icon
                                           tile
                                           v-on:click="deleteEvent(LifeEvent, 0)"
+                                          :disabled="isViewing"
                                         >
                                           <v-icon dark>
                                             mdi-trash-can-outline
@@ -416,7 +418,9 @@
                           <v-tab-item>
                             <v-card flat>
                               <v-card-title class="headline">
-                                {{ user.f_name }}'s Relationships
+                                {{ user.f_name }}'s 
+                                <br/>
+                                Relationships
                                 <v-spacer></v-spacer>
                                 <v-list-item-content>
                                   <v-dialog
@@ -430,6 +434,7 @@
                                         class="mb-1"
                                         v-bind="attrs"
                                         v-on="on"
+                                        :disabled="isViewing"
                                       >
                                         Add Relation
                                       </v-btn>
@@ -546,6 +551,7 @@
                                         fab
                                         tile
                                         v-on:click="deleteEvent(Relation, 1)"
+                                        :disabled="isViewing"
                                       >
                                         <v-icon dark>
                                           mdi-trash-can-outline
@@ -572,10 +578,10 @@
                       <div :class="'px-6'" class="pt-6">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.f_name"
+                          v-model="user.f_name"
                           :counter="15"
                           :rules="nameRules"
-                          :label="'First Name: ' + user.f_name"
+                          :label="'First Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -585,10 +591,10 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.l_name"
+                          v-model="user.l_name"
                           :counter="15"
                           :rules="nameRules"
-                          :label="'Last Name: ' + user.l_name"
+                          :label="'Last Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -598,10 +604,10 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.preferred_name"
-                          :counter="10"
+                          v-model="user.preferred_name"
+                          :counter="15"
                           :rules="nameRules"
-                          :label="'Preferred Name: ' + user.occupation"
+                          :label="'Preferred Name: '"
                           required
                         ></v-text-field>
                       </div>
@@ -610,8 +616,8 @@
 
                       <div :class="'px-6'">
                         <v-text-field
-                          v-model="form.email"
-                          :label="'E-mail: ' + user.email"
+                          v-model="user.email"
+                          :label="'E-mail: '"
                           disabled
                         ></v-text-field>
                       </div>
@@ -621,10 +627,8 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.occupation"
-                          :counter="30"
-                          :rules="nameRules"
-                          :label="'Occupation: ' + user.occupation"
+                          v-model="user.occupation"
+                          :label="'Occupation: '"
                           required
                         ></v-text-field>
                       </div>
@@ -634,9 +638,9 @@
                       <div :class="'px-6'">
                         <v-select
                           :disabled="!editflag"
-                          v-model="form.gender"
+                          v-model="user.gender"
                           :items="form.GenderTypes"
-                          label="Gender"
+                          label="Gender: "
                           menu-props="auto"
                           return-object
                           single-line
@@ -648,8 +652,8 @@
                       <div :class="'px-6'">
                         <v-text-field
                           :disabled="!editflag"
-                          v-model="form.employer"
-                          :label="'Employer: ' + user.employer"
+                          v-model="user.employer"
+                          :label="'Employer: '"
                           required
                         ></v-text-field>
                       </div>
@@ -683,32 +687,41 @@
                                 </template>
                                 <v-card>
                                   <v-card-text>
-                                    <v-container>
-                                      <v-row>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-select
-                                            v-model="editedItem.type"
-                                            :items="form.cellPhoneTypes"
-                                            label="Phone Type"
-                                            menu-props="auto"
-                                            single-line
-                                          ></v-select>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-text-field
-                                            v-model="editedItem.number"
-                                            label="Phone Number"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-checkbox
-                                            v-model="editedItem.can_publish"
-                                            label="Include in Directory?"
-                                            hint="This phone will be used public information for things like Events, or Directory listings."
-                                          ></v-checkbox>
-                                        </v-col>
-                                      </v-row>
-                                    </v-container>
+                                    <!-- <v-form ref="form" v-model="ValidPhone" lazy-validation> -->
+                                      <v-container>
+                                        <v-row>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-form ref="form" v-model="ValidPhone" lazy-validation>
+                                              <v-select
+                                                v-model="editedItem.type"
+                                                :items="form.cellPhoneTypes"
+                                                label="Phone Type"
+                                                menu-props="auto"
+                                                single-line
+                                                required
+                                              ></v-select>
+                                            </v-form>
+                                          </v-col>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-form ref="form" v-model="ValidPhone" lazy-validation>
+                                              <v-text-field
+                                                v-model="editedItem.number"
+                                                :rules="phoneRules"
+                                                label="Phone Number"
+                                                required
+                                              ></v-text-field>
+                                            </v-form>
+                                          </v-col>
+                                          <v-col cols="12" sm="6" md="4">
+                                            <v-checkbox
+                                              v-model="editedItem.can_publish"
+                                              label="Include in Directory?"
+                                              hint="This phone will be used public information for things like Events, or Directory listings."
+                                            ></v-checkbox>
+                                          </v-col>
+                                        </v-row>
+                                      </v-container>
+                                    <!-- </v-form> -->
                                   </v-card-text>
                                   <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -723,6 +736,7 @@
                                       color="blue darken-1"
                                       text
                                       @click="save"
+                                      :disabled="!ValidPhone"
                                     >
                                       Save
                                     </v-btn>
@@ -851,8 +865,8 @@
                         <v-select
                           :disabled="!editflag"
                           v-model="form.involvement"
-                          label="Involvment in the Church"
-                          :items="form.InvolmentTypes"
+                          label="Involvement in the Church"
+                          :items="form.InvolvementTypes"
                           item-text="type"
                           dense
                           filled
@@ -881,12 +895,12 @@
                                 v-bind="attrs"
                                 v-on="on"
                               >
-                                Open Involment Types
+                                Open Involvement Types
                               </v-btn>
                             </template>
                             <v-card>
                               <v-card-title>
-                                Involment types
+                                Involvement types
                                 <v-list-item-content>
                                   <v-dialog
                                     v-model="dialogAdminInvolvment"
@@ -951,7 +965,7 @@
                                     <v-card>
                                       <v-card-title class="headline"
                                         >Are you sure you want to
-                                        delete this Involment
+                                        delete this Involvement
                                         Type?</v-card-title
                                       >
                                       <v-card-actions>
@@ -980,7 +994,7 @@
                                     <v-col cols="12">
                                       <v-list>
                                         <v-list-item
-                                          v-for="InvolvmentType in form.InvolmentTypes"
+                                          v-for="InvolvmentType in form.InvolvementTypes"
                                           v-bind:key="InvolvmentType.type"
                                         >
                                           <v-list-item-content>
@@ -1222,16 +1236,16 @@
                           color="primary"
                           class="mr-4"
                           v-on:click="editflag = !editflag"
+                          :disabled="isViewing"
                         >
                           Edit Info
                         </v-btn>
 
                         <v-btn
                           :disabled="!valid || !editflag"
-                          type="submit"
                           color="primary"
                           class="mr-4"
-                          @click="submit"
+                          v-on:click="submit"
                         >
                           Save
                         </v-btn>
@@ -1240,7 +1254,7 @@
                           :disabled="!editflag"
                           color="secondary" 
                           class="mr-4" 
-                          @click="reset">
+                          v-on:click="reset">
                           Reset
                         </v-btn>
                       </div>
@@ -1260,17 +1274,21 @@ import axios from "axios";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
+    console.log("Params: ", this.$route.params);
     //Get User Info from window.person
-    this.user.id = window.person.id;//Figure out some way to set this value before loading page
-    this.user.email = window.person.email//Set value before loading page 
-
+    if(this.$route.params.id == undefined)
+      this.user.id = window.person.id;
+    else
+      this.user.id = this.$route.params.id;//Figure out some way to set this value before loading page
+    if(this.user.id != window.person.id)
+      this.isViewing = true;
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
       axios.get(baseURL + "valid_value"),
       axios.get(baseURL + "person"),
       axios.get(baseURL + "relationship?person1_ID=" + this.user.id),
       axios.get(baseURL + "life_event?person_id=" + this.user.id),
-      axios.get(baseURL + 'person?email='+ this.user.email),
+      axios.get(baseURL + 'person?id='+ this.user.id),
       axios.get(baseURL + 'person_involvement?person_id=' + this.user.id),
       axios.get(baseURL + 'person_ministry?person_id=' + this.user.id),
       axios.get(baseURL + 'person_hobby?person_id=' + this.user.id),
@@ -1301,7 +1319,7 @@ export default {
           }
           else if(temp.value_group == 'involvement')
           {
-            this.form.InvolmentTypes.push(temp)
+            this.form.InvolvementTypes.push(temp)
           }
           else if(temp.value_group == 'ministry')
           {
@@ -1323,7 +1341,7 @@ export default {
               FullName: persons.data[c].f_name + " " + persons.data[c].l_name,
           };
           //If the ID is not the User ID
-          if(temp2.ID != window.person.id)
+          if(temp2.ID != this.user.id)
           {
             this.people.push(temp2);
             // console.log("Adding Person");
@@ -1393,12 +1411,13 @@ export default {
 
         console.log("Loading User Info: ");
         //Set user Info for the V-Form
-        if(user.data[0].f_name)
+        if(user.data[0].ID)
         {
           //Section for setting Form data from user data
-          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
+          this.user.email = user.data[0].email;
           this.user.gender = user.data[0].gender;
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
@@ -1412,6 +1431,8 @@ export default {
             if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
+          if(this.isAdmin)
+            this.isViewing = false;
         }
 
         //Clear both of the arrays
@@ -1426,12 +1447,12 @@ export default {
             "person_ID": involvement.data[k].person_ID,
             "involvement_ID": involvement.data[k].involvement_ID,
           }
-          for( j = 0; j < this.form.InvolmentTypes.length; j++)
+          for( j = 0; j < this.form.InvolvementTypes.length; j++)
           {
-            if(this.form.InvolmentTypes[j].ID == involve.involvement_ID)
+            if(this.form.InvolvementTypes[j].ID == involve.involvement_ID)
             {
               //Add that Involement Type to the this.form.involvement array since it will just be the types
-              this.form.involvement.push(this.form.InvolmentTypes[j]);
+              this.form.involvement.push(this.form.InvolvementTypes[j]);
             }
           }
           // put into prechange list
@@ -1455,7 +1476,7 @@ export default {
             if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
             {
               //Add that Involement Type to the this.form.ministry array since it will just be the types
-              this.form.ministry.push(this.form.MinistryTypes[k]);
+              this.form.ministry.push(this.form.MinistryTypes[j]);
             }
           }
           // put into prechange list first
@@ -1486,28 +1507,23 @@ export default {
           this.hobbylist.push(temp);
         }
       }
-    )); 
-
+    )) 
     //axios call to get phones
     this.GetPhones();
     
     //Section for setting Form data from user data
-    this.form.f_name = this.user.f_name;
-    this.form.l_name = this.user.l_name;
-    this.form.gender = this.user.gender;
-    this.form.preferred_name = this.user.preferred_name;
-    this.form.email = this.user.email;
-    this.form.occupation = this.user.occupation;
-    this.form.employer = this.user.employer;
+    this.form.hobbies = this.user.hobbies;
     this.form.ministry = this.user.ministry;
     this.form.involvement = this.user.involvement;
     this.form.phones = this.user.phones;
-    this.form.workPhone = this.user.workPhone;
-    this.form.hobbies = this.user.hobbies;
     this.editedItem = this.defaultItem;
   },
 
   data: () => ({
+    //Flag for viewing person
+    isViewing:false,
+    //Validation for phone
+    ValidPhone: false,
     //For v-form
     valid: false,
     //Array for all the Valid_Values
@@ -1534,7 +1550,7 @@ export default {
     },
     defaultItem: {
       ID:0,
-      number: "000-000-0000",
+      number: "0000000000",
       can_publish: false,
       type: "",
     },
@@ -1585,21 +1601,10 @@ export default {
     currentDate: new Date().toISOString().substr(0,10),
     //Variables for the Form
     form: {
-      id: 0,
-      f_name: "",
-      l_name: "",
-      gender:'',
-      preferred_name:'',
-      email: "",
-      immersed: false,
-      data_Immersed: "",
-      birthday: "",
-      occupation: "",
-      employer: "",
       cellPhoneTypes: ["Work", "Home", "Mobile"],
       LifeEventTypes: [],
       RelationType: [],
-      InvolmentTypes: [],
+      InvolvementTypes: [],
       MinistryTypes: [],
       HobbyTypes: [],
       GenderTypes: ["male","female","other"],
@@ -1615,7 +1620,7 @@ export default {
     //User Info Class
     user: {
       id: null,
-      congregation_id: null,
+      congregation_ID: null,
       f_name: "",
       l_name: "",
       gender:'',
@@ -1647,6 +1652,21 @@ export default {
     emailRules: [
       (v) => !!v || "E-mail is required",
       (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    phoneRules: [
+      value => !!value || 'Required.',
+      // value => (value || '').length <= 14 || 'Number is too long.',
+      value => (value || '').length == 10 || 'Number is not correct length',
+      value => {
+        const pattern = /(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/g
+        return pattern.test(value) || 'Invalid Phone Number. 1111111111'
+      },
+      // value => {
+      //   const pattern2 = /([^A-Z]|[^a-z])/g
+      //   return pattern2.test(value) || 'Number contains Letters.'
+
+      // },
+      
     ],
   }),
   watch: {
@@ -1723,27 +1743,20 @@ export default {
       console.log("PreSubmit");
       if (this.$refs.form.validate()) {
         console.log("PostSubmit");
-        this.user.f_name = this.form.f_name;
-        this.user.l_name = this.form.l_name;
-        this.user.gender = this.form.gender;
-        this.user.preferred_name = this.form.preferred_name;
-        this.user.email = this.form.email;
-        this.user.occupation = this.form.occupation;
-        this.user.employer = this.form.employer;
-        this.user.ministry = this.form.ministry;
         this.MakePut(null,5);
       }
+      alert('Your information has been saved');
     },
     reset() {
       this.$refs.form.reset();
       //Section for setting Form data from user data
-      this.form.f_name = this.user.f_name;
-      this.form.l_name = this.user.l_name;
-      this.form.gender = this.user.gender;
-      this.form.preferred_name = this.user.preferred_name;
-      this.form.email = this.user.email;
-      this.form.occupation = this.user.occupation;
-      this.form.employer = this.user.employer;
+      // this.form.f_name = this.user.f_name;
+      // this.form.l_name = this.user.l_name;
+      // this.form.gender = this.user.gender;
+      // this.form.preferred_name = this.user.preferred_name;
+      // this.form.email = this.user.email;
+      // this.form.occupation = this.user.occupation;
+      // this.form.employer = this.user.employer;
     },
     resetValidation() {
       this.$refs.form.resetValidation();
@@ -1834,7 +1847,7 @@ export default {
         this.editedEvent = Object.assign({}, Event);
         this.dialogAdminEvent = true;
       } else if (type == 3){ //Involvment Types
-        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.EventsIndex = this.form.InvolvementTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogAdminInvolvment = true;
       } else{ //Ministery Areas
@@ -1862,7 +1875,7 @@ export default {
         this.dialogDeleteAdminEvent = true;
       } else if(type == 3){
         //Else the Event is a EventType
-        this.EventsIndex = this.form.InvolmentTypes.indexOf(Event);
+        this.EventsIndex = this.form.InvolvementTypes.indexOf(Event);
         this.editedEvent = Object.assign({}, Event);
         this.dialogDeleteAdminInvolvment = true;
       } else {
@@ -1884,7 +1897,7 @@ export default {
         this.form.LifeEventTypes.splice(this.EventsIndex, 1);
         this.MakeDeletes(this.editedEvent,type);
       } else if (type == 3) {
-        this.form.InvolmentTypes.splice(this.EventsIndex, 1);
+        this.form.InvolvementTypes.splice(this.EventsIndex, 1);
         this.MakeDeletes(this.editedEvent,type);
       } else {
         this.form.MinistryTypes.splice(this.EventsIndex, 1);
@@ -1996,12 +2009,12 @@ export default {
       } else if (type == 3){
         if (this.EventsIndex > -1) {
           Object.assign(
-            this.form.InvolmentTypes[this.EventsIndex],
+            this.form.InvolvementTypes[this.EventsIndex],
             this.editedEvent
           );
           this.MakePut(this.editedEvent,type);
         } else {
-          this.form.InvolmentTypes.push(this.editedEvent);
+          this.form.InvolvementTypes.push(this.editedEvent);
           this.MakePost(this.editedEvent,type);
         }
         this.closeEvent(type);
@@ -2319,12 +2332,12 @@ export default {
                     "person_ID": get.data[k].person_ID,
                     "involvement_ID": get.data[k].involvement_ID,
                   }
-                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                  for(j = 0; j < this.form.InvolvementTypes.length; j++)
                   {
-                    if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                    if(this.form.InvolvementTypes[j].ID == temp.involvement_ID)
                     {
                       //Add that Involement Type to the this.form.involvement array since it will just be the types
-                      this.form.involvement.push(this.form.InvolmentTypes[j]);
+                      this.form.involvement.push(this.form.InvolvementTypes[j]);
                     }
                   }
                   // put into prechange list first
@@ -2377,12 +2390,12 @@ export default {
                   "person_ID": get.data[k].person_ID,
                   "involvement_ID": get.data[k].involvement_ID,
                 }
-                for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                for(j = 0; j < this.form.InvolvementTypes.length; j++)
                 {
-                  if(this.form.InvolmentTypes[j].ID == temp.involvement_ID)
+                  if(this.form.InvolvementTypes[j].ID == temp.involvement_ID)
                   {
                     //Add that Involement Type to the this.form.involvement array since it will just be the types
-                    this.form.involvement.push(this.form.InvolmentTypes[k]);
+                    this.form.involvement.push(this.form.InvolvementTypes[j]);
                   }
                 }
                 // put into prechange list first
@@ -2437,7 +2450,7 @@ export default {
                     "person_ID": get.data[k].person_ID,
                     "ministry_ID": get.data[k].ministry_ID,
                   }
-                  for(j = 0; j < this.form.InvolmentTypes.length; j++)
+                  for(j = 0; j < this.form.InvolvementTypes.length; j++)
                   {
                     if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
                     {
@@ -2501,7 +2514,7 @@ export default {
                   if(this.form.MinistryTypes[j].ID == temp.ministry_ID)
                   {
                     //Add that Ministry Area  to the this.form.ministry array since it will just be the types
-                    this.form.ministry.push(this.form.MinistryTypes[k]);
+                    this.form.ministry.push(this.form.MinistryTypes[j]);
                   }
                 }
                 // put into prechange list first
@@ -2523,7 +2536,7 @@ export default {
           this.validvalues = [];
           this.form.RelationType = [];
           this.form.LifeEventTypes = [];
-          this.form.InvolmentTypes =[];
+          this.form.InvolvementTypes =[];
           this.form.MinistryTypes = [];
           //Do a For loop to iterate through the list and then create an Object
           console.log("Loading Valid Values...");
@@ -2548,7 +2561,7 @@ export default {
             }
             else if(temp.value_group == 'involvement')
             {
-              this.form.InvolmentTypes.push(temp)
+              this.form.InvolvementTypes.push(temp)
             }
             else if(temp.value_group == 'ministry')
             {
@@ -2564,7 +2577,7 @@ export default {
     {
       //Axios call for all users for Relationships
       axios
-      .get(baseURL + "relationship?person1_ID=" + window.person.id)
+      .get(baseURL + "relationship?person1_ID=" + this.user.id)
       .then((response) => {
         this.form.Relations = [];//Null out array
         //Loop through and make another axios call for each of the person_ids to get that person with their full name
@@ -2653,7 +2666,7 @@ export default {
                 FullName: response.data[i].f_name + " " + response.data[i].l_name,
             };
             //If the ID is not the User ID
-            if(temp.ID != window.person.id)
+            if(temp.ID != this.user.id)
               {
                 this.people.push(temp);
                 console.log("Adding Person");
@@ -2672,10 +2685,11 @@ export default {
         .get(baseURL + "phone_number?person_ID=" + this.user.id)
         .then((response) => {
           this.form.phones = response.data;
-          // for( var i = 0; i< this.form.phones.length; i++)
-          //   console.log(`Phone Info ${this.form.phones[i].ID}`);
         })
-        .catch((error) => {this.CatchError(error);});  
+        .catch((error) => {
+          this.CatchError(error);
+          this.form.phones = [];
+        });  
     },
     async GetUser()
     {
@@ -2686,14 +2700,14 @@ export default {
         if(user.data[0].f_name)
         {
           //Section for setting Form data from user data
-          this.user.congregation_id = user.data[0].congregation_ID
+          this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
           this.user.gender = user.data[0].gender;
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
           this.user.employer = user.data[0].employer;
-          this.user.role = user.data[0].role
+          this.user.role = user.data[0].role;
           this.user.family_ID = user.data[0].family_ID;
           
         }
@@ -2750,8 +2764,10 @@ export default {
         .catch(error=>{this.CatchError(error);})
       } else if( type == 0 )//New Life Event
       {
-        console.log(object.type.ID);
+        console.log("Mysterious Object:", object);
         //Create Object to send from Given Data
+        if(object.visible == null || object.visible == false)
+          object.visible = false;
         Data = {
           "person_ID":this.user.id,
           "description":object.description,
@@ -2759,6 +2775,7 @@ export default {
           "type":object.type.ID,
           "visible": object.visible,
         };
+        console.log("Data for Life Event: ", Data)
         axios
         .post(baseURL + 'life_event', Data)
         .then(response =>
@@ -2862,8 +2879,11 @@ export default {
       {
         console.log(object.type.ID);
         //Create Object to send from Given Data
+
+        if(object.visible == null || object.visible == false)
+          object.visible = false;
         Data = {
-          "person_ID":window.person.id,
+          "person_ID":this.user.id,
           "description":object.description,
           "date":object.date,
           "type":object.type.ID,
@@ -2927,7 +2947,7 @@ export default {
       {
         Data = {
           "ID": this.user.id,
-          "congregation_ID": this.user.congregation_id,
+          "congregation_ID": this.user.congregation_ID,
           "f_name": this.user.f_name,
           "l_name": this.user.l_name,
           "occupation": this.user.occupation,
@@ -2938,7 +2958,9 @@ export default {
           "preferred_name": this.user.preferred_name,
           "role": this.user.role,
         }
+        console.log(Data);
         axios.put(baseURL + 'person?id=' + this.user.id,Data)
+        .catch(error =>{this.CatchError(error);})
         .finally(() => {
             this.GetUser();
         })
