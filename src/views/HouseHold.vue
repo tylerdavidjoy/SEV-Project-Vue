@@ -212,7 +212,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         l_name: "",
         occupation: "",
         employer: "",
-        baseURL: "http://team2.eaglesoftwareteam.com/",
+        baseURL: "http://localhost:3000/",
         familyImgSrc: "",
         members:[
           {name: 'Billy Bob jr.'},

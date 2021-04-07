@@ -20,7 +20,7 @@ export default ({
     {
     generateReport: function(id)
     {
-        axios.get("http://team2.eaglesoftwareteam.com/group?id="+id+"&get_members=1")
+        axios.get("http://localhost:3000/group?id="+id+"&get_members=1")
         .then(response => {
         if (this.selected == "CSV")
             this.csvCreation(response.data);

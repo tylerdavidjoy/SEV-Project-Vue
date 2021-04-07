@@ -37,7 +37,7 @@ window.onSignIn = function (googleUser) {
 
 
   axios
-    .get('http://team2.eaglesoftwareteam.com/person?email='+ window.user.email)
+    .get('http://localhost:3000/person?email='+ window.user.email)
     .then(response => {
       if(response.data[0].f_name)
       {

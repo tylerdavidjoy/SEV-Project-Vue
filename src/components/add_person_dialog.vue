@@ -135,7 +135,7 @@ export default ({
     name: "AddPersonDialog",
     mounted()
     {
-    axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=role")
+    axios.get("http://localhost:3000/valid_value?value_group=role")
     .then(response => {
       console.log(response.data);
       for(var i = 0; i < response.data.length; i++)
@@ -162,7 +162,7 @@ export default ({
             this.person.gender = this.person.gender.toLowerCase();
             this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
             
-            //axios.post('http://team2.eaglesoftwareteam.com/person', this.person);
+            //axios.post('http://localhost:3000/person', this.person);
             this.dialog = false;
             this.$parent.$parent.$parent.$parent.getData();
         }

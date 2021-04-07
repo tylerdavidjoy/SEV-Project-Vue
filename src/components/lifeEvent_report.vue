@@ -19,7 +19,7 @@ export default ({
     {
     generateReport: function(date_start, date_end, type)
     {
-        axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
+        axios.get("http://localhost:3000/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
         .then(response => {
         this.pdfCreation(response.data,this.picture);
         })

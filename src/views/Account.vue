@@ -1271,7 +1271,7 @@
 </template>
 <script>
 import axios from "axios";
-var baseURL = 'http://team2.eaglesoftwareteam.com/';
+var baseURL = 'http://localhost:3000/';
 export default {
   mounted() {
     console.log("Params: ", this.$route.params);
