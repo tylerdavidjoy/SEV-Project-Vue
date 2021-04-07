@@ -340,16 +340,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
     methods: {
       onEdit: function() {
-
-        // If the head of household is logged in give edit permission
-        if(this.userId == this.headOfFamilyID) {
-          this.editable = true;
-        }
-
-        // If the head of household is not logged in do not allow edit permission
-        else {
-          alert("You are not head of household. You do not have permission to edit.")
-        }
+        this.editable = true;
       },
       onSave: function() {
         this.editable = false;
@@ -402,7 +393,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       navToAccountPage: function(param) {
         console.log("Navigate to account page!")
         console.log(param)
-        this.$router.push({ path: '/account', params: { id: param }})
+        this.$router.push({ name: 'Account', params: { personID: param }})
       },
 
       addMemberDialog: function() {
