@@ -58,7 +58,7 @@
 
                           <div id="content" ref="content" style="width:100%; margin:auto; padding-left:3.5%;">
                             <div v-for="person in display" :key="person.name" style="float:left; padding: 15px;">
-                              <v-btn style="text-transform:none" height="auto" color="transparent" @click="goToPage(person.ID)" elevation="10">
+                              <v-btn style="text-transform:none" height="auto" color="transparent" @click="goToPage(person.id)" elevation="10">
                                 <div>
                                   <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
                                     <v-img
