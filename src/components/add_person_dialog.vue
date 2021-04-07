@@ -160,11 +160,16 @@ export default ({
         createPerson()
         {
             this.person.gender = this.person.gender.toLowerCase();
+            console.log(this.rolesObj);
             this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
             
-            axios.post('http://localhost:3000/person', this.person);
+            axios.post('http://localhost:3000/person', this.person)
+            .then( () =>
+            {
             this.dialog = false;
             this.$parent.$parent.$parent.$parent.getData();
+            })
+
         }
     },
 
