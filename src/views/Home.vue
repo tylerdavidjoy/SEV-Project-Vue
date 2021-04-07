@@ -33,7 +33,7 @@
 <script>
 import axios from 'axios';
 
-const apiBaseUrl = "http://localhost:3000";
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import AnnouncementViewer from '@/components/Announcements.vue'
   export default {
     components:

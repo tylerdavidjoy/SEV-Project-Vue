@@ -68,7 +68,7 @@ export default {
         }
         else
         {
-          window.location.href = 'http://localhost:8080/#/';
+          window.location.href = 'http://team2.eaglesoftwareteam.com/#/';
         }
       }
     },

@@ -124,7 +124,7 @@
 <script>
 import axios from 'axios';
 
-const apiBaseUrl = "http://localhost:3000";
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 
 export default {
     name: "AnnouncementViewer",
