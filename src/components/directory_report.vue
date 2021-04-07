@@ -61,9 +61,9 @@ export default ({
                 var columns = ["Name", "Preferred Name", "Occupation", "Employer", "Email", "Role Type", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
                 var rows = [];
 
-                for(var i=0; i < people.length; i++){
-                    rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
-                }
+           for(var i=0; i < people.length; i++){
+            rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
+        }
                 
                 doc.autoTable(columns, rows);
                 doc.save('Directory.pdf');
@@ -71,7 +71,7 @@ export default ({
 
             else
             {
-
+                console.log(people[1])
                 var contentTemp = [];
                 for (i = 0; i < people.length; i++)
                 {

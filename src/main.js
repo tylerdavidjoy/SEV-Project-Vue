@@ -48,7 +48,7 @@ window.onSignIn = function (googleUser) {
           l_name: response.data[0].l_name,
           occupation: response.data[0].occupation,
           employer: response.data[0].employer,
-          family_id: response.data[0].family_id,
+          family_ID: response.data[0].family_ID,
           email: response.data[0].email,
           gender: response.data[0].gender,
           preferred_name: response.data[0].preferred_name,
