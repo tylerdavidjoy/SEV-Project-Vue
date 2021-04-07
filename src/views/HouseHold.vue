@@ -205,7 +205,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         l_name: "",
         occupation: "",
         employer: "",
-        baseURL: "http://localhost:3000/",
+        baseURL: "http://team2.eaglesoftwareteam.com/",
         familyImgSrc: "",
         members:[
           {name: 'Billy Bob jr.'},
@@ -335,7 +335,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       //     this.phoneNumber_Type = response.data[0].type;
       //     this.can_publish = response.data[0].can_publish;
       //   })
-
+         this.isHeadOfHousehold();
          this.isAdminFunction();
           
     },
