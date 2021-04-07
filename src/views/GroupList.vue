@@ -198,6 +198,8 @@ export default {
         required: value => !!value || 'Required.'
       },
       isAddValid: false,
+      fileType:"PDF",
+      picture:false
     }
   },
   beforeCreate(){
@@ -311,7 +313,8 @@ export default {
         type: this.dialogm2type.ID,
         leader: this.dialogm2leader.ID,
         congregation_ID: this.$person.congregation_ID,
-        name: this.dialogm2name
+        name: this.dialogm2name,
+        image: "default.jpg"
       }
       
       axios.post(`${apiBaseUrl}/group`, {

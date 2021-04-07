@@ -236,7 +236,7 @@
         </v-container>
       </v-main>
         <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
-        <GroupReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+        <GroupReport class="primary" :selected.sync="fileType" :picture.sync="picture" :reportid.sync="group.ID"/>
     </div>
   </v-app>
 </template>
@@ -274,6 +274,8 @@ export default {
         dialogm2: '',
         dialog: false,
         dialog2: false,
+        fileType:"PDF",
+        picture:false
       }
   },
   methods:

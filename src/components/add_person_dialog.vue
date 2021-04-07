@@ -186,7 +186,7 @@ export default ({
                 occupation: null,
                 employer:null,
                 family_ID:null,
-                email:null,
+                email:"",
                 gender:null,
                 preferred_name:null,
                 role:null,

@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn color="green" @click.native="generateReport(1)">Generate <br/> Group Memeber Report</v-btn>
+  <v-btn color="green" @click.native="generateReport()">Generate <br/> Group Memeber Report</v-btn>
 </template>
 
 <script>
@@ -14,14 +14,16 @@ export default ({
     props:
     {
         selected: String,
-        picture: Boolean
+        picture: Boolean,
+        reportid: Number
     },
     methods: 
     {
-    generateReport: function(id)
+    generateReport: function()
     {
-        axios.get("http://localhost:3000/group?id="+id+"&get_members=1")
+        axios.get("http://localhost:3000/group?id="+ this.reportid +"&get_members=1")
         .then(response => {
+        console.log(response.data)
         if (this.selected == "CSV")
             this.csvCreation(response.data);
         else
