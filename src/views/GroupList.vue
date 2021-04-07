@@ -170,7 +170,7 @@
 
 <script>
 import axios from "axios";
-const apiBaseUrl = "http://localhost:3000";
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import GroupListReport from "@/components/group_list_report.vue";
 import ReportSettings from "@/components/report_settings.vue";
 

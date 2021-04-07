@@ -85,11 +85,11 @@ export default ({
         {
 
         this.family.head_ID = this.people.filter(x => x.name == this.headOfFamily)[0].id;
-        axios.get("http://localhost:3000/address?person_ID=" + this.family.head_ID)
+        axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID)
         .then(response => {
           console.log(response)
           this.family.address_ID = response.data[0].ID
-          axios.post('http://localhost:3000/family', this.family)
+          axios.post('http://team2.eaglesoftwareteam.com/family', this.family)
         })
         .catch(error => {
           console.log(error);

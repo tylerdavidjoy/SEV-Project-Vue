@@ -21,7 +21,7 @@ export default ({
     {
     generateReport: function()
     {
-        axios.get("http://localhost:3000/group?id="+ this.reportid +"&get_members=1")
+        axios.get("http://team2.eaglesoftwareteam.com/group?id="+ this.reportid +"&get_members=1")
         .then(response => {
         console.log(response.data)
         if (this.selected == "CSV")

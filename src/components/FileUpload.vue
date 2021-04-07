@@ -16,7 +16,7 @@ export default {
     data() {
         return {
             selectedFile: "",
-            baseURL: "http://localhost:3000/",
+            baseURL: "http://team2.eaglesoftwareteam.com/",
             progress: 0,
             // familyImgSrc: ""
         };
