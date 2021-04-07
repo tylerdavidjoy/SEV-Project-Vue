@@ -245,7 +245,7 @@ export default {
     goToPage(ID)
     {
       if(this.displayMode == "person")
-        this.$router.push({name: 'Account', params: {personID: ID}})
+        this.$router.push({name: 'Account', params: {id: ID}})
 
       else
         this.$router.push({name: 'HouseHold', params: {familyID: ID}})

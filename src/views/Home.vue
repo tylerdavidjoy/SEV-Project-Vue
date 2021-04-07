@@ -40,8 +40,8 @@
     name:"", 
     drawer: null,
     tabs:[
-    {icon:'mdi-account',text:'Account', name:'Account', params: { id:window.person.id}},
-    {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params: { id:window.person.id}},
+    {icon:'mdi-account',text:'Account', name:'Account', params: { id:1}},
+    {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params: { familyID:window.person.id}},
     {icon:'mdi-account-group',text:'Groups', name:'Group List', params: { id:window.person.id}},
     {icon:'mdi-calendar',text:'Events', name:'Events', params: { id:window.person.id}},
     {icon:'mdi-church',text:'Directory', name:'Directory', params: { id:window.person.id}},
