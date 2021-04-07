@@ -87,10 +87,10 @@
                           </v-container>
 
                           <div v-if="isAdmin" style="margin:auto">
-                            <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+                            <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end" :life_event_types.sync="life_event_types"/>
                             <DirectoryReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
                             <RoleReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
-                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end"/>
                           </div>
                         </v-container>
                       </div>
@@ -140,7 +140,10 @@ export default {
       displayMode: "person",
       items: ["person", "family"],
       fileType:"PDF",
-      picture:false
+      picture:false,
+      start: new Date().toISOString().substr(0, 10),
+      end: new Date().toISOString().substr(0, 10),
+      life_event_types:[]
     }
   },
   methods:{
@@ -177,6 +180,22 @@ export default {
               id: response.data[i].ID,
               name: response.data[i].l_name,
               image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+        axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=life_event")
+        .then(response => {
+          console.log(response.data);
+          this.life_event_types = []
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.life_event_types.push({
+              id: response.data[i].ID,
+              value: response.data[i].value
             })
           }
         })
