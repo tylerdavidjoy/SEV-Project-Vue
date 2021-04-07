@@ -34,6 +34,7 @@
                           small-chips
                           truncate-length="50"
                           @change="getFileObject($event)"
+                          :disabled="isViewing"
                         ></v-file-input>
                       </div>
                       <div :class="'px-6'">
@@ -43,6 +44,7 @@
                           color="primary"
                           width="auto"
                           v-on:click="chooseFiles()"
+                          :disabled="isViewing"
                         >
                           <v-icon left>mdi-pencil</v-icon>Upload Profile Picture
                         </v-btn>
@@ -239,6 +241,7 @@
                                         class="mb-2"
                                         v-bind="attrs"
                                         v-on="on"
+                                        :disabled="isViewing"
                                       >
                                         Add Event
                                       </v-btn>
@@ -386,6 +389,7 @@
                                           icon
                                           tile
                                           v-on:click="editEvent(LifeEvent, 0)"
+                                          :disabled="isViewing"
                                         >
                                           <v-icon dark>
                                             mdi-pencil-outline
@@ -397,6 +401,7 @@
                                           icon
                                           tile
                                           v-on:click="deleteEvent(LifeEvent, 0)"
+                                          :disabled="isViewing"
                                         >
                                           <v-icon dark>
                                             mdi-trash-can-outline
@@ -429,6 +434,7 @@
                                         class="mb-1"
                                         v-bind="attrs"
                                         v-on="on"
+                                        :disabled="isViewing"
                                       >
                                         Add Relation
                                       </v-btn>
@@ -545,6 +551,7 @@
                                         fab
                                         tile
                                         v-on:click="deleteEvent(Relation, 1)"
+                                        :disabled="isViewing"
                                       >
                                         <v-icon dark>
                                           mdi-trash-can-outline
@@ -1229,6 +1236,7 @@
                           color="primary"
                           class="mr-4"
                           v-on:click="editflag = !editflag"
+                          :disabled="isViewing"
                         >
                           Edit Info
                         </v-btn>
@@ -1266,17 +1274,21 @@ import axios from "axios";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   mounted() {
+    console.log("Params: ", this.$route.params);
     //Get User Info from window.person
-    this.user.id = window.person.id;//Figure out some way to set this value before loading page
-    this.user.email = window.person.email;//Set value before loading page 
-
+    if(this.$route.params.id == undefined)
+      this.user.id = window.person.id;
+    else
+      this.user.id = this.$route.params.id;//Figure out some way to set this value before loading page
+    if(this.user.id != window.person.id)
+      this.isViewing = true;
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
       axios.get(baseURL + "valid_value"),
       axios.get(baseURL + "person"),
       axios.get(baseURL + "relationship?person1_ID=" + this.user.id),
       axios.get(baseURL + "life_event?person_id=" + this.user.id),
-      axios.get(baseURL + 'person?email='+ this.user.email),
+      axios.get(baseURL + 'person?id='+ this.user.id),
       axios.get(baseURL + 'person_involvement?person_id=' + this.user.id),
       axios.get(baseURL + 'person_ministry?person_id=' + this.user.id),
       axios.get(baseURL + 'person_hobby?person_id=' + this.user.id),
@@ -1405,6 +1417,7 @@ export default {
           this.user.congregation_ID = user.data[0].congregation_ID
           this.user.f_name = user.data[0].f_name;
           this.user.l_name = user.data[0].l_name;
+          this.user.email = user.data[0].email;
           this.user.gender = user.data[0].gender;
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
@@ -1418,7 +1431,8 @@ export default {
             if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
-          console.log(this.user.congregation_ID);
+          if(this.isAdmin)
+            this.isViewing = false;
         }
 
         //Clear both of the arrays
@@ -1506,6 +1520,8 @@ export default {
   },
 
   data: () => ({
+    //Flag for viewing person
+    isViewing:false,
     //Validation for phone
     ValidPhone: false,
     //For v-form
@@ -1534,7 +1550,7 @@ export default {
     },
     defaultItem: {
       ID:0,
-      number: "000-000-0000",
+      number: "0000000000",
       can_publish: false,
       type: "",
     },
@@ -1639,12 +1655,18 @@ export default {
     ],
     phoneRules: [
       value => !!value || 'Required.',
-      // value => (value || '').length <= 12 || 'Number is too long.',
-      value => (value || '').length <= 10 || 'Number is too short.',
+      // value => (value || '').length <= 14 || 'Number is too long.',
+      value => (value || '').length == 10 || 'Number is not correct length',
       value => {
-        const pattern = /(1{0,1}[ \-.]{0,1}\({0,1}[0-9]{3}\){0,1}[ \-.]{0,1}[0-9]{3}[ \-.]{0,1}[0-9]{4})/g
-        return pattern.test(value) || 'Invalid Phone Number. 5554443232'
+        const pattern = /(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/g
+        return pattern.test(value) || 'Invalid Phone Number. 1111111111'
       },
+      // value => {
+      //   const pattern2 = /([^A-Z]|[^a-z])/g
+      //   return pattern2.test(value) || 'Number contains Letters.'
+
+      // },
+      
     ],
   }),
   watch: {

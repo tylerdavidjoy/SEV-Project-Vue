@@ -116,6 +116,7 @@
                     scrollable
                     max-width="300px"
                     v-if="hasEditPermission()"
+
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn @click="addMemberDialog"
@@ -163,6 +164,7 @@
                           color="blue darken-1"
                           text
                           @click="addMemberToFamily()"
+
                         >
                           Save
                         </v-btn>
