@@ -98,7 +98,7 @@
                 sm="6"
               >
                 <v-select
-                  :items="['User', 'Decan', 'Admin']"
+                  :items="['User', 'Deacon', 'Admin']"
                   label="User Type*"
                   v-model="person.role"
                   required/>
