@@ -1276,10 +1276,10 @@ export default {
   mounted() {
     console.log("Params: ", this.$route.params);
     //Get User Info from window.person
-    if(this.$route.params.id == undefined)
+    if(this.$route.params.personID == undefined)
       this.user.id = window.person.id;
     else
-      this.user.id = this.$route.params.id;//Figure out some way to set this value before loading page
+      this.user.id = this.$route.params.personID;//Figure out some way to set this value before loading page
     if(this.user.id != window.person.id)
       this.isViewing = true;
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
@@ -1422,16 +1422,17 @@ export default {
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
           this.user.employer = user.data[0].employer;
-          this.user.role = user.data[0].role
+          // this.user.role = user.data[0].role
           this.user.family_ID = user.data[0].family_ID;
           //iterate through valid_values to get the Role
           this.isAdmin = false;
           for(var i = 0; i < this.validvalues.length; i++)
           {
-            if(this.validvalues[i].ID == this.user.role && this.validvalues[i].value == 'admin')
+            if(this.validvalues[i].ID == window.person.role && this.validvalues[i].value == 'admin')
               this.isAdmin = true;
           }
-          if(this.isAdmin)
+          //Checking for if the viewing user is an admin or if the viewing user is the user of the account
+          if(this.isAdmin || this.user.id == window.person.id)
             this.isViewing = false;
         }
 

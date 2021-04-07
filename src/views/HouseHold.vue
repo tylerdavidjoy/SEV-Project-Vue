@@ -335,7 +335,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       //     this.phoneNumber_Type = response.data[0].type;
       //     this.can_publish = response.data[0].can_publish;
       //   })
-
+         this.isHeadOfHousehold();
          this.isAdminFunction();
           
     },

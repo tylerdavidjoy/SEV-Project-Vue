@@ -11,15 +11,22 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default ({
-    name: "DirectoryReportNoImg",
+    name: "DirectoryReport",
+    props:
+    {
+        selected: String,
+        picture: Boolean
+    },
     methods: 
     {
     generateReport: function()
     {
         axios.get("http://team2.eaglesoftwareteam.com/person?getInfo=1")
         .then(response => {
-            //this.csvCreation(response.data);
-            this.pdfCreation(response.data,true);
+        if (this.selected == "CSV")
+            this.csvCreation(response.data);
+        else
+            this.pdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);
@@ -54,9 +61,9 @@ export default ({
                 var columns = ["Name", "Preferred Name", "Occupation", "Employer", "Email", "Role Type", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
                 var rows = [];
 
-                for(var i=0; i < people.length; i++){
-                    rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
-                }
+           for(var i=0; i < people.length; i++){
+            rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
+        }
                 
                 doc.autoTable(columns, rows);
                 doc.save('Directory.pdf');
@@ -64,10 +71,7 @@ export default ({
 
             else
             {
-                var picture = new Image();
-                picture.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png";
-
-                //var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
+                console.log(people[1])
                 var contentTemp = [];
                 for (i = 0; i < people.length; i++)
                 {
@@ -115,6 +119,15 @@ export default ({
                     contentTemp.push(tempNames);
                     i +=2;
                 }
+
+                var imgList = {}
+
+                for (var x = 0; x < people.length; x++)
+                {
+                    imgList[x] = people[x].image;
+                }
+
+                console.log(imgList);
 
                 var pdfContent = {
                     content: contentTemp,

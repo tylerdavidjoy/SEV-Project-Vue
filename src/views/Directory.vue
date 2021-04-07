@@ -28,59 +28,44 @@
                         ></v-text-field>
                       </div>
 
+
                     </div>
                   </v-sheet>
               </v-col>
               <v-col cols="12">
                   <v-sheet class="rounded-lg">
                     <div class="px-4">
-                      <!-- Switch for Pagenation and Calendar -->
-                      <div>
-                        <v-container>
-                          <v-row>
-                            <v-col cols="6">
-                              <v-container>    
-                                <v-sheet class="rounded-lg">
-                                  <div>
-                                    <v-btn @click='viewMode("person")' block elevation="2" outlined>Person View</v-btn>
-                                  </div>
-                                  
-                                  <div>
-                                    <v-btn style="margin-top: 2%;" @click='addPerson()' elevation="2" outlined>+ Person</v-btn>
-                                  </div>
-                                </v-sheet>
-                              </v-container>
-                            </v-col>
-                            <v-col cols="6">
-                              <v-container>    
-                                <v-sheet class="rounded-lg">
-                                  <div>
-                                    <v-btn @click='viewMode("family")' block elevation="2" outlined >Family View</v-btn>
-                                  </div>
-                                  <div>
-                                    <v-btn style="margin-top: 2%;" @click='addFamily()' elevation="2" outlined>+ Family</v-btn>
-                                  </div>
-                                </v-sheet>
-                              </v-container>
-                            </v-col>
-                          </v-row>
-                        </v-container>
+                      <v-tabs
+                        v-model="tab"
+                            fixed-tabs
+                            background-color="white">
+                        <v-tabs-slider color="Blue"/>
+                        <v-tab
+                          v-for="item in items"
+                          :key="item"
+                          @click = "viewMode(item)">
+                          {{ item }}
+                        </v-tab>
+                      </v-tabs>
+                      
+                      <div style="margin-top:2%;">
+                      <AddPersonDialog v-if="isAdmin && displayMode=='person'"/>
+                      <AddFamilyDialog v-if="isAdmin && displayMode=='family'" :people="people"/>
                       </div>
-
                       <!-- Results Bar -->
                       <div class="pt-2">
                         <v-container>
 
                           <div id="content" ref="content" style="width:100%; margin:auto; padding-left:3.5%;">
                             <div v-for="person in display" :key="person.name" style="float:left; padding: 15px;">
-                              <v-btn style="text-transform:none" height="auto" color="transparent" @click="goToPage(person.ID)" elevation="10">
+                              <v-btn style="text-transform:none" height="auto" color="transparent" @click="goToPage(person.id)" elevation="10">
                                 <div>
                                   <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
                                     <v-img
                                       height="175px"
                                       width="175px"
-                                      lazy-src="../assets/logo.png"
-                                      src="../assets/logo.png"
+                                      :lazy-src="person.image"
+                                      :src="person.image"
                                     ></v-img>
                                   </v-avatar>
                                   <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
@@ -93,16 +78,20 @@
                             <v-pagination
                               v-model="page"
                               class="my-4"
-                              :length="pageLength"
+                              :length="numPages"
                               :total-visible="7"
+                              @next="pageChange('next')"
+                              @previous="pageChange('previous')"
+                              @input="pageChange(page)"
                             ></v-pagination>
                           </v-container>
-                          <DirectoryReportNoImg/>
-                          <RoleReport/>
-                           <GroupReportNoImg/>
-                           <GroupListReport/>
-                          <LifeEventReport/>
-                          
+
+                          <div v-if="isAdmin" style="margin:auto">
+                            <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end" :life_event_types.sync="life_event_types"/>
+                            <DirectoryReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+                            <RoleReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end"/>
+                          </div>
                         </v-container>
                       </div>
                     </div>
@@ -118,78 +107,123 @@
 </template>
 <script>
 import axios from "axios";
-import DirectoryReportNoImg from "@/components/directory_report.vue";
-import GroupReportNoImg from "@/components/group_report.vue";
-import GroupListReport from "@/components/group_list_report.vue";
+import ReportSettings from "@/components/report_settings.vue";
+import DirectoryReport from "@/components/directory_report.vue";
 import LifeEventReport from "@/components/lifeEvent_report.vue";
 import RoleReport from "@/components/role_report.vue";
+import AddPersonDialog from "@/components/add_person_dialog.vue";
+import AddFamilyDialog from "@/components/add_family_dialog.vue";
+
 export default {
   name: "Home",
   components: {
-    DirectoryReportNoImg,
-    GroupReportNoImg,
+    ReportSettings,
+    DirectoryReport,
     LifeEventReport,
-    GroupListReport,
-    RoleReport
+    RoleReport,
+    AddPersonDialog,
+    AddFamilyDialog
   },
   mounted() {
-    //People
-    axios.get("http://team2.eaglesoftwareteam.com/person")
-    .then(response => {
-      console.log("people Res:", response.data);
-      for(var i = 0; i < response.data.length; i++)
-      {
-        this.people.push({
-          id: response.data[i].ID,
-          name: response.data[i].f_name + " " + response.data[i].l_name
-        })
-      }
-      if(this.people.length > 20)
-        this.display = this.people.slice(0,19);
-      
-      else
-        this.display = this.people;
-
-      if(this.people.length == 20)
-        this.pageLength = 1;
-      
-      else
-        this.pageLength = (this.people.length / 20) + 1;
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
-    axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
-    .then(response => {
-      console.log(response.data);
-      for(var i = 0; i < response.data.length; i++)
-      {
-        this.family.push({
-          id: response.data[i].ID,
-          name: response.data[i].l_name
-        })
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
-
+    this.getData()
   },
     data() {
     return {
       isAdmin:true,
       search:'',
       page:1,
-      pageLength:20,
+      numPages:0,
+      maxPageLength: 20,
       display:[],
       people:[],
       family: [],
       displayMode: "person",
+      items: ["person", "family"],
+      fileType:"PDF",
+      picture:false,
+      start: new Date().toISOString().substr(0, 10),
+      end: new Date().toISOString().substr(0, 10),
+      life_event_types:[]
     }
   },
   methods:{
+    getData()
+    {
+      console.log("TEST");
+      this.people = []
+      this.family = []
+      this.display = []
+    //People
+        axios.get("http://team2.eaglesoftwareteam.com/person")
+        .then(response => {
+          console.log("people Res:", response.data);
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.people.push({
+              id: response.data[i].ID,
+              name: response.data[i].f_name + " " + response.data[i].l_name,
+              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+            })
+          }
+          this.autoPagination(this.people);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+        axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
+        .then(response => {
+          console.log(response.data);
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.family.push({
+              id: response.data[i].ID,
+              name: response.data[i].l_name,
+              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+        axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=life_event")
+        .then(response => {
+          console.log(response.data);
+          this.life_event_types = []
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.life_event_types.push({
+              id: response.data[i].ID,
+              value: response.data[i].value
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    },
+
+    pageChange(target)
+    {
+      switch(target) {
+        case "next":
+          if(this.page < this.numPages){
+            this.page++;
+          }
+          break;
+        case "previous":
+          if(this.page > 1){
+            this.page--;
+          }
+          break;
+        default:
+          this.page = target;
+      }
+
+      this.viewMode(this.displayMode)
+
+    },
     addPerson()
     {
 
@@ -197,7 +231,15 @@ export default {
 
     addFamily()
     {
+      if(this.displayMode == "person")
+      {
+        console.log("Add Person");
+      }
 
+      else
+      {
+        console.log("Add Family");
+      }
     },
 
     goToPage(ID)
@@ -211,7 +253,7 @@ export default {
 
     clearAPI()
     {
-      this.search = "";
+      this.search = " ";
       this.SearchAPI();
     },
     //Function for loading in the Events based on given API filters and Search Parameters
@@ -226,7 +268,6 @@ export default {
         else
           temp = JSON.parse(JSON.stringify(this.family));
         
-
         temp.forEach(x => x.name = x.name.toLowerCase());
         temp = temp.filter(item => item.name.includes(this.search.toLowerCase()));
 
@@ -237,70 +278,42 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            if(this.viewMode == "person")
+            if(this.displayMode == "person")
               x.name = split[0] + " " + split[1];
             else 
               x.name = split[0];
           })
-          
-
-        console.log(temp);
-        if(temp.length > 20)
-          this.display = temp.slice(0,19);
-  
-        else
-          this.display = temp;
-
-        if(this.temp.length == 20)
-          this.pageLength = 1;
-        
-        else
-          this.pageLength = (temp.length / 20) + 1;
+         this.autoPagination(temp);
       }
-
       else
-      {
-        console.log("People:",this.people);
         this.viewMode(this.displayMode);
-      }
-        
     },
+
+    autoPagination(data)
+    {
+      console.log(data);
+      if(data.length > this.maxPageLength)
+          this.display = data.slice(((this.page - 1) * this.maxPageLength) ,((this.page * this.maxPageLength)));
+      
+        else
+          this.display = data;
+
+        if (this.maxPageLength % data.length == 0)
+          this.numPages = 1;
+        
+        else
+          this.numPages = Math.ceil(data.length / this.maxPageLength);
+      },
 
     viewMode(mode)
     {
-      console.log(this);
       this.displayMode = mode;
-      if(mode == "person")
-      {
-        if(this.people.length > 20)
-          this.display = this.people.slice(0,19);
-      
-        else
-          this.display = this.people;
+      if(this.displayMode == "person")
+        this.autoPagination(this.people);
 
-        if(this.people.length == 20)
-          this.pageLength = 1;
-        
-        else
-          this.pageLength = (this.people.length / 20) + 1;
-      }
-
-      else
-      {
-        if(this.family.length > 20)
-          this.display = this.people.slice(0,19);
-      
-        else
-          this.display = this.family;
-
-        if(this.family.length == 20)
-          this.pageLength = 1;
-        
-        else
-          this.pageLength = (this.family.length / 20) + 1;
-      }
+      else 
+        this.autoPagination(this.family);
     }
-  },
-
+  }
 }
 </script>
