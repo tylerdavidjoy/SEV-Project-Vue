@@ -122,6 +122,7 @@
                   </v-sheet>
                 </v-col>
           </v-row>
+            <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="userHasPerms" class="mt-5"/>
           <v-row>
             <v-col>
               <v-container>
@@ -245,15 +246,17 @@ import axios from 'axios'
 const apiBaseUrl = "http://localhost:3000";
 import GroupReport from "@/components/group_report.vue";
 import ReportSettings from "@/components/report_settings.vue";
-
+import AnnouncementViewer from "@/components/Announcements.vue";
 export default {
   name: "GroupMembers",
     components: {
       ReportSettings,
-      GroupReport
+      GroupReport,
+      AnnouncementViewer
   },
   data() {
     return {
+        announcements: [],
         possibleAddList: [],
         addList: [],
         user: this.$person,
@@ -332,11 +335,24 @@ export default {
     axios.all([
 
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
-      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=${this.$route.params.groupLeaderID}`),
+      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`)
       ])
       .then(axios.spread((group, groupMembers, types, churchMembers) => {
+      let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
+      axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
+        .then(messages => {
+          if(messages.data.length > 0)
+            this.announcements = messages.data;
+          else
+            this.announcements.push({message: "No announcements to show."})
+          console.log(this.announcements)
+        })
+        .catch(error => {
+          console.error(error);
+        })
+      
       // Setting the currentAddress id for grabbing a member's current address later.
       let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
       
