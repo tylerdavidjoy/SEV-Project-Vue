@@ -425,6 +425,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
       addMemberToFamily() {
         this.dialogAdd = false;
         this.addList.forEach(member => {
+          console.log("hello")
           axios.put(this.baseURL + "person?id="  + member.ID, {
             congregation_ID: member.congregation_ID,
             f_name: member.f_name,
@@ -442,10 +443,13 @@ import PhotoUpload from "../components/PhotoUpload.vue";
             console.log(response.data)
             console.log("Person added to family: " + member.f_name + ", " + member.l_name)
           })
+          console.log(this.familyMembers)
           this.familyMembers.push(member);
           this.deletableMembers.push(member);
           this.$set(this.familyMembers, this.familyMembers.indexOf(member), member);
           this.$set(this.deletableMembers, this.deletableMembers.indexOf(member), member);
+          this.familyMembers = Array.from(new Set(this.familyMembers))
+          this.deletableMembers = Array.from(new Set(this.deletableMembers))  
         })
       },
 
