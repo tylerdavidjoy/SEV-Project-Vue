@@ -62,6 +62,7 @@
                                 <div>
                                   <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
                                     <v-img
+                                      :id="person.id"
                                       height="175px"
                                       width="175px"
                                       :lazy-src="person.image"

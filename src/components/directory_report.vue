@@ -33,6 +33,37 @@ export default ({
         })
     },
 
+      getBase64ImageFromURL(url) {
+            return new Promise((resolve, reject) => {
+            var img = new Image();
+            img.setAttribute("crossOrigin", "anonymous");
+
+            img.onload = () => {
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                var dataURL = canvas.toDataURL("image/png");
+
+                resolve(dataURL);
+            };
+
+            img.onerror = error => {
+                reject(error);
+            };
+
+            img.src = url;
+            });
+        },
+
+    sleep(ms) {
+        console.log("sleep")
+        return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
     csvCreation(people)
     {
         var rows = [];
@@ -51,7 +82,7 @@ export default ({
         link.click();
     },
 
-    pdfCreation: function(people,img)
+    pdfCreation: async function(people,img)
         {
             var doc = new jsPDF('l', 'pt');
             if(!img)
@@ -61,9 +92,10 @@ export default ({
                 var columns = ["Name", "Preferred Name", "Occupation", "Employer", "Email", "Role Type", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
                 var rows = [];
 
-           for(var i=0; i < people.length; i++){
-            rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
-        }
+                for(var i=0; i < people.length; i++)
+                    {
+                        rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
+                    }
                 
                 doc.autoTable(columns, rows);
                 doc.save('Directory.pdf');
@@ -71,26 +103,47 @@ export default ({
 
             else
             {
-                console.log(people[1])
+                console.log(people)
+                var promiseList = []
+                people.forEach(async element => {
+                    var temp = await this.getBase64ImageFromURL("http://team2.eaglesoftwareteam.com/images/" + element.image)
+                    var item =
+                    {
+                        id: element.ID,
+                        image:temp
+                    }
+                    promiseList.push(item);
+                });
+
+                await this.sleep(2000);
+                var imgList = []
+                promiseList.forEach(element => {
+                     imgList.push(element);
+                });
+
+                console.log("imgList:", imgList.sort(function (a, b) {
+                        return a.id - b.id;
+                    }))
+
                 var contentTemp = [];
                 for (i = 0; i < people.length; i++)
                 {
                    var tempImg = {
                         columns: [
                             {
-                                image: 'sample', //First IMG in row
+                                image: imgList[i].image, //First IMG in row
                                 width: 150,
                                 height: 150
                             },
                             {}, //Spacing
                             {
-                                image: 'sample', //Second IMG in row
+                                image: imgList[i + 1].image, //Second IMG in row
                                 width: 150,
                                 height: 150
                             },
                             {}, //Spacing
                             {
-                                image: 'sample', //Third IMG in row
+                                image: imgList[i + 2].image, //Third IMG in row
                                 width: 150,
                                 height: 150
                             }
@@ -120,20 +173,8 @@ export default ({
                     i +=2;
                 }
 
-                var imgList = {}
-
-                for (var x = 0; x < people.length; x++)
-                {
-                    imgList[x] = people[x].image;
-                }
-
-                console.log(imgList);
-
                 var pdfContent = {
-                    content: contentTemp,
-                    images:{
-                        sample: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png"
-                    }
+                    content: contentTemp
                 }
                 pdfMake.createPdf(pdfContent).open();
                 // doc.setFontSize(20);
