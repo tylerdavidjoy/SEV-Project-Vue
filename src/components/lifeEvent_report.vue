@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn color="green" @click.native="generateReport(start,end, 5)">Generate <br/> Life Event  Report</v-btn>
+  <v-btn color="green" @click.native="generateReport(start,end, eventType)">Generate <br/> Life Event  Report</v-btn>
 </template>
 
 <script>
@@ -13,12 +13,14 @@ export default ({
         selected: String,
         picture: Boolean,
         start: String,
-        end: String
+        end: String,
+        eventType: Number
     },
     methods: 
     {
     generateReport: function(date_start, date_end, type)
     {
+        console.log(date_start, date_end, type)
         axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
         .then(response => {
         this.pdfCreation(response.data,this.picture);
@@ -30,8 +32,9 @@ export default ({
 
     pdfCreation: function(life_event, img)
         {
+            console.log(life_event);
+        img;
         require('jspdf-autotable');
-        img.use();
         var columns = ["Name", "Description", "Date" ];
         var rows = [];
 

@@ -23,11 +23,28 @@ export default ({
     {
         axios.get("http://team2.eaglesoftwareteam.com/group?id="+ this.reportid +"&get_members=1")
         .then(response => {
-        console.log(response.data)
-        if (this.selected == "CSV")
-            this.csvCreation(response.data);
-        else
-            this.pdfCreation(response.data,this.picture);
+            var callList = []
+            response.data.forEach(element => {
+                callList.push(axios.get("http://team2.eaglesoftwareteam.com/phone_number?person_ID=" + element.ID))
+            });
+            console.log(callList)
+            axios.all(callList)
+            .then(res => {
+                console.log("Axios ALL", res)
+                
+                res.forEach(resp => {
+                    var person_id = resp.config.url.split("=")[1]
+                    response.data.find(person => person.ID == person_id).phone_number = resp.data[0].number
+                })
+
+
+                console.log(response.data)
+                if (this.selected == "CSV")
+                    this.csvCreation(response.data);
+                else
+                    this.pdfCreation(response.data,this.picture);
+            })
+
         })
         .catch(error => {
         console.log(error);
@@ -59,11 +76,11 @@ export default ({
             {     
                 require('jspdf-autotable');
                 
-                var columns = ["Name", "Occupation", "Employer", "Email" ];
+                var columns = ["Name", "Phone Number", "Email" ];
                 var rows = [];
 
                 for(var i=0; i < group.length; i++){
-                    rows.push([group[i].f_name + " " + group[i].l_name, group[i].occupation, group[i].employer, group[i].email]);
+                    rows.push([group[i].f_name + " " + group[i].l_name, group[i].phone_number, group[i].email]);
                 }
                 var doc = new jsPDF('p', 'pt');
                 doc.autoTable(columns, rows);

@@ -87,10 +87,10 @@
                           </v-container>
 
                           <div v-if="isAdmin" style="margin:auto">
-                            <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end" :life_event_types.sync="life_event_types"/>
+                            <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end" :life_event_types.sync="life_event_types" :eventType.sync="eventType"/>
                             <DirectoryReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
                             <RoleReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
-                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end"/>
+                            <LifeEventReport class="primary" :selected.sync="fileType" :picture.sync="picture" :start.sync="start" :end.sync="end" :eventType.sync="eventType"/>
                           </div>
                         </v-container>
                       </div>
@@ -143,7 +143,8 @@ export default {
       picture:false,
       start: new Date().toISOString().substr(0, 10),
       end: new Date().toISOString().substr(0, 10),
-      life_event_types:[]
+      life_event_types:[],
+      eventType: null
     }
   },
   methods:{
