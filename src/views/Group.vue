@@ -183,7 +183,7 @@
             <v-dialog
               v-model="dialog"
               scrollable
-              max-width="300px"
+              max-width="750px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -199,19 +199,17 @@
                 <v-card-title>Select Members to Add</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="height: 300px;">
-                  <v-item-group
-                    v-model="dialogm1"
-                    column
+                  <v-autocomplete
+                  v-model="addList"
+                  :items="possibleAddList"
+                  :item-text="member => member.f_name + ' ' + member.l_name + ' ' + member.email"
+                  return-object
+                  label="Members to Add"
+                  multiple
+                  clearable
+                  hide-details="auto"
                   >
-                    <v-checkbox
-                    v-for="addPerson in possibleAddList"
-                    :key="addPerson.ID"
-                    multiple
-                    :value="addPerson"
-                    :label="addPerson.f_name + ' ' + addPerson.l_name + ', ' + addPerson.email"
-                    v-model="addList"
-                    />
-                  </v-item-group>
+                  </v-autocomplete>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -319,6 +317,7 @@ export default {
       axios.delete(`${apiBaseUrl}/group_person?group_ID=${this.group.ID}&person_ID=${memberID}`);
     },
     addGroupMember () {
+      console.log(this.addList)
       this.addList.forEach(person => {
         axios.post(`${apiBaseUrl}/group_person`, {
             group_ID: this.group.ID,
