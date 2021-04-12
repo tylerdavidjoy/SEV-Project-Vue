@@ -26,7 +26,9 @@
                       </div>
                       <v-spacer></v-spacer>
                       <div :class="'px-6'">
-                        <v-file-input
+                        <PhotoUpload v-bind:userId="this.user.id" v-bind:personImgSrc="this.user.image" @onFileChange="user.image=$event"/>
+
+                        <!-- <v-file-input
                           color="primary"
                           placeholder="Upload Profile Picture"
                           id="fileupload"
@@ -35,9 +37,9 @@
                           truncate-length="50"
                           @change="getFileObject($event)"
                           :disabled="isViewing"
-                        ></v-file-input>
+                        ></v-file-input> -->
                       </div>
-                      <div :class="'px-6'">
+                      <!-- <div :class="'px-6'">
                         <v-btn
                           tile
                           outlined
@@ -48,7 +50,7 @@
                         >
                           <v-icon left>mdi-pencil</v-icon>Upload Profile Picture
                         </v-btn>
-                      </div>
+                      </div> -->
                     </v-sheet>
                   </v-col>
                   <v-col cols="12">
@@ -1271,8 +1273,12 @@
 </template>
 <script>
 import axios from "axios";
+import PhotoUpload from "../components/PhotoUpload.vue";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
+  components: {
+      PhotoUpload
+    },
   mounted() {
     console.log("Params: ", this.$route.params);
     //Get User Info from window.person
@@ -1424,6 +1430,7 @@ export default {
           this.user.employer = user.data[0].employer;
           // this.user.role = user.data[0].role
           this.user.family_ID = user.data[0].family_ID;
+          this.user.image = baseURL + "images/" + user.data[0].image;
           //iterate through valid_values to get the Role
           this.isAdmin = false;
           for(var i = 0; i < this.validvalues.length; i++)
