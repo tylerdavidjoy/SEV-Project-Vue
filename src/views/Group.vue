@@ -10,7 +10,7 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card elevation="2" v-if="renderLeader" :height="270">
+                    <v-card elevation="2" v-if="renderLeader" :height="300">
                       <v-card-title>
                         Group Leader
                       </v-card-title>
@@ -26,9 +26,15 @@
                           <v-icon v-else>mdi-phone</v-icon>
                           {{phone.number}}
                         </v-card-text>
+                        
                       <v-card-text>
                         {{this.leader.email}}
                       </v-card-text>
+                       <v-card-actions>
+                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
+                          View Member Page
+                        </v-btn>
+                      </v-card-actions>
                     </v-card>
                     <v-card v-else>
                       <v-card-subtitle>
@@ -57,8 +63,8 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card :height="270">
-                      <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270">
+                    <v-card :height="300">
+                      <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
                         <v-img src="https://i.imgur.com/NZtcOfi.jpg">
                         </v-img>
                       </v-avatar>
@@ -145,6 +151,9 @@
                           {{member.email}}
                         </v-card-text>
                         <v-card-actions>
+                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: member.ID}})">
+                          View Member Page
+                        </v-btn>
                         <v-btn v-on:click="removeGroupMember(member.ID, index)" v-if="userHasPerms">
                           Remove Member
                         </v-btn>
