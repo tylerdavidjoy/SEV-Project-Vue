@@ -219,6 +219,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         churchMembers: [],
         addList: [],
         deleteList: [],
+        phoneTypeArr: [],
         userId: window.person.id,
         familyId: "",
         address_ID: "",
@@ -255,21 +256,25 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           this.email = headOfFamily.data[0].email;
           this.headOfFamilyID = headOfFamily.data[0].ID;
 
-          axios.all([
-            axios.get(`${this.baseURL}address?id=${family.data.address_ID}`), // Address object from family address ID
-            axios.get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`), // Gets array of phone #s
-          ])
-          .then(axios.spread((familyAddress, headOfFamilyPhones) => {
+          axios
+          .get(`${this.baseURL}address?id=${family.data.address_ID}`) // Address object from family address ID
+          .then(familyAddress => {
             this.address = familyAddress.data.address;
             this.address_Type = familyAddress.data.type;
             this.address_ID = familyAddress.data.ID;
-            
+          })
+          axios
+          .get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`) // Gets array of phone #s
+          .then(headOfFamilyPhones => {
             let tempPhone = headOfFamilyPhones.data.find(x => x.can_publish === 1);
             this.phone = tempPhone.number;
             this.phoneNumber_Type = tempPhone.type;
             this.phoneNumberID = tempPhone.ID;
             this.can_publish = 1;
-          }))
+          })
+          .catch(err => {
+            console.log(err);
+          })
         }))
 
       // // Get family ID of the currently logged in user
@@ -357,12 +362,30 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
 
       // Update family phone number
-        axios
-        .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
-          number: this.phone,
-          can_publish: this.can_publish,
-          type: this.phoneNumber_Type
-        })
+        if(this.phone == "") {
+          axios
+          .get(`${this.baseURL}valid_value?value_group=phone`)
+          .then(phoneTypes => {
+            this.phoneTypeArr = phoneTypes.data;
+            this.phoneTypeArr = this.phoneTypeArr.filter(type => type.value=="mobile")
+            console.log(this.phoneTypeArr)
+          })
+          axios
+          .post(`${this.baseURL}phone_number?id=${this.headOfFamilyID}`, {
+            number: this.phone,
+            can_publish: 1,
+            type: this.phoneNumber_Type
+          })
+        }
+
+        else {
+          axios
+          .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
+            number: this.phone,
+            can_publish: this.can_publish,
+            type: this.phoneNumber_Type
+          })
+        }
       },
 
       isHeadOfHousehold: function() {
