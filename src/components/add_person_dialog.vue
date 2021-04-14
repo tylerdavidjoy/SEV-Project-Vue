@@ -75,6 +75,12 @@
                 <v-text-field label="Email"
                 v-model="person.email"/>
               </v-col>
+
+              <v-col cols="12">
+                <v-text-field label="Address"
+                v-model="address"/>
+              </v-col>
+
               <v-col
                 cols="12"
                 sm="6"
@@ -106,6 +112,8 @@
             </v-row>
           </v-container>
           <small>*indicates required field</small>
+          <br/>
+          <small>Email required to allow user to login</small>
           <small>{{err}}</small>
         </v-card-text>
         <v-card-actions>
@@ -164,11 +172,21 @@ export default ({
             this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
             
             axios.post('http://team2.eaglesoftwareteam.com/person', this.person)
+            .then( (res) =>
+            {
+            this.dialog = false;
+            this.$parent.$parent.$parent.$parent.getData();
+
+
+            axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=', res.ID)
             .then( () =>
             {
             this.dialog = false;
             this.$parent.$parent.$parent.$parent.getData();
             })
+
+            })
+            .catch(error => {console.log(error)})
 
         }
     },
@@ -190,8 +208,9 @@ export default ({
                 gender:null,
                 preferred_name:null,
                 role:null,
-                image:"default.jpg"
+                image:"default.jpg",
             },
+            address:null,
             err: ""
         }
     }
