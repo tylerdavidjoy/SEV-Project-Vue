@@ -43,7 +43,7 @@
             <v-row>
               <v-col cols="12">
                 <v-text-field label="Address*"
-                v-model="address"
+                v-model="address.address"
                 required/>
               </v-col>
             </v-row>
@@ -92,25 +92,41 @@ export default ({
         async createFamily()
         {
 
+          var myPromise = new Promise((resolve, reject) => { 
+          axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=address")
+            .then(response => {
+              this.address.type = response.data.filter(x => x.value == "current")[0].ID
+              console.log(this.address)
+              resolve()
+            })
+            .catch(error => {
+              console.log(error);
+              reject()
+            })
+          })
+
         this.family.head_ID = this.people.filter(x => x.name == this.headOfFamily)[0].id;
+        console.log("Family Head ID: ", this.family.head_ID)
+        myPromise.then(() => { 
+          axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=' + this.family.head_ID, this.address) //Adds address
+          })
 
-        new Promise((resolve, reject) => { axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=',  this.family.head_ID) };
+        .then( async () => {
+          axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID) //Gets ID of the address that was added for that person
+          .then(response => {
+            console.log(response)
+            this.family.address_ID = response.data[0].ID
+            axios.post('http://team2.eaglesoftwareteam.com/family', this.family) //Adds Family
+          })
+          .catch(error => {
+            console.log(error);
+          })
 
-
-        axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID)
-        .then(response => {
-          console.log(response)
-          this.family.address_ID = response.data[0].ID
-          axios.post('http://team2.eaglesoftwareteam.com/family', this.family)
-        })
-        .catch(error => {
-          console.log(error);
-        })
-
-          await this.resolveAfter2Seconds(200)
-          this.dialog = false;
-          this.$parent.$parent.$parent.$parent.getData();
-          console.log(this.family)
+            await this.resolveAfter2Seconds(200)
+            this.dialog = false;
+            this.$parent.$parent.$parent.$parent.getData();
+            console.log(this.family)
+          })
         },
 
         resolveAfter2Seconds(x) {
@@ -134,7 +150,10 @@ export default ({
               head_ID: null,
               image: "default.jpg"
             },
-            address:null,
+            address:{
+              address:null,
+              type:null
+            },
             err: ""
         }
     }
