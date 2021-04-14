@@ -39,6 +39,14 @@
               </v-col>
 
             </v-row>
+
+            <v-row>
+              <v-col cols="12">
+                <v-text-field label="Address*"
+                v-model="address"
+                required/>
+              </v-col>
+            </v-row>
           </v-container>
           <small>*indicates required field</small>
           <small>{{err}}</small>
@@ -85,6 +93,10 @@ export default ({
         {
 
         this.family.head_ID = this.people.filter(x => x.name == this.headOfFamily)[0].id;
+
+        new Promise((resolve, reject) => { axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=',  this.family.head_ID) };
+
+
         axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID)
         .then(response => {
           console.log(response)
@@ -122,6 +134,7 @@ export default ({
               head_ID: null,
               image: "default.jpg"
             },
+            address:null,
             err: ""
         }
     }
