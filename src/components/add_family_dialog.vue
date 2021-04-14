@@ -109,23 +109,22 @@ export default ({
         console.log("Family Head ID: ", this.family.head_ID)
         myPromise.then(() => { 
           axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=' + this.family.head_ID, this.address) //Adds address
-          })
+          .then( async () => {
+            axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID) //Gets ID of the address that was added for that person
+            .then(response => {
+              console.log(response)
+              this.family.address_ID = response.data[0].ID
+              axios.post('http://team2.eaglesoftwareteam.com/family', this.family) //Adds Family
+            })
+            .catch(error => {
+              console.log(error);
+            })
 
-        .then( async () => {
-          axios.get("http://team2.eaglesoftwareteam.com/address?person_ID=" + this.family.head_ID) //Gets ID of the address that was added for that person
-          .then(response => {
-            console.log(response)
-            this.family.address_ID = response.data[0].ID
-            axios.post('http://team2.eaglesoftwareteam.com/family', this.family) //Adds Family
-          })
-          .catch(error => {
-            console.log(error);
-          })
-
-            await this.resolveAfter2Seconds(200)
-            this.dialog = false;
-            this.$parent.$parent.$parent.$parent.getData();
-            console.log(this.family)
+              await this.resolveAfter2Seconds(200)
+              this.dialog = false;
+              this.$parent.$parent.$parent.$parent.getData();
+              console.log(this.family)
+            })
           })
         },
 
