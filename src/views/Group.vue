@@ -225,7 +225,7 @@
                   <v-btn
                     color="blue darken-1"
                     text
-                    @click="dialog = false"
+                    @click="dialog = false, addList = []"
                   >
                     Cancel
                   </v-btn>
@@ -233,6 +233,58 @@
                     color="blue darken-1"
                     text
                     @click="addGroupMember()"
+                  >
+                    Add
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+          <v-row justify="center" v-if="userHasPerms">
+            <v-dialog
+              v-model="dialog3"
+              scrollable
+              max-width="750px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Add Family to Group
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>Select Family to Add</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text style="height: 300px;">
+                  <v-autocomplete
+                  v-model="addFamilyList"
+                  :items="addPossibleFamilyList"
+                  :item-text="member => member.l_name + ' Family'"
+                  return-object
+                  label="Members to Add"
+                  multiple
+                  clearable
+                  hide-details="auto"
+                  >
+                  </v-autocomplete>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="dialog3 = false, addFamilyList = []"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="addFamily()"
                   >
                     Add
                   </v-btn>
@@ -266,6 +318,8 @@ export default {
         announcements: [],
         possibleAddList: [],
         addList: [],
+        addFamilyList: [],
+        addPossibleFamilyList: [],
         user: this.$person,
         userHasPerms: false,
         group: {},
@@ -281,6 +335,7 @@ export default {
         dialogm2: '',
         dialog: false,
         dialog2: false,
+        dialog3: false,
         fileType:"PDF",
         picture:false
       }
@@ -336,9 +391,31 @@ export default {
         this.$set(this.groupMembers, this.groupMembers.indexOf(person), person);
         this.possibleAddList.splice(this.possibleAddList.indexOf(person), 1);
       })
+      this.addList = [];
       this.dialog = false;
       this.renderMembers = true;
     },
+    addFamily(){
+      console.log("Family clicked!")
+      console.log("Families", this.addFamilyList)
+
+      this.addFamilyList.forEach((family, index) => {
+        axios.post(`${apiBaseUrl}/family_ID=${family.ID}&group_ID=${this.$route.params.groupID}`)
+        .then(() => {
+          axios.get(`${apiBaseUrl}/group_person?group_ID=${this.$route.params.groupID}`)
+          .then(response => {
+            this.groupMembers = response.data.filter(x => x.ID != this.group.leader)
+            
+            if(index === this.addFamilyList.length - 1)
+            {
+              this.addFamilyList = [];
+              this.dialog3 = false;
+            }
+          })
+        })
+
+      })
+    }
   },
   beforeCreate()
   {
@@ -347,9 +424,10 @@ export default {
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
-      axios.get(`${apiBaseUrl}/person`)
+      axios.get(`${apiBaseUrl}/person`),
+      axios.get(`${apiBaseUrl}/family`)
       ])
-      .then(axios.spread((group, groupMembers, types, churchMembers) => {
+      .then(axios.spread((group, groupMembers, types, churchMembers, families) => {
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
         .then(messages => {
@@ -388,6 +466,11 @@ export default {
       // Set list of possible members to add to group to everyone, remove current members
       this.possibleAddList = churchMembers.data;
       this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
+
+      // Set list of possible families to add to a group
+      families.data.forEach(family => {
+        this.addPossibleFamilyList.push(churchMembers.data.find(x => x.ID === family.head_ID))
+      })
 
       // Remove the leader from the list of group members
       this.groupMembers.splice(groupMembers.data.indexOf(this.leader), 1);  
