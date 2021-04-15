@@ -262,7 +262,13 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            x.name = split[0] + " " + split[1];
+            
+            x.name = split[0];
+
+            split.forEach((word) => {
+              if(word != split[0])
+                x.name += " " + word;
+            })
           })
           
 
