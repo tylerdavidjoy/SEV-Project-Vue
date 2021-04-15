@@ -40,10 +40,10 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.account.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="primary">
+                          <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                          <v-card-title>Step {{n}}</v-card-title>
-                          <v-card-text>{{content.account.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.account.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -52,7 +52,7 @@
                 </v-container>
               </v-card>
             </v-tab-item>
-            <!-- The v-tab for the File & Photo Uploading -->
+            <!-- The v-tab for the File Uploading -->
             <v-tab-item>
               <v-card color="dark" flat>
                 <v-container>
@@ -67,10 +67,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
-                        <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card class="mb-12" color="grey darken-3">
+                        <v-img contain :height="300" :src="getImgUrl('fileuploading',n)"/>
+                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -93,10 +93,10 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.group.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="primary">
+                          <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('group',n)"/>
-                          <v-card-title>Step {{n}}</v-card-title>
-                          <v-card-text>{{content.group.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.group.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -119,10 +119,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -145,10 +145,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.reports.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('report',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.reports.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.reports.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -171,10 +171,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.directory.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('directory',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.directory.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.directory.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -197,10 +197,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                         <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -224,7 +224,7 @@
     data: () => ({
       tab: null,
       items: [
-      'Account','Photo & File Uploading', 'Groups', 'Events','Printing Reports','Searching Directory','Administrators'
+      'Account','Photo Uploading', 'Groups', 'Events','Printing Reports','Searching Directory','Administrators'
       ],
       itemText:[
         'The Account page is for a person to view and edit all their information like phone number and Life Events that a congregation might like to keep track of. Here, we will walk through how to Add,Edit and Delete a Life Event. ',
@@ -241,14 +241,12 @@
             'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
           ],
         },
-        fileuploading:{id:0, steps:[1,2,3,4,5,6],
+        fileuploading:{id:0, steps:[1,2,3,4,],
           info:[
-            'Test 1',
-            'Test 2',
-            'Test 3',
-            'Test 4',
-            'Test 5',
-            'Test 6',
+            'When Uploading a Photo or File, you will first need to navigate to a page that contains a section where a photo/file uploading component is located on',
+            'For Photo uploading, once you have located the component, you will need to click the choose file button to select the file/photo that you will want to upload',
+            'After clicking the button, you will need to select the file/photo to upload and then select save in the file explorer to choose this.',
+            'Finally after selecting the file/photo, you will click upload Photo/File to upload it to your profile.',
           ],
         },
         group:{id:0, steps:[1,2,3,4,5],
