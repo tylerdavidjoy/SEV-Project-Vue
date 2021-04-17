@@ -400,7 +400,7 @@ export default {
       console.log("Families", this.addFamilyList)
 
       this.addFamilyList.forEach((family, index) => {
-        axios.post(`${apiBaseUrl}/family_ID=${family.ID}&group_ID=${this.$route.params.groupID}`)
+        axios.post(`${apiBaseUrl}/family_ID=${family.family_ID}&group_ID=${this.$route.params.groupID}`)
         .then(() => {
           axios.get(`${apiBaseUrl}/group_person?group_ID=${this.$route.params.groupID}`)
           .then(response => {
