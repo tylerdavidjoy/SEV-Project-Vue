@@ -1,11 +1,11 @@
 <template>
-    <div class="file-upload">
+    <div class="file-upload" v-if="canEdit">
         <input type="file" @change="onFileChange" accept="image/*"/>
         <div v-if="progress" class="progress-bar" :style="{'width': progress}">
             {{progress}}
         </div>
         <v-btn @click="onUploadFile" class="upload-button"
-        :disabled="!this.selectedFile">Upload photo</v-btn>
+        :disabled="!this.selectedFile">Save</v-btn>
     </div>
 </template>
 
@@ -23,6 +23,9 @@ export default {
     },
 
     props: {
+        canEdit: {
+            type: Boolean
+        },
         familyId: {
             type: Number
         },

@@ -26,7 +26,7 @@
                       </div>
                       <v-spacer></v-spacer>
                       <div :class="'px-6'">
-                        <PhotoUpload v-bind:userId="this.user.id" v-bind:personImgSrc="this.user.image" @onFileChange="user.image=$event"/>
+                        <PhotoUpload v-bind:canEdit="this.isAdmin" v-bind:userId="this.user.id" v-bind:personImgSrc="this.user.image" @onFileChange="user.image=$event"/>
 
                         <!-- <v-file-input
                           color="primary"
