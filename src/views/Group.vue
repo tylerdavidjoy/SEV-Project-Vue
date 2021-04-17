@@ -10,7 +10,7 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card elevation="2" v-if="renderLeader" :height="300">
+                    <v-card elevation="2" v-if="renderLeader" :height="360">
                       <v-card-title>
                         Group Leader
                       </v-card-title>
@@ -63,11 +63,14 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card :height="300">
+                    <v-card :height="360">
                       <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
-                        <v-img src="https://i.imgur.com/NZtcOfi.jpg">
+                        <v-img :src="groupImgSrc">
                         </v-img>
                       </v-avatar>
+
+                      <PhotoUpload v-bind:canEdit="this.userHasPerms" v-bind:groupId="this.group.ID" v-bind:groupImgSrc="this.group.image" @onFileChange="groupImgSrc=$event"/>
+
                     
                     <v-row justify="center" v-if="userHasPerms">
                       <v-dialog
@@ -125,6 +128,7 @@
                       </v-dialog>
                     </v-row>
                     </v-card>
+                    
                   </v-sheet>
                 </v-col>
           </v-row>
@@ -306,12 +310,15 @@ const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import GroupReport from "@/components/group_report.vue";
 import ReportSettings from "@/components/report_settings.vue";
 import AnnouncementViewer from "@/components/Announcements.vue";
+import PhotoUpload from "../components/PhotoUpload.vue";
+
 export default {
   name: "GroupMembers",
     components: {
       ReportSettings,
       GroupReport,
-      AnnouncementViewer
+      AnnouncementViewer,
+      PhotoUpload
   },
   data() {
     return {
@@ -323,6 +330,7 @@ export default {
         user: this.$person,
         userHasPerms: false,
         group: {},
+        groupImgSrc: "",
         leader: {},
         groupMembers: [],
         renderMembers: false,
@@ -448,7 +456,10 @@ export default {
       let phoneTypes = types.data;
       
       // Setting the view's group and groupMembers variables up with data.
+      console.log(group.data);
       this.group = group.data;
+      this.groupImgSrc = apiBaseUrl + "/images/" + group.data.image;
+      console.log("Img Src: " + this.groupImgSrc)
       this.groupMembers = groupMembers.data;
 
       console.log(this.groupMembers.find(x => x.ID === this.group.leader))
