@@ -10,7 +10,7 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card elevation="2" v-if="renderLeader" :height="270">
+                    <v-card elevation="2" v-if="renderLeader" :height="300">
                       <v-card-title>
                         Group Leader
                       </v-card-title>
@@ -26,9 +26,15 @@
                           <v-icon v-else>mdi-phone</v-icon>
                           {{phone.number}}
                         </v-card-text>
+                        
                       <v-card-text>
                         {{this.leader.email}}
                       </v-card-text>
+                       <v-card-actions>
+                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
+                          View Member Page
+                        </v-btn>
+                      </v-card-actions>
                     </v-card>
                     <v-card v-else>
                       <v-card-subtitle>
@@ -57,8 +63,8 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card :height="270">
-                      <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270">
+                    <v-card :height="300">
+                      <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
                         <v-img src="https://i.imgur.com/NZtcOfi.jpg">
                         </v-img>
                       </v-avatar>
@@ -145,6 +151,9 @@
                           {{member.email}}
                         </v-card-text>
                         <v-card-actions>
+                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: member.ID}})">
+                          View Member Page
+                        </v-btn>
                         <v-btn v-on:click="removeGroupMember(member.ID, index)" v-if="userHasPerms">
                           Remove Member
                         </v-btn>
@@ -183,7 +192,7 @@
             <v-dialog
               v-model="dialog"
               scrollable
-              max-width="300px"
+              max-width="750px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -199,26 +208,24 @@
                 <v-card-title>Select Members to Add</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="height: 300px;">
-                  <v-item-group
-                    v-model="dialogm1"
-                    column
+                  <v-autocomplete
+                  v-model="addList"
+                  :items="possibleAddList"
+                  :item-text="member => member.f_name + ' ' + member.l_name + ' ' + member.email"
+                  return-object
+                  label="Members to Add"
+                  multiple
+                  clearable
+                  hide-details="auto"
                   >
-                    <v-checkbox
-                    v-for="addPerson in possibleAddList"
-                    :key="addPerson.ID"
-                    multiple
-                    :value="addPerson"
-                    :label="addPerson.f_name + ' ' + addPerson.l_name + ', ' + addPerson.email"
-                    v-model="addList"
-                    />
-                  </v-item-group>
+                  </v-autocomplete>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
                   <v-btn
                     color="blue darken-1"
                     text
-                    @click="dialog = false"
+                    @click="dialog = false, addList = []"
                   >
                     Cancel
                   </v-btn>
@@ -226,6 +233,58 @@
                     color="blue darken-1"
                     text
                     @click="addGroupMember()"
+                  >
+                    Add
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+          <v-row justify="center" v-if="userHasPerms">
+            <v-dialog
+              v-model="dialog3"
+              scrollable
+              max-width="750px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Add Family to Group
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>Select Family to Add</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text style="height: 300px;">
+                  <v-autocomplete
+                  v-model="addFamilyList"
+                  :items="addPossibleFamilyList"
+                  :item-text="member => member.l_name + ' Family'"
+                  return-object
+                  label="Members to Add"
+                  multiple
+                  clearable
+                  hide-details="auto"
+                  >
+                  </v-autocomplete>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="dialog3 = false, addFamilyList = []"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="addFamily()"
                   >
                     Add
                   </v-btn>
@@ -259,6 +318,8 @@ export default {
         announcements: [],
         possibleAddList: [],
         addList: [],
+        addFamilyList: [],
+        addPossibleFamilyList: [],
         user: this.$person,
         userHasPerms: false,
         group: {},
@@ -274,6 +335,7 @@ export default {
         dialogm2: '',
         dialog: false,
         dialog2: false,
+        dialog3: false,
         fileType:"PDF",
         picture:false
       }
@@ -319,6 +381,7 @@ export default {
       axios.delete(`${apiBaseUrl}/group_person?group_ID=${this.group.ID}&person_ID=${memberID}`);
     },
     addGroupMember () {
+      console.log(this.addList)
       this.addList.forEach(person => {
         axios.post(`${apiBaseUrl}/group_person`, {
             group_ID: this.group.ID,
@@ -328,9 +391,31 @@ export default {
         this.$set(this.groupMembers, this.groupMembers.indexOf(person), person);
         this.possibleAddList.splice(this.possibleAddList.indexOf(person), 1);
       })
+      this.addList = [];
       this.dialog = false;
       this.renderMembers = true;
     },
+    addFamily(){
+      console.log("Family clicked!")
+      console.log("Families", this.addFamilyList)
+
+      this.addFamilyList.forEach((family, index) => {
+        axios.post(`${apiBaseUrl}/family_ID=${family.ID}&group_ID=${this.$route.params.groupID}`)
+        .then(() => {
+          axios.get(`${apiBaseUrl}/group_person?group_ID=${this.$route.params.groupID}`)
+          .then(response => {
+            this.groupMembers = response.data.filter(x => x.ID != this.group.leader)
+            
+            if(index === this.addFamilyList.length - 1)
+            {
+              this.addFamilyList = [];
+              this.dialog3 = false;
+            }
+          })
+        })
+
+      })
+    }
   },
   beforeCreate()
   {
@@ -339,9 +424,10 @@ export default {
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
       axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
-      axios.get(`${apiBaseUrl}/person`)
+      axios.get(`${apiBaseUrl}/person`),
+      axios.get(`${apiBaseUrl}/family`)
       ])
-      .then(axios.spread((group, groupMembers, types, churchMembers) => {
+      .then(axios.spread((group, groupMembers, types, churchMembers, families) => {
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
         .then(messages => {
@@ -380,6 +466,11 @@ export default {
       // Set list of possible members to add to group to everyone, remove current members
       this.possibleAddList = churchMembers.data;
       this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
+
+      // Set list of possible families to add to a group
+      families.data.forEach(family => {
+        this.addPossibleFamilyList.push(churchMembers.data.find(x => x.ID === family.head_ID))
+      })
 
       // Remove the leader from the list of group members
       this.groupMembers.splice(groupMembers.data.indexOf(this.leader), 1);  
