@@ -70,8 +70,18 @@
                                     ></v-img>
                                   </v-avatar>
                                   <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{person.name}}</div> <!--Person Name-->
+                                  
+                                  <v-btn v-if="isAdmin" icon @click="deleteItem(person.id)" style="float:right">
+                                    <v-icon dark>
+                                      mdi-trash-can-outline
+                                    </v-icon>
+                                  </v-btn>
+
                                 </div>
                               </v-btn>
+
+
+
                             </div>
                           </div>
 
@@ -145,7 +155,8 @@ export default {
       start: new Date().toISOString().substr(0, 10),
       end: new Date().toISOString().substr(0, 10),
       life_event_types:[],
-      eventType: null
+      eventType: null,
+      deleteFlag: false
     }
   },
   methods:{
@@ -246,11 +257,14 @@ export default {
 
     goToPage(ID)
     {
-      if(this.displayMode == "person")
-        this.$router.push({name: 'Account', params: {personID: ID}})
+      if(!this.deleteFlag)
+      {
+        if(this.displayMode == "person")
+          this.$router.push({name: 'Account', params: {personID: ID}})
 
-      else
-        this.$router.push({name: 'HouseHold', params: {familyID: ID}})
+        else
+          this.$router.push({name: 'HouseHold', params: {familyID: ID}})
+      }
     },
 
     clearAPI()
@@ -315,6 +329,26 @@ export default {
 
       else 
         this.autoPagination(this.family);
+    },
+
+    deleteItem(id)
+    {
+      this.deleteFlag = true
+      var endpoint = ""
+      if (this.displayMode == "person")
+          endpoint = "person"
+      
+      else
+        endpoint = "family"
+
+      axios.delete("http://team2.eaglesoftwareteam.com/" + endpoint + "?id=" + id)
+      .then( () => {
+        console.log("Item deleted successfully")
+        this.deleteFlag = false
+        this.getData()
+      })
+      .catch(err =>
+      console.log(err))
     }
   }
 }

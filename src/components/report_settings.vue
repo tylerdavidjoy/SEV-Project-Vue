@@ -35,6 +35,20 @@
                     @change="$emit('update:eventType', eventType);"
                 />
             </v-col>
+
+            <v-col>
+                <v-select
+                    v-model="groupType"
+                    v-if="group_types"
+                    :items="group_types"
+                    item-text="value"
+                    item-value = "id"
+                    label="Type of Group"
+                    style=" margin:auto;"
+                    @change="$emit('update:groupType', groupType);"
+                />
+            </v-col>
+
             
         </v-row>
 
