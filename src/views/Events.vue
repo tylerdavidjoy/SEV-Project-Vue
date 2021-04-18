@@ -57,10 +57,10 @@
                             <v-form v-model="isAddValid">
                               <v-autocomplete
                               v-model="dialogm2type"
-                              :items="eventTypes"
+                              :items="eventLocations"
                               :item-text="type => type.value"
                               return-object
-                              label="Event Type"
+                              label="Event Location"
                               clearable
                               auto-select-first
                               :rules="[rules.required]"
@@ -78,12 +78,15 @@
                               hide-details="auto"
                             >
                             </v-autocomplete>
-                            <v-text-field
+                            <v-textarea
                             v-model="dialogm2name"
-                            label="Event Name"
+                            label="Event Description"
+                            clearable
+                            auto-grow
                             :rules="[rules.required]"
                             hide-details="auto"
-                            ></v-text-field>
+                            ></v-textarea>
+                            <v-date-picker v-model="picker"></v-date-picker>
                             </v-form>
                             </v-card-text>
                           <v-divider></v-divider>
@@ -123,14 +126,15 @@
                             <div v-else>
                               <div v-for="event in display" :key="event.name" style="float:left; padding: 15px;">
                                 <v-card>
-                                  <div>
-                                    <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
-                                      <v-img
-                                        :src="'http://team2.eaglesoftwareteam.com/images/'+event.image"
-                                      ></v-img>
-                                    </v-avatar>
-                                    <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{event.name}}</div>
-                                  </div>
+                                  <v-card-title>
+                                    {{event.description}}
+                                  </v-card-title>
+                                  <v-card-text>
+                                    Leader: {{members.find(x => x.ID === event.leader).f_name + " " + members.find(x => x.ID === event.leader).l_name}}
+                                  </v-card-text>
+                                  <v-card-text>
+                                    {{event.date}}
+                                  </v-card-text>
                                   <v-card-actions>
                                     <v-btn height="auto" color="transparent" @click="goToEventPage(event.ID, event.leader)">
                                       View Event
@@ -185,7 +189,7 @@ export default {
       display:[],
       events:[],
       members:[],
-      eventTypes:[],
+      eventLocations:[],
       dialogm2leader: null,
       dialogm2name: '',
       dialogm2type: null,
@@ -195,7 +199,8 @@ export default {
       },
       isAddValid: false,
       fileType:"PDF",
-      picture:false
+      picture:false,
+      pickers: new Date().toISOString().substr(0, 10),
     }
   },
   beforeCreate(){
@@ -207,7 +212,7 @@ export default {
     .then(axios.spread((events, types, members) =>{
       let adminRoleID = types.data.find(x => x.value === 'admin').ID;
 
-      this.eventTypes = types.data.filter(x => x.value_group === "event");
+      this.eventLocations = types.data.filter(x => x.value_group === "event");
       
       this.members = members.data;
 
