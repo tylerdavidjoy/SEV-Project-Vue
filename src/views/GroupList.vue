@@ -126,8 +126,7 @@
                                   <div>
                                     <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
                                       <v-img
-                                        lazy-src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jAioCeiE6Cwhq9Ph3dee4gHaHa%26pid%3DApi&f=1"
-                                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1"
+                                        :src="'http://team2.eaglesoftwareteam.com/images/'+group.image"
                                       ></v-img>
                                     </v-avatar>
                                     <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{group.name}}</div>
@@ -262,7 +261,13 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            x.name = split[0] + " " + split[1];
+            
+            x.name = split[0];
+
+            split.forEach((word) => {
+              if(word != split[0])
+                x.name += " " + word;
+            })
           })
           
 

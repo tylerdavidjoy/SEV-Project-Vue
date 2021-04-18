@@ -1,11 +1,8 @@
 <template>
-    <div class="file-upload">
+    <div  v-if="canEdit">
         <input type="file" @change="onFileChange" accept="image/*"/>
-        <div v-if="progress" class="progress-bar" :style="{'width': progress}">
-            {{progress}}
-        </div>
-        <v-btn @click="onUploadFile" class="upload-button"
-        :disabled="!this.selectedFile">Upload photo</v-btn>
+        <v-btn @click="onUploadFile" 
+        :disabled="!this.selectedFile">Save</v-btn>
     </div>
 </template>
 
@@ -23,6 +20,12 @@ export default {
     },
 
     props: {
+        canEdit: {
+            type: Boolean
+        },
+        groupId: {
+            type: Number
+        },
         familyId: {
             type: Number
         },
@@ -33,6 +36,9 @@ export default {
             type: String
         },
         personImgSrc: {
+            type: String
+        },
+        groupImgSrc: {
             type: String
         },
         isCreateFamily: {
@@ -65,12 +71,6 @@ export default {
                 console.log("Uploading photo for household page")
                 axios
                 .post(this.baseURL + "upload?family_ID=" + this.familyId, formData, {
-                    onUploadProgress: ProgressEvent => {
-                        let progress = 
-                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-                            +"%";
-                            this.progress = progress;
-                    }
                 })
                 .then(response => {
                     console.log(response);
@@ -85,12 +85,20 @@ export default {
                 console.log("Uploading photo for the account page")
                 axios
                 .post(this.baseURL + "upload?person_ID=" + this.userId, formData, {
-                    onUploadProgress: ProgressEvent => {
-                        let progress = 
-                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-                            +"%";
-                            this.progress = progress;
-                    }
+                })
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
+
+            else if(this.$route.name == "Group")
+            {
+                console.log("Uploading photo for the group page")
+                axios
+                .post(this.baseURL + "upload?group_ID=" + this.groupId, formData, {
                 })
                 .then(response => {
                     console.log(response);

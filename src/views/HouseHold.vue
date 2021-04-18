@@ -7,12 +7,9 @@
             <v-col cols="6">
               <v-container>
                 <v-sheet width="600">
-                  <!-- <v-avatar size="auto" :tile="true" min-height="230" max-height="270" min-width="230" max-width="270"> -->
                   <img :src="familyImgSrc"  class="familyImg" />
-                        
-                  <!-- </v-avatar>  -->
                   <br />
-                  <PhotoUpload v-bind:familyId="this.familyId" v-bind:familyImgSrc="this.familyImgSrc" @onFileChange="familyImgSrc=$event"/>
+                  <PhotoUpload v-bind:canEdit="hasEditPermission()" v-bind:familyId="this.familyId" v-bind:familyImgSrc="this.familyImgSrc" @onFileChange="familyImgSrc=$event"/>
                   <br />
                   <h1>HouseHold Information</h1>
                   <br />
@@ -34,7 +31,6 @@
             <v-col cols="auto">
               <v-container>
                 <v-sheet width="600">
-                  <!-- <img src="../assets/dog.jpg" class="userImg"> -->
                   <br />
                   <h1>Family Members</h1>
                   <br />
@@ -197,6 +193,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         searchDelete: "",
         address: "",
         phone: "",
+        hasPhone: null,
         email: "",
         headOfFamilyID: "",
         phoneNumberID: "",
@@ -207,18 +204,12 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         employer: "",
         baseURL: "http://team2.eaglesoftwareteam.com/",
         familyImgSrc: "",
-        members:[
-          {name: 'Billy Bob jr.'},
-          {name: 'Billy Bob sr.'},
-          {name: 'Sally Bob jr.'},
-          {name: 'Sally Bob sr.'},
-          {name: 'Junior Bob jr.'},
-        ],
         familyMembers: [],
         deletableMembers: [],
         churchMembers: [],
         addList: [],
         deleteList: [],
+        phoneTypeArr: [],
         userId: window.person.id,
         familyId: "",
         address_ID: "",
@@ -255,86 +246,29 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           this.email = headOfFamily.data[0].email;
           this.headOfFamilyID = headOfFamily.data[0].ID;
 
-          axios.all([
-            axios.get(`${this.baseURL}address?id=${family.data.address_ID}`), // Address object from family address ID
-            axios.get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`), // Gets array of phone #s
-          ])
-          .then(axios.spread((familyAddress, headOfFamilyPhones) => {
+          axios
+          .get(`${this.baseURL}address?id=${family.data.address_ID}`) // Address object from family address ID
+          .then(familyAddress => {
             this.address = familyAddress.data.address;
             this.address_Type = familyAddress.data.type;
             this.address_ID = familyAddress.data.ID;
-            
+          })
+          axios
+          .get(`${this.baseURL}phone_number?person_ID=${headOfFamily.data[0].ID}`) // Gets array of phone #s
+          .then(headOfFamilyPhones => {
             let tempPhone = headOfFamilyPhones.data.find(x => x.can_publish === 1);
             this.phone = tempPhone.number;
             this.phoneNumber_Type = tempPhone.type;
             this.phoneNumberID = tempPhone.ID;
             this.can_publish = 1;
-          }))
+            this.hasPhone = true;
+          })
+          .catch(err => {  // If there is no phone number(s)
+            console.log(err);
+            this.hasPhone = false;
+          })
         }))
 
-      // // Get family ID of the currently logged in user
-      //   axios
-      //   .get(this.baseURL + "family?person_ID=" + this.userId)
-      //   .then(response => {
-      //     this.familyId = response.data.ID;
-      //     console.log("Family ID: " + this.familyId)
-      //     this.address_ID = response.data.address_ID;
-      //     console.log("Address ID: " + this.address_ID)
-      //     this.familyImgSrc = this.baseURL + "images/" + response.data.image;
-      //     // console.log(this.familyImgSrc);
-      //     return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-      //   })
-
-      // // Get family members of the currently logged in user
-      //   .then(response => {
-      //     this.familyMembers = response.data;
-      //     this.deletableMembers = response.data;
-      //     return axios.get(this.baseURL + "address?id=" + this.address_ID)
-      //   })
-
-
-      // // Get the household address
-      //   // axios
-      //   // .get(this.baseURL + "address?person_ID=" + this.userId)
-      //   .then(response => {
-      //     this.address = response.data.address;
-      //     console.log("Address: " + this.address)
-      //     // this.address_ID = response.data[0].ID;
-      //     this.address_Type = response.data.type;
-      //     return axios.get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-      //     // return axios.get(this.baseURL + "person?id=" + this.userId)
-      //   })
-
-
-      // // Find the head of the family
-      //   // axios
-      //   // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=0&isGetHeadOfFamily=1")
-      //   .then(response => {
-      //     this.headOfFamilyID = response.data[0].ID;
-      //     this.isHeadOfHousehold();
-      //     return axios.get(this.baseURL + "person?id=" + this.headOfFamilyID) // do not need this call, we got the person already.
-      //   })
-
-        
-      // // Get the family email and store information for updating a person
-      //   .then(response => {
-      //     this.email = response.data[0].email;
-      //     this.congregationID = response.data[0].congregation_ID;
-      //     this.f_name = response.data[0].f_name;
-      //     this.l_name = response.data[0].l_name;
-      //     this.occupation = response.data[0].occupation;
-      //     this.employer = response.data[0].employer;
-      //     return axios.get(this.baseURL + "phone_number?person_ID=" + this.headOfFamilyID)
-      //   })
-
-
-      // // Get the family phone number
-      //   .then(response => {
-      //     this.phone = response.data[0].number;
-      //     this.phoneNumberID = response.data[0].ID;
-      //     this.phoneNumber_Type = response.data[0].type;
-      //     this.can_publish = response.data[0].can_publish;
-      //   })
          this.isHeadOfHousehold();
          this.isAdminFunction();
           
@@ -357,19 +291,43 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
 
       // Update family phone number
-        axios
-        .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
-          number: this.phone,
-          can_publish: this.can_publish,
-          type: this.phoneNumber_Type
-        })
+        if(!this.hasPhone) {
+          console.log("No phone number");
+          axios
+          .get(`${this.baseURL}valid_value?value_group=phone`)
+          .then(phoneTypes => {
+            this.phoneTypeArr = phoneTypes.data;
+            this.phoneTypeArr = this.phoneTypeArr.filter(type => type.value=="mobile")
+            console.log(this.phoneTypeArr[0])
+          })
+          axios
+          .post(`${this.baseURL}phone_number?id=${this.headOfFamilyID}`, {
+            number: this.phone,
+            can_publish: 1,
+            type: this.phoneTypeArr[0].ID
+          })
+          .then(response => {
+            console.log(response)
+          })
+        }
+
+        else {
+          console.log("Yes phone number");
+          axios
+          .put(this.baseURL + "phone_number?id=" + this.phoneNumberID, {
+            number: this.phone,
+            can_publish: this.can_publish,
+            type: this.phoneNumber_Type
+          })
+        }
       },
 
       isHeadOfHousehold: function() {
-        if(this.userId === this.headOfFamilyID) {
-          this.isHeadOfFamily = true;
-        }
-        // return this.isHeadOfFamily;
+        this.$nextTick(() => {
+          if(this.userId === this.headOfFamilyID) {
+            this.isHeadOfFamily = true;
+          }
+        })
       },
 
       isAdminFunction: function() {
@@ -382,12 +340,9 @@ import PhotoUpload from "../components/PhotoUpload.vue";
           return(axios.get(this.baseURL + "valid_value?id=" + validValueId))
         })
         .then(response => {
-          // console.log(response.data.value)
             this.$nextTick(() => {
               if(response.data.value === "admin")
-                // console.log("True")
                 this.isAdmin = true;
-                // console.log(this.isAdmin)
           })
         })
       },
@@ -412,13 +367,6 @@ import PhotoUpload from "../components/PhotoUpload.vue";
 
       deleteMemberDialog: function() {
         console.log("member remove dialog")
-        // axios
-        // .get(this.baseURL + "family?id=" + this.familyId + "&isGetPersons=1&isGetHeadOfFamily=0")
-        // .then(response => {
-        //   this.familyMembers = response.data;
-        //   console.log(response.data)
-        //   console.log(this.familyMembers)
-        // })
         this.deletableMembers = this.deletableMembers.filter(member => member.ID!=this.headOfFamilyID)
       },
 
@@ -476,20 +424,13 @@ import PhotoUpload from "../components/PhotoUpload.vue";
               console.log("Person deleted from family: " + member.f_name + ", " + member.l_name)
             })
             this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
+            this.$delete(this.deletableMembers, this.deletableMembers.indexOf(member), member);
           }
         })
-
-        // .then(response => {
-        //   this.familyMembers = response.data;
-        //   console.log(response.data)
-        //   console.log(this.familyMembers)
-        // })
       },
 
       hasEditPermission: function() {
         var canEdit = false;
-        // console.log("Is Head of Household: " + this.isHeadOfFamily);
-        // console.log("Is Admin: " + this.isAdmin);
         if(this.isHeadOfFamily || this.isAdmin) {
           canEdit = true;
         }
