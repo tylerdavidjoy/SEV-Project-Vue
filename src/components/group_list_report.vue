@@ -15,13 +15,21 @@ export default ({
     props:
     {
         selected: String,
-        picture: Boolean
+        picture: Boolean,
+        groupType: Number
     },
     methods: 
     {
         generateReport: function()
         {
-            axios.get("http://team2.eaglesoftwareteam.com/group?report=1")
+            var url = ""
+            if (this.groupType)
+                url = "http://team2.eaglesoftwareteam.com/group?report=1&type=" + this.groupType
+
+            else
+                url = "http://team2.eaglesoftwareteam.com/group?report=1"
+
+            axios.get(url)
             .then(response => {
             if (this.selected == "CSV")
                 this.csvCreation(response.data);

@@ -38,9 +38,9 @@
 
             <v-col>
                 <v-select
-                    v-model="groupType"
-                    v-if="group_types"
-                    :items="group_types"
+                    v-model="selectedGroupType"
+                    v-if="groupTypes"
+                    :items="groupTypes"
                     item-text="value"
                     item-value = "id"
                     label="Type of Group"
@@ -129,7 +129,9 @@ export default ({
         start: String,
         end: String,
         life_event_types: [],
-        eventType: Number
+        groupTypes:[],
+        eventType: Number,
+        groupType: Number
     },
     methods: 
     {
