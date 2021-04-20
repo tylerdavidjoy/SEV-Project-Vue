@@ -345,7 +345,9 @@ export default {
         dialog2: false,
         dialog3: false,
         fileType:"PDF",
-        picture:false
+        picture:false,
+        phoneTypes: [],
+        currentAddress: null,
       }
   },
   methods:
@@ -408,18 +410,78 @@ export default {
       console.log("Families", this.addFamilyList)
 
       this.addFamilyList.forEach((family, index) => {
-        axios.post(`${apiBaseUrl}/family_ID=${family.family_ID}&group_ID=${this.$route.params.groupID}`)
+        this.memberAddressesReceived = false;
+        this.memberPhonesReceived = false;
+        this.renderMembers = false;
+        axios.post(`${apiBaseUrl}/group_person?family_ID=${family.family_ID}&group_ID=${this.$route.params.groupID}`)
         .then(() => {
-          axios.get(`${apiBaseUrl}/group_person?group_ID=${this.$route.params.groupID}`)
+          axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`)
           .then(response => {
+            console.log(response.data)
             this.groupMembers = response.data.filter(x => x.ID != this.group.leader)
+
+            // For every group member we need to grab the phones and addresses
+            for(let i = 0; i < this.groupMembers.length; i++)
+            {
+              axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.groupMembers[i].ID}`)
+              .then(memberPhones => {
+                // Initializing phone property like before with leader
+                this.groupMembers[i].phone = [];
+                for(let j = 0; j < memberPhones.data.length; j++)
+                {
+                  if(memberPhones.data[j].can_publish){
+                    let tempPhone = {};
+                    // Get the phone type
+                    let tempPhoneType = this.phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
+                    tempPhone.type = tempPhoneType;
+                    tempPhone.number = memberPhones.data[j].number;
+                    this.groupMembers[i].phone.push(tempPhone);
+                     console.log("Bagels1", i, this.groupMembers.length, tempPhone)
+                  }
+                    if(i === this.groupMembers.length - 1){
+                      this.memberPhonesReceived = true;
+                      // Tell the page to check if both address and phones are loaded for all members
+                      this.finishedLoadingMemberData();
+                  }
+                }          
+              })
+              .catch((error) => {
+                if(i === this.groupMembers.length - 1){
+                    this.memberPhonesReceived = true;
+                    // Tell the page to check if both address and phones are loaded for all members
+                    this.finishedLoadingMemberData();
+                }
+                console.error(error);
+              })
+
+              axios.get(`${apiBaseUrl}/address?person_ID=${this.groupMembers[i].ID}`)
+              .then(memberAddresses => {
+                // Initializing address property like before with leader
+                this.groupMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
+                console.log("Pizza", i, this.groupMembers.length, this.groupMembers[i].address)
+                if(i === this.groupMembers.length - 1){
+                  this.memberAddressesReceived = true;
+                  // Tell the page to check if both address and phones are loaded for all members
+                  this.finishedLoadingMemberData();
+                }
+              })
+              .catch(error => {
+                if(i === this.groupMembers.length - 1){
+                  this.memberAddressesReceived = true;
+                  // Tell the page to check if both address and phones are loaded for all members
+                  this.finishedLoadingMemberData();
+                }
+                console.error(error);
+              })
             
             if(index === this.addFamilyList.length - 1)
             {
               this.addFamilyList = [];
               this.dialog3 = false;
             }
+            }
           })
+          
         })
 
       })
@@ -450,10 +512,10 @@ export default {
         })
       
       // Setting the currentAddress id for grabbing a member's current address later.
-      let currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
+      this.currentAddress = types.data.find(x => x.value_group === "address" && x.value === "current").ID;
       
       // Get the valid values for phone to put the type with the number later.
-      let phoneTypes = types.data;
+      this.phoneTypes = types.data;
       
       // Setting the view's group and groupMembers variables up with data.
       console.log(group.data);
@@ -497,7 +559,7 @@ export default {
           if(phones.data[i].can_publish){
             let tempPhone = {};
             // Get phone type for each usable phone number
-            let tempPhoneType = phoneTypes.find(x => x.ID === phones.data[i].type).value;
+            let tempPhoneType = this.phoneTypes.find(x => x.ID === phones.data[i].type).value;
             tempPhone.type = tempPhoneType;
             tempPhone.number = phones.data[i].number;
             this.leader.phone.push(tempPhone);
@@ -516,7 +578,7 @@ export default {
       axios.get(`${apiBaseUrl}/address?person_ID=${this.leader.ID}`)
       .then(addresses =>{
         // Initializing the leader person object property address with the current address
-        this.leader.address = addresses.data.find(x => x.type === currentAddress).address;
+        this.leader.address = addresses.data.find(x => x.type === this.currentAddress).address;
         this.leaderAddressReceived = true;
         this.finishedLoadingLeaderData();
       })
@@ -538,7 +600,7 @@ export default {
             if(memberPhones.data[j].can_publish){
               let tempPhone = {};
               // Get the phone type
-              let tempPhoneType = phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
+              let tempPhoneType = this.phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
               tempPhone.type = tempPhoneType;
               tempPhone.number = memberPhones.data[j].number;
               this.groupMembers[i].phone.push(tempPhone);
@@ -563,7 +625,7 @@ export default {
         axios.get(`${apiBaseUrl}/address?person_ID=${this.groupMembers[i].ID}`)
         .then(memberAddresses => {
           // Initializing address property like before with leader
-          this.groupMembers[i].address = memberAddresses.data.find(x => x.type === currentAddress).address;
+          this.groupMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
           if(i === this.groupMembers.length - 1){
             this.memberAddressesReceived = true;
             // Tell the page to check if both address and phones are loaded for all members
