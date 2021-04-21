@@ -30,147 +30,168 @@
             </v-col>
             <v-col cols="auto">
               <v-container>
-                <v-sheet width="600">
-                  <br />
-                  <h1>Family Members</h1>
-                  <br />
-                  <v-list class="list">
-                    <v-list-item
-                      v-for="member in familyMembers"
-                      v-bind:key="member.ID" class="list" @click="navToAccountPage(member.ID)">
-                      <v-list-item-icon>
-                        <img :src="baseURL + 'images/' + member.image" class="smallUserImg">
-                      </v-list-item-icon>
+                <v-row>
+                  <v-sheet width="600">
+                    <br />
+                    <h1>Family Members</h1>
+                    <br />
+                    <v-list class="list">
+                      <v-list-item
+                        v-for="member in familyMembers"
+                        v-bind:key="member.ID" class="list" @click="navToAccountPage(member.ID)">
+                        <v-list-item-icon>
+                          <img :src="baseURL + 'images/' + member.image" class="smallUserImg">
+                        </v-list-item-icon>
 
-                      <v-list-item-content class="large">
-                        <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
+                        <v-list-item-content class="large">
+                          <v-list-item-title class="large">{{ member.f_name }} {{ member.l_name }}</v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list>
 
-                  <v-dialog
-                    v-model="dialogDelete"
-                    scrollable
-                    max-width="300px"
-                    v-if="isAdmin"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn @click="deleteMemberDialog"
-                        class="ma-2"
-                        outlined
-                        large
-                        fab
-                        color="red darken-4"
-                        v-on="on"
-                        v-bind="attrs"
-                      >
-                        <v-icon>mdi-account-minus</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-card>
-                      <v-card-title>Select Person</v-card-title>
-                      <v-divider></v-divider>
-                      <div class="search-wrapper">
-                        <input type="text" v-model="searchDelete" placeholder="Search title.."/>
-                          <label>Search title:</label>
-                      </div>
-                      <v-card-text style="height: 300px;">
-                        <v-list class="list">
-                          <v-checkbox
-                            v-for="member in filteredDeleteList"
-                            v-bind:key="member.ID"
-                            multiple
-                            :value="member"
-                            :label="member.f_name + ' ' + member.l_name"
-                            v-model="deleteList"
-                            >
-                          </v-checkbox>
-                        </v-list>
-                      </v-card-text>
-                      <v-divider></v-divider>
-                      <v-card-actions>
-                        <v-btn
-                          color="blue darken-1"
-                          text
-                          @click="dialogDelete = false"
+                    <v-dialog
+                      v-model="dialogDelete"
+                      scrollable
+                      max-width="300px"
+                      v-if="isAdmin"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn @click="deleteMemberDialog"
+                          class="ma-2"
+                          outlined
+                          large
+                          fab
+                          color="red darken-4"
+                          v-on="on"
+                          v-bind="attrs"
                         >
-                          Close
+                          <v-icon>mdi-account-minus</v-icon>
                         </v-btn>
-                        <v-btn
-                          color="blue darken-1"
-                          text
-                          @click="deleteMemberFromFamily()"
-                        >
-                          Save
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
+                      </template>
+                      <v-card>
+                        <v-card-title>Select Person</v-card-title>
+                        <v-divider></v-divider>
+                        <div class="search-wrapper">
+                          <input type="text" v-model="searchDelete" placeholder="Search title.."/>
+                            <label>Search title:</label>
+                        </div>
+                        <v-card-text style="height: 300px;">
+                          <v-list class="list">
+                            <v-checkbox
+                              v-for="member in filteredDeleteList"
+                              v-bind:key="member.ID"
+                              multiple
+                              :value="member"
+                              :label="member.f_name + ' ' + member.l_name"
+                              v-model="deleteList"
+                              >
+                            </v-checkbox>
+                          </v-list>
+                        </v-card-text>
+                        <v-divider></v-divider>
+                        <v-card-actions>
+                          <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="dialogDelete = false"
+                          >
+                            Close
+                          </v-btn>
+                          <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="deleteMemberFromFamily()"
+                          >
+                            Save
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
 
-                  <v-dialog
-                    v-model="dialogAdd"
-                    scrollable
-                    max-width="300px"
-                    v-if="hasEditPermission()"
+                    <v-dialog
+                      v-model="dialogAdd"
+                      scrollable
+                      max-width="300px"
+                      v-if="hasEditPermission()"
 
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn @click="addMemberDialog"
-                        class="ma-2"
-                        outlined
-                        large
-                        fab
-                        color="red darken-4"
-                        v-on="on"
-                        v-bind="attrs"
-                      >
-                        <v-icon>mdi-account-plus</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-card>
-                      <v-card-title>Select Person</v-card-title>
-                      <v-divider></v-divider>
-                      <div class="search-wrapper">
-                        <input type="text" v-model="searchAdd" placeholder="Search title.."/>
-                          <label>Search title:</label>
-                      </div>
-                      <v-card-text style="height: 300px;">
-                        <v-list class="list">
-                          <v-checkbox
-                            v-for="member in filteredAddList"
-                            v-bind:key="member.ID"
-                            multiple
-                            :value="member"
-                            :label="member.f_name + ' ' + member.l_name"
-                            v-model="addList"
-                            >
-                          </v-checkbox>
-                        </v-list>
-                      </v-card-text>
-                      <v-divider></v-divider>
-                      <v-card-actions>
-                        <v-btn
-                          color="blue darken-1"
-                          text
-                          @click="dialogAdd = false"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn @click="addMemberDialog"
+                          class="ma-2"
+                          outlined
+                          large
+                          fab
+                          color="red darken-4"
+                          v-on="on"
+                          v-bind="attrs"
                         >
-                          Close
+                          <v-icon>mdi-account-plus</v-icon>
                         </v-btn>
-                        <v-btn
-                          color="blue darken-1"
-                          text
-                          @click="addMemberToFamily()"
+                      </template>
+                      <v-card>
+                        <v-card-title>Select Person</v-card-title>
+                        <v-divider></v-divider>
+                        <div class="search-wrapper">
+                          <input type="text" v-model="searchAdd" placeholder="Search title.."/>
+                            <label>Search title:</label>
+                        </div>
+                        <v-card-text style="height: 300px;">
+                          <v-list class="list">
+                            <v-checkbox
+                              v-for="member in filteredAddList"
+                              v-bind:key="member.ID"
+                              multiple
+                              :value="member"
+                              :label="member.f_name + ' ' + member.l_name"
+                              v-model="addList"
+                              >
+                            </v-checkbox>
+                          </v-list>
+                        </v-card-text>
+                        <v-divider></v-divider>
+                        <v-card-actions>
+                          <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="dialogAdd = false"
+                          >
+                            Close
+                          </v-btn>
+                          <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="addMemberToFamily()"
 
-                        >
-                          Save
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </v-sheet>
+                          >
+                            Save
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </v-sheet>
+                </v-row>
+                <br />
+                <br />
+                <v-row>
+                  <v-sheet width="600">
+                    <h1>Family Documents</h1>
+                    <br />
+                    <v-list class="list">
+                      <a
+                        v-for="document in familyDocuments"
+                        v-bind:key="document.ID" class="list">
+
+                        <!-- <v-list-item-content class="large">
+                          <v-list-item-title class="large">{{ member.f_name }}</v-list-item-title>
+                        </v-list-item-content> -->
+                      </a>
+                    </v-list>
+                  </v-sheet>
+                </v-row>
               </v-container>
             </v-col>
           </v-row>
+
         </v-container>
       </v-main>
     </div>
@@ -204,6 +225,7 @@ import PhotoUpload from "../components/PhotoUpload.vue";
         employer: "",
         baseURL: "http://team2.eaglesoftwareteam.com/",
         familyImgSrc: "",
+        familyDocuments: [],
         familyMembers: [],
         deletableMembers: [],
         churchMembers: [],
@@ -268,6 +290,16 @@ import PhotoUpload from "../components/PhotoUpload.vue";
             this.hasPhone = false;
           })
         }))
+
+        axios
+        .get(`${this.baseURL}family_doc?family_ID=${this.$route.params.familyID}`)
+        .then(familyDocs => {
+          console.log(familyDocs.data);
+          this.familyDocuments = familyDocs.data;
+        })
+        .catch(err => {
+          console.log(err);
+        })
 
          this.isHeadOfHousehold();
          this.isAdminFunction();
