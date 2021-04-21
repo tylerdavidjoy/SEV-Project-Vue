@@ -126,8 +126,7 @@
                                   <div>
                                     <v-avatar size="auto" tile min-height="175" max-height="175" min-width="175" max-width="175">
                                       <v-img
-                                        lazy-src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.jAioCeiE6Cwhq9Ph3dee4gHaHa%26pid%3DApi&f=1"
-                                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.ffM2c8XIZTLve4CbmxytyQHaHa%26pid%3DApi&f=1"
+                                        :src="'http://team2.eaglesoftwareteam.com/images/'+group.image"
                                       ></v-img>
                                     </v-avatar>
                                     <div style="width: 175px; font-size: 128%; font-weight: bold; word-wrap: break-word;">{{group.name}}</div>
@@ -155,6 +154,8 @@
                         </v-container>
                       </div>
                     </div>
+                    <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :groupTypes.sync="groupTypes" :groupType.sync="groupType"/>
+                    <GroupListReport class="primary" :selected.sync="fileType" :picture.sync="picture" :groupType.sync="groupType"/>
                   </v-sheet>
               </v-col>
             </v-row>
@@ -168,10 +169,15 @@
 
 <script>
 import axios from "axios";
-
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+import GroupListReport from "@/components/group_list_report.vue";
+import ReportSettings from "@/components/report_settings.vue";
 
 export default {
+  components: {
+    ReportSettings,
+    GroupListReport
+  },
   data() {
     return {
       isAdmin: false,
@@ -191,6 +197,9 @@ export default {
         required: value => !!value || 'Required.'
       },
       isAddValid: false,
+      fileType:"PDF",
+      picture:false,
+      selectedGroupType:null
     }
   },
   beforeCreate(){
@@ -253,7 +262,13 @@ export default {
             {
               split[y] = split[y][0].toUpperCase() + split[y].substr(1);
             }
-            x.name = split[0] + " " + split[1];
+            
+            x.name = split[0];
+
+            split.forEach((word) => {
+              if(word != split[0])
+                x.name += " " + word;
+            })
           })
           
 
@@ -304,7 +319,8 @@ export default {
         type: this.dialogm2type.ID,
         leader: this.dialogm2leader.ID,
         congregation_ID: this.$person.congregation_ID,
-        name: this.dialogm2name
+        name: this.dialogm2name,
+        image: "default.jpg"
       }
       
       axios.post(`${apiBaseUrl}/group`, {

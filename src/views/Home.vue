@@ -24,13 +24,22 @@
                   <!-- </button> -->
               </v-col>
         </v-row>
+        <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="isAdmin" class="mt-5"/>
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import axios from 'axios';
+
+const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+import AnnouncementViewer from '@/components/Announcements.vue'
   export default {
+    components:
+    {
+      AnnouncementViewer
+    },
     mounted() {
       console.log("Window.person: " + window.person.f_name);
       this.name = window.person.f_name + " " + window.person.l_name;
@@ -40,13 +49,45 @@
     name:"", 
     drawer: null,
     tabs:[
-    {icon:'mdi-account',text:'Account', name:'Account', params: { personID :window.person.id}},
+    {icon:'mdi-account',text:'Account', name:'Account', params: { personID:window.person.id}},
     {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params: { familyID:window.person.family_ID}},
     {icon:'mdi-account-group',text:'Groups', name:'Group List', params: {}},
     {icon:'mdi-calendar',text:'Events', name:'Events', params: {}},
     {icon:'mdi-church',text:'Directory', name:'Directory', params: {}},
     {icon:'mdi-help',text:'Help', name:'Help', params: {}},
     ],
+    announcements: [],
+    isAdmin: false,
     }),
+    beforeCreate(){
+      axios.get(`${apiBaseUrl}/valid_value`)
+      .then(values => {
+        let messageTypeID = values.data.find(x => x.value_group === "message" && x.value === "congregation").ID;
+
+        let adminID = values.data.find(x => x.value === "admin").ID
+
+        this.$nextTick(() => {
+          if(this.$person.role === adminID){
+            this.isAdmin = true;
+          }
+        })
+
+        console.log(this.$person.congregation_ID, values.data.find(x => x.value_group === "message" && x.value === "congregation").ID)
+        console.log(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
+
+        axios.get(`${apiBaseUrl}/message?receipient=(${this.$person.congregation_ID})&receipient_type=${messageTypeID}`)
+        .then(messages => {
+          if(messages.data.length > 0)
+            this.announcements = messages.data;
+          else
+            this.announcements.push({message: "No announcements to show."})
+          console.log(this.announcements)
+          
+        })
+        .catch(error => {
+          console.error(error);
+        })
+      })
+    }
   }
 </script>

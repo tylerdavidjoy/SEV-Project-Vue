@@ -36,9 +36,8 @@ export default {
   data() {
     return {
     login: true,
-    user: {
-
-    },
+    user: window.user,
+    person: window.person,
     passingUserID:null,
     passingFamilyID:null,
     polling: null,
