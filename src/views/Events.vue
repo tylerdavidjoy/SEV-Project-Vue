@@ -55,10 +55,18 @@
                           <v-divider></v-divider>
                             <v-card-text  style="height: 300px;">
                             <v-form v-model="isAddValid">
+                              <v-text-field
+                              v-model="dialogm2name"
+                              label="Event Name"
+                              clearable
+                              :rules="[rules.required]"
+                              hide-details="auto"
+                              >
+                              </v-text-field>
                               <v-autocomplete
-                              v-model="dialogm2type"
-                              :items="eventLocations"
-                              :item-text="type => type.value"
+                              v-model="dialogm2room"
+                              :items="rooms"
+                              :item-text="room => room.room_number"
                               return-object
                               label="Event Location"
                               clearable
@@ -79,7 +87,7 @@
                             >
                             </v-autocomplete>
                             <v-textarea
-                            v-model="dialogm2name"
+                            v-model="dialogm2desc"
                             label="Event Description"
                             clearable
                             auto-grow
@@ -87,6 +95,10 @@
                             hide-details="auto"
                             ></v-textarea>
                             <v-date-picker v-model="picker"></v-date-picker>
+                            <v-checkbox>
+                            </v-checkbox>
+                            <v-checkbox>
+                            </v-checkbox>
                             </v-form>
                             </v-card-text>
                           <v-divider></v-divider>
@@ -129,6 +141,9 @@
                                   <v-card-title>
                                     {{event.description}}
                                   </v-card-title>
+                                  <v-card-text>
+                                    {{rooms.find(x => x.ID === event.location).room_number}}
+                                  </v-card-text>
                                   <v-card-text>
                                     Leader: {{members.find(x => x.ID === event.leader).f_name + " " + members.find(x => x.ID === event.leader).l_name}}
                                   </v-card-text>
@@ -191,8 +206,9 @@ export default {
       members:[],
       eventLocations:[],
       dialogm2leader: null,
+      dialogm2desc: '',
+      dialogm2room: null,
       dialogm2name: '',
-      dialogm2type: null,
       dialog2: false,
       rules: {
         required: value => !!value || 'Required.'
@@ -200,21 +216,23 @@ export default {
       isAddValid: false,
       fileType:"PDF",
       picture:false,
-      pickers: new Date().toISOString().substr(0, 10),
+      picker: new Date().toISOString().substr(0, 10),
+      rooms: [],
     }
   },
   beforeCreate(){
     axios.all([
       axios.get(`${apiBaseUrl}/event`),
       axios.get(`${apiBaseUrl}/valid_value`),
-      axios.get(`${apiBaseUrl}/person`)
+      axios.get(`${apiBaseUrl}/person`),
+      axios.get(`${apiBaseUrl}/room`)
     ])
-    .then(axios.spread((events, types, members) =>{
+    .then(axios.spread((events, types, members, rooms) =>{
       let adminRoleID = types.data.find(x => x.value === 'admin').ID;
-
-      this.eventLocations = types.data.filter(x => x.value_group === "event");
       
       this.members = members.data;
+      
+      this.rooms = rooms.data;
 
       this.$nextTick(()=>{
         if(this.user.role != adminRoleID){
@@ -317,18 +335,19 @@ export default {
 
     addEvent: function(){   
       let tempEvent = {
-        type: this.dialogm2type.ID,
+        date: this.picker,
+        location: this.dialogm2room.ID,
         leader: this.dialogm2leader.ID,
-        congregation_ID: this.$person.congregation_ID,
-        name: this.dialogm2name,
-        image: "default.jpg"
+        description: this.dialogm2desc,
+        recurring: 0
       }
       
       axios.post(`${apiBaseUrl}/event`, {
-        type: tempEvent.type,
+        date: tempEvent.date,
         leader: tempEvent.leader,
-        congregation_ID: tempEvent.congregation_ID,
-        name: tempEvent.name
+        location: tempEvent.location,
+        description: tempEvent.description,
+        recurring: tempEvent.recurring
       })
       .then(() => {
         axios.get(`${apiBaseUrl}/event`)
@@ -338,17 +357,8 @@ export default {
           let tempEventIndex = this.events.indexOf(tempEvent)
           tempEvent = events.data[events.data.length-1]
           this.$set(this.events, tempEventIndex, tempEvent)
-          
-          axios.post(`${apiBaseUrl}/event_group`, {
-            event_ID: tempEvent.ID,
-            group_ID: this.dialogm2leader.ID
-          })
-          .then(() => {
-            this.dialog2 = false;
-          })
-          .catch(error =>{
-            console.error(error);
-          })
+
+          this.dialog2 = false;
         })
         .catch(error =>{
           console.error(error);
@@ -357,13 +367,6 @@ export default {
       .catch(error =>{
         console.error(error);
       })
-
-      
-
-      // this.$nextTick(()=>{
-      //   this.leader = this.dialogm2;
-      //   this.$delete(this.groupMembers, this.groupMembers.indexOf(this.groupMembers.find(x => x.ID === this.dialogm2.ID)));
-      // })
       
       
     },
