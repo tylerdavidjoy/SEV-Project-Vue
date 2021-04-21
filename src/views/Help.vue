@@ -42,8 +42,8 @@
                         <v-stepper-content v-for="n in content.account.steps" :key="`${n}-content`" :step="n">
                           <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                          <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.account.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.account.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -69,8 +69,8 @@
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
                         <v-img contain :height="300" :src="getImgUrl('fileuploading',n)"/>
-                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -95,8 +95,8 @@
                         <v-stepper-content v-for="n in content.group.steps" :key="`${n}-content`" :step="n">
                           <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('group',n)"/>
-                          <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.group.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.group.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -121,8 +121,8 @@
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -147,8 +147,8 @@
                       <v-stepper-content v-for="n in content.reports.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('report',n)"/>
-                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.reports.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.reports.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -173,8 +173,8 @@
                       <v-stepper-content v-for="n in content.directory.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('directory',n)"/>
-                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.directory.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.directory.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -199,8 +199,8 @@
                       <v-stepper-content v-for="n in content.administrator.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
                         <v-img contain :height="300" :src="getImgUrl('administrator',n)"/>
-                        <v-card-title class="text-h2">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4">{{content.administrator.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.administrator.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
