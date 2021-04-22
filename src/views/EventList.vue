@@ -95,10 +95,26 @@
                             hide-details="auto"
                             ></v-textarea>
                             <v-date-picker v-model="picker"></v-date-picker>
-                            <v-checkbox>
+                            <v-checkbox
+                            label="Does this event recur?"
+                            v-model="recurChkbx"
+                            >
                             </v-checkbox>
-                            <v-checkbox>
+                            <v-checkbox
+                            label="Is this event for a group?"
+                            v-model="groupChkbx"
+                            >
                             </v-checkbox>
+                            <v-autocomplete v-if="groupChkbx"
+                            v-model="eventGroup"
+                            :items="groups"
+                            :item-text="group => group.name"
+                            return-object
+                            label="Event Group"
+                            clearable
+                            hide-details="auto"
+                            >
+                            </v-autocomplete>
                             </v-form>
                             </v-card-text>
                           <v-divider></v-divider>
@@ -204,6 +220,8 @@ export default {
       display:[],
       events:[],
       members:[],
+      groups: [],
+      eventGroup: {},
       eventLocations:[],
       dialogm2leader: null,
       dialogm2desc: '',
@@ -218,6 +236,8 @@ export default {
       picture:false,
       picker: new Date().toISOString().substr(0, 10),
       rooms: [],
+      recurChkbx: false,
+      groupChkbx: false,
     }
   },
   beforeCreate(){
@@ -225,14 +245,17 @@ export default {
       axios.get(`${apiBaseUrl}/event`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`),
-      axios.get(`${apiBaseUrl}/room`)
+      axios.get(`${apiBaseUrl}/room`),
+      axios.get(`${apiBaseUrl}/group`)
     ])
-    .then(axios.spread((events, types, members, rooms) =>{
+    .then(axios.spread((events, types, members, rooms, groups) =>{
       let adminRoleID = types.data.find(x => x.value === 'admin').ID;
       
       this.members = members.data;
       
       this.rooms = rooms.data;
+
+      this.groups = groups.data;
 
       this.$nextTick(()=>{
         if(this.user.role != adminRoleID){
@@ -339,35 +362,64 @@ export default {
         location: this.dialogm2room.ID,
         leader: this.dialogm2leader.ID,
         description: this.dialogm2desc,
-        recurring: 0
+        recurring: this.recurChkbx ? 1 : 0
       }
       
-      axios.post(`${apiBaseUrl}/event`, {
-        date: tempEvent.date,
-        leader: tempEvent.leader,
-        location: tempEvent.location,
-        description: tempEvent.description,
-        recurring: tempEvent.recurring
-      })
-      .then(() => {
-        axios.get(`${apiBaseUrl}/event`)
-        .then(events => {
-          
-          this.events.push(tempEvent);
-          let tempEventIndex = this.events.indexOf(tempEvent)
-          tempEvent = events.data[events.data.length-1]
-          this.$set(this.events, tempEventIndex, tempEvent)
+      if(!this.groupChkbx){
+        axios.post(`${apiBaseUrl}/event`, {
+          date: tempEvent.date,
+          leader: tempEvent.leader,
+          location: tempEvent.location,
+          description: tempEvent.description,
+          recurring: tempEvent.recurring
+        })
+        .then(() => {
+          axios.get(`${apiBaseUrl}/event`)
+          .then(events => {
+            
+            this.events.push(tempEvent);
+            let tempEventIndex = this.events.indexOf(tempEvent)
+            tempEvent = events.data[events.data.length-1]
+            this.$set(this.events, tempEventIndex, tempEvent)
 
-          this.dialog2 = false;
+            this.dialog2 = false;
+          })
+          .catch(error =>{
+            console.error(error);
+          })
         })
         .catch(error =>{
           console.error(error);
         })
-      })
-      .catch(error =>{
-        console.error(error);
-      })
-      
+      }
+      else{
+        console.log(this.eventGroup)
+        axios.post(`${apiBaseUrl}/event?group_ID=${this.eventGroup.ID}`, {
+          date: tempEvent.date,
+          leader: tempEvent.leader,
+          location: tempEvent.location,
+          description: tempEvent.description,
+          recurring: tempEvent.recurring
+        })
+        .then(() => {
+          axios.get(`${apiBaseUrl}/event`)
+          .then(events => {
+            
+            this.events.push(tempEvent);
+            let tempEventIndex = this.events.indexOf(tempEvent)
+            tempEvent = events.data[events.data.length-1]
+            this.$set(this.events, tempEventIndex, tempEvent)
+
+            this.dialog2 = false;
+          })
+          .catch(error =>{
+            console.error(error);
+          })
+        })
+        .catch(error =>{
+          console.error(error);
+        })
+      }
       
     },
 
