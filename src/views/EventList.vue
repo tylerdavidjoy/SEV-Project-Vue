@@ -9,190 +9,193 @@
       <v-main :class="'grey lighten-2'">
         <div :class="'mt-n12'">
           <v-container>
-            <v-row>
-              <v-col cols="12">
-              </v-col>
-              <v-col cols="12">
-                  <v-sheet class="rounded-lg">
-                    <div class="px-4">
-                      
-                      <!-- Search Bar -->
-                      <div>
-                        <v-text-field
-                          v-model="search"
-                          label="Search"
-                          hint="Search for a event"
-                          clearable
-                          @input="SearchAPI()"
-                          @click:clear="ClearAPI()"
-                        ></v-text-field>
-                      </div>
-                      
-                    </div>
-                  </v-sheet>
-              </v-col>
-              <v-dialog
-                        v-model="dialog2"
-                        scrollable
-                        max-width="500px"
-                        v-if="isAdmin"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-card-actions>
-                          <v-btn
-                            color="primary"
-                            dark
-                            v-bind="attrs"
-                            v-on="on"
-                            
-                          >
-                            Add Event
-                          </v-btn>
-                          </v-card-actions>
-                        </template>
-                        <v-card>
-                          <v-card-title>Create a Event</v-card-title>
-                          <v-divider></v-divider>
-                            <v-card-text  style="height: 300px;">
-                            <v-form v-model="isAddValid">
-                              <v-text-field
-                              v-model="dialogm2name"
-                              label="Event Name"
-                              clearable
-                              :rules="[rules.required]"
-                              hide-details="auto"
-                              >
-                              </v-text-field>
-                              <v-autocomplete
-                              v-model="dialogm2room"
-                              :items="rooms"
-                              :item-text="room => room.room_number"
-                              return-object
-                              label="Event Location"
-                              clearable
-                              auto-select-first
-                              :rules="[rules.required]"
-                              hide-details="auto"
-                            ></v-autocomplete>
-                            <v-autocomplete
-                              v-model="dialogm2leader"
-                              :items="members"
-                              :item-text="member => member.f_name + ' ' + member.l_name + ' ' + member.email"
-                              return-object
-                              label="Event Leader"
-                              clearable
-                              auto-select-first
-                              :rules="[rules.required]"
-                              hide-details="auto"
-                            >
-                            </v-autocomplete>
-                            <v-textarea
-                            v-model="dialogm2desc"
-                            label="Event Description"
-                            clearable
-                            auto-grow
-                            :rules="[rules.required]"
-                            hide-details="auto"
-                            ></v-textarea>
-                            <v-date-picker v-model="picker"></v-date-picker>
-                            <v-checkbox
-                            label="Does this event recur?"
-                            v-model="recurChkbx"
-                            >
-                            </v-checkbox>
-                            <v-checkbox
-                            label="Is this event for a group?"
-                            v-model="groupChkbx"
-                            >
-                            </v-checkbox>
-                            <v-autocomplete v-if="groupChkbx"
-                            v-model="eventGroup"
-                            :items="groups"
-                            :item-text="group => group.name"
-                            return-object
-                            label="Event Group"
-                            clearable
-                            hide-details="auto"
-                            >
-                            </v-autocomplete>
-                            </v-form>
-                            </v-card-text>
-                          <v-divider></v-divider>
-                          <v-card-actions>
-                            <v-btn
-                              color="blue darken-1"
-                              text
-                              @click="dialog2 = false"
-                            >
-                              Cancel
-                            </v-btn>
-                            <v-btn
-                              color="blue darken-1"
-                              text
-                              @click="addEvent()"
-                              :disabled="!isAddValid"
-                            >
-                              Add
-                            </v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </v-dialog>
-              <v-col cols="12">
-                  <v-sheet class="rounded-lg">
-                    <div class="px-4">
-                      <!-- Switch for Pagenation and Calendar -->
-                      
-
-                      <!-- Results Bar -->
-                      <div class="pt-2">
-                        <v-container>
-
-                          <div style="width:100%; margin:auto; padding-left:3.5%;">
-                            <div v-if="display.length === 0">
-                              Looks like you aren't in any events or we can't find any events related to your search.
-                            </div>
-                            <div v-else>
-                              <div v-for="event in display" :key="event.name" style="float:left; padding: 15px;">
-                                <v-card>
-                                  <v-card-title>
-                                    {{event.description}}
-                                  </v-card-title>
-                                  <v-card-text>
-                                    {{rooms.find(x => x.ID === event.location).room_number}}
-                                  </v-card-text>
-                                  <v-card-text>
-                                    Leader: {{members.find(x => x.ID === event.leader).f_name + " " + members.find(x => x.ID === event.leader).l_name}}
-                                  </v-card-text>
-                                  <v-card-text>
-                                    {{event.date}}
-                                  </v-card-text>
-                                  <v-card-actions>
-                                    <v-btn height="auto" color="transparent" @click="goToEventPage(event.ID, event.leader)">
-                                      View Event
-                                    </v-btn>
-                                    <v-btn  v-if="isAdmin" height="auto" color="transparent" @click="deleteEvent(event.ID, events.indexOf(event))">
-                                      <v-icon>mdi-trash-can</v-icon>
-                                    </v-btn>
-                                  </v-card-actions>
-                                </v-card>
-                              </div>
-                            </div>
-                          </div>
-                          <v-container class="max-width" v-if="display.length > 0">
-                            <v-pagination
-                              v-model="page"
-                              class="my-4"
-                              :length="pageLength"
-                              :total-visible="7"
-                            ></v-pagination>
-                          </v-container>
-                        </v-container>
-                      </div>
-                    </div>
-                    <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
-                  </v-sheet>
-              </v-col>
-            </v-row>
+            <v-dialog
+              v-model="dialog2"
+              scrollable
+              max-width="500px"
+              v-if="isAdmin"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-card-actions>
+                <v-btn
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                  
+                >
+                  Add Event
+                </v-btn>
+                </v-card-actions>
+              </template>
+              <v-card>
+                <v-card-title>Create a Event</v-card-title>
+                <v-divider></v-divider>
+                  <v-card-text  style="height: 300px;">
+                  <v-form v-model="isAddValid">
+                    <v-text-field
+                    v-model="dialogm2name"
+                    label="Event Name"
+                    clearable
+                    :rules="[rules.required]"
+                    hide-details="auto"
+                    >
+                    </v-text-field>
+                    <v-autocomplete
+                    v-model="dialogm2room"
+                    :items="rooms"
+                    :item-text="room => room.room_number"
+                    return-object
+                    label="Event Location"
+                    clearable
+                    auto-select-first
+                    :rules="[rules.required]"
+                    hide-details="auto"
+                  ></v-autocomplete>
+                  <v-autocomplete
+                    v-model="dialogm2leader"
+                    :items="members"
+                    :item-text="member => member.f_name + ' ' + member.l_name + ' ' + member.email"
+                    return-object
+                    label="Event Leader"
+                    clearable
+                    auto-select-first
+                    :rules="[rules.required]"
+                    hide-details="auto"
+                  >
+                  </v-autocomplete>
+                  <v-textarea
+                  v-model="dialogm2desc"
+                  label="Event Description"
+                  clearable
+                  auto-grow
+                  :rules="[rules.required]"
+                  hide-details="auto"
+                  ></v-textarea>
+                  <v-menu
+                    ref="menu"
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    :return-value.sync="timePicker"
+                    transition="scale-transition"
+                    offset-y
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="timePicker"
+                        label="Event Time"
+                        prepend-icon="mdi-clock-time-four-outline"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-time-picker
+                      v-if="menu"
+                      v-model="timePicker"
+                      full-width
+                      @click:minute="$refs.menu.save(timePicker)"
+                    ></v-time-picker>
+                  </v-menu>
+                  <v-menu
+                    v-model="menu2"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="datePicker"
+                        label="Event Date"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="datePicker"
+                      @input="menu2 = false"
+                    ></v-date-picker>
+                  </v-menu>
+                  <v-checkbox
+                  label="Does this event recur?"
+                  v-model="recurChkbx"
+                  >
+                  </v-checkbox>
+                  <v-checkbox
+                  label="Is this event for a group?"
+                  v-model="groupChkbx"
+                  >
+                  </v-checkbox>
+                  <v-autocomplete v-if="groupChkbx"
+                  v-model="eventGroup"
+                  :items="groups"
+                  :item-text="group => group.name"
+                  return-object
+                  label="Event Group"
+                  clearable
+                  hide-details="auto"
+                  >
+                  </v-autocomplete>
+                  </v-form>
+                  </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="dialog2 = false"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="addEvent()"
+                    :disabled="!isAddValid"
+                  >
+                    Add
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <v-sheet>
+              <v-toolbar elevation="0">
+                <v-btn
+                  icon
+                  class="ma-2"
+                  @click="$refs.calendar.prev()"
+                >
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-spacer><v-toolbar-title v-if="$refs.calendar">{{$refs.calendar.title}}</v-toolbar-title></v-spacer>
+                <v-btn
+                  icon
+                  class="ma-2"
+                  @click="$refs.calendar.next()"
+                >
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </v-toolbar>
+            </v-sheet>
+            <v-sheet height="600">
+              <v-calendar
+                ref="calendar"
+                v-model="calendarDay"
+                color="primary"
+                :events="events"
+              >
+              </v-calendar>
+            </v-sheet>
+            <v-sheet class="rounded-lg">                    
+              <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+            </v-sheet>
           </v-container>
         </div>
       </v-main>
@@ -213,16 +216,18 @@ export default {
   data() {
     return {
       isAdmin: false,
+      adminRoleID: null,
       user: this.$person,
       search:'',
-      page:1,
-      pageLength:20,
+      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       display:[],
       events:[],
       members:[],
       groups: [],
       eventGroup: {},
       eventLocations:[],
+      menu: false,
+      menu2: false,
       dialogm2leader: null,
       dialogm2desc: '',
       dialogm2room: null,
@@ -234,7 +239,9 @@ export default {
       isAddValid: false,
       fileType:"PDF",
       picture:false,
-      picker: new Date().toISOString().substr(0, 10),
+      datePicker: null,
+      timePicker: null,
+      calendarDay: '',
       rooms: [],
       recurChkbx: false,
       groupChkbx: false,
@@ -249,7 +256,7 @@ export default {
       axios.get(`${apiBaseUrl}/group`)
     ])
     .then(axios.spread((events, types, members, rooms, groups) =>{
-      let adminRoleID = types.data.find(x => x.value === 'admin').ID;
+      this.adminRoleID = types.data.find(x => x.value === 'admin').ID;
       
       this.members = members.data;
       
@@ -258,10 +265,22 @@ export default {
       this.groups = groups.data;
 
       this.$nextTick(()=>{
-        if(this.user.role != adminRoleID){
+        if(this.user.role != this.adminRoleID){
           axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
           .then(response =>{
-            this.events = response.data;
+            //this.events = response.data;
+            response.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
+            
           })
           .catch(error =>{
             this.events = [];
@@ -269,7 +288,18 @@ export default {
           })
         }
         else{
-          this.events = events.data;
+          //this.events = events.data;
+          events.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
           this.isAdmin = true;
         }
 
@@ -285,6 +315,9 @@ export default {
       this.search = "";
       this.SearchAPI();
     },
+    rnd (a, b) {
+        return Math.floor((b - a + 1) * Math.random()) + a
+      },
     //Function for loading in the events based on given API Search Parameters
     SearchAPI()
     {
@@ -357,8 +390,9 @@ export default {
     },
 
     addEvent: function(){   
+      this.events = [];
       let tempEvent = {
-        date: this.picker,
+        date: this.datePicker + "T" + this.timePicker + ":00.000Z",
         location: this.dialogm2room.ID,
         leader: this.dialogm2leader.ID,
         description: this.dialogm2desc,
@@ -377,10 +411,47 @@ export default {
           axios.get(`${apiBaseUrl}/event`)
           .then(events => {
             
-            this.events.push(tempEvent);
-            let tempEventIndex = this.events.indexOf(tempEvent)
-            tempEvent = events.data[events.data.length-1]
-            this.$set(this.events, tempEventIndex, tempEvent)
+            this.$nextTick(()=>{
+        if(this.user.role != this.adminRoleID){
+          axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
+          .then(response =>{
+            //this.events = response.data;
+            response.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
+            
+          })
+          .catch(error =>{
+            this.events = [];
+            console.error(error)
+          })
+        }
+        else{
+          //this.events = events.data;
+          events.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
+          this.isAdmin = true;
+        }
+
+        this.viewMode()
+      })
 
             this.dialog2 = false;
           })
@@ -405,10 +476,47 @@ export default {
           axios.get(`${apiBaseUrl}/event`)
           .then(events => {
             
-            this.events.push(tempEvent);
-            let tempEventIndex = this.events.indexOf(tempEvent)
-            tempEvent = events.data[events.data.length-1]
-            this.$set(this.events, tempEventIndex, tempEvent)
+            this.$nextTick(()=>{
+        if(this.user.role != this.adminRoleID){
+          axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
+          .then(response =>{
+            //this.events = response.data;
+            response.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
+            
+          })
+          .catch(error =>{
+            this.events = [];
+            console.error(error)
+          })
+        }
+        else{
+          //this.events = events.data;
+          events.data.forEach(event =>{
+                let tempEvent = {
+                name: event.name,
+                start: Date.parse(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: false
+              }
+            
+              this.events.push(tempEvent);
+
+            })
+          this.isAdmin = true;
+        }
+
+        this.viewMode()
+      })
 
             this.dialog2 = false;
           })
