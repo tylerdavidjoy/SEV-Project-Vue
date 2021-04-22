@@ -6,7 +6,8 @@ import Account from '../views/Account.vue'
 import HouseHold from '../views/HouseHold.vue'
 import GroupList from '../views/GroupList.vue'
 import Group from '../views/Group.vue'
-import Events from '../views/Events.vue'
+import EventList from '../views/EventList.vue'
+import Event from '../views/Event.vue'
 import Directory from '../views/Directory.vue'
 import Help from '../views/Help.vue'
 
@@ -67,13 +68,22 @@ const routes = [
     component: GroupList
   },
   {
-    path: '/events',
-    name: 'Events',
+    path: '/eventlist',
+    name: 'EventList',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-    component: Events
+    component: EventList
+  },
+  {
+    path: '/event',
+    name: 'Event',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: Event
   },
   {
     path: '/directory',
