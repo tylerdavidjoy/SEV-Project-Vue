@@ -4,7 +4,7 @@
       <v-main class="grey lighten-2">
         <v-container>
             <v-banner>
-              {{group.name}}
+              {{event.name}}
             </v-banner>
           <v-row>
                 <v-col>
@@ -12,7 +12,7 @@
                   color="transparent">
                     <v-card elevation="2" v-if="renderLeader" :height="360">
                       <v-card-title>
-                        Group Leader
+                        Event Leader
                       </v-card-title>
                       <v-card-subtitle>
                         {{leader.f_name + " " + leader.l_name}}
@@ -65,11 +65,11 @@
                   color="transparent">
                     <v-card :height="360">
                       <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
-                        <v-img :src="groupImgSrc">
+                        <v-img :src="eventImgSrc">
                         </v-img>
                       </v-avatar>
 
-                      <PhotoUpload v-bind:canEdit="this.userHasPerms" v-bind:groupId="this.group.ID" v-bind:groupImgSrc="this.group.image" @onFileChange="groupImgSrc=$event"/>
+                      <PhotoUpload v-bind:canEdit="this.userHasPerms" v-bind:eventId="this.event.ID" v-bind:eventImgSrc="this.event.image" @onFileChange="eventImgSrc=$event"/>
 
                     
                     <v-row justify="center" v-if="userHasPerms">
@@ -92,7 +92,7 @@
                           </v-card-actions>
                         </template>
                         <v-card>
-                          <v-card-title>Select Member to Make<br/>Group Leader</v-card-title>
+                          <v-card-title>Select Member to Make<br/>Event Leader</v-card-title>
                           <v-divider></v-divider>
                           <v-card-text style="height: 300px;">
                             <v-radio-group
@@ -100,7 +100,7 @@
                               column
                             >
                               <v-radio
-                              v-for="changePerson in groupMembers"
+                              v-for="changePerson in eventMembers"
                               :key="changePerson.ID"
                               :label="changePerson.f_name + ' ' + changePerson.l_name + ' ' + changePerson.email"
                               :value="changePerson"
@@ -138,7 +138,7 @@
               <v-container>
                 <v-list color="transparent">
                     <template v-if="renderMembers" >
-                      <v-card v-for="(member, index) in groupMembers" :key="member.ID" class="my-2">
+                      <v-card v-for="(member, index) in eventMembers" :key="member.ID" class="my-2">
                         <v-card-subtitle>
                           {{member.f_name + " " + member.l_name}}
                         </v-card-subtitle>
@@ -158,13 +158,13 @@
                         <v-btn v-on:click="$router.push({name: 'Account', params:{personID: member.ID}})">
                           View Member Page
                         </v-btn>
-                        <v-btn v-on:click="removeGroupMember(member.ID, index)" v-if="userHasPerms">
+                        <v-btn v-on:click="removeEventMember(member.ID, index)" v-if="userHasPerms">
                           Remove Member
                         </v-btn>
                       </v-card-actions>
                       </v-card>
                     </template>
-                    <template v-else-if="this.groupMembers.length > 0">
+                    <template v-else-if="this.eventMembers.length > 0">
                       <v-card>
                         <v-card-subtitle>
                           <v-progress-circular
@@ -205,7 +205,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Add member(s) to Group
+                  Add member(s) to Event
                 </v-btn>
               </template>
               <v-card>
@@ -236,7 +236,7 @@
                   <v-btn
                     color="blue darken-1"
                     text
-                    @click="addGroupMember()"
+                    @click="addEventMember()"
                   >
                     Add
                   </v-btn>
@@ -257,7 +257,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Add Family to Group
+                  Add Family to Event
                 </v-btn>
               </template>
               <v-card>
@@ -298,8 +298,7 @@
           </v-row>
         </v-container>
       </v-main>
-        <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
-        <GroupReport class="primary" :selected.sync="fileType" :picture.sync="picture" :reportid.sync="group.ID"/>
+
     </div>
   </v-app>
 </template>
@@ -307,16 +306,12 @@
 <script>
 import axios from 'axios'
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
-import GroupReport from "@/components/group_report.vue";
-import ReportSettings from "@/components/report_settings.vue";
 import AnnouncementViewer from "@/components/Announcements.vue";
 import PhotoUpload from "../components/PhotoUpload.vue";
 
 export default {
-  name: "GroupMembers",
+  name: "EventMembers",
     components: {
-      ReportSettings,
-      GroupReport,
       AnnouncementViewer,
       PhotoUpload
   },
@@ -329,10 +324,10 @@ export default {
         addPossibleFamilyList: [],
         user: this.$person,
         userHasPerms: false,
-        group: {},
-        groupImgSrc: "",
+        event: {},
+        eventImgSrc: "",
         leader: {},
-        groupMembers: [],
+        eventMembers: [],
         renderMembers: false,
         memberAddressesReceived: false,
         memberPhonesReceived: false,
@@ -365,13 +360,14 @@ export default {
       });
     },
     changeLeader: function(){
-      this.groupMembers.push(this.leader);
+      this.eventMembers.push(this.leader);
       
-      axios.put(`${apiBaseUrl}/group?id=${this.group.ID}`, {
-        type: this.group.type,
+      axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`, {
+        date: this.event.date,
         leader: this.dialogm2.ID,
-        congregation_ID: this.group.congregation_ID,
-        name: this.group.name
+        location: this.event.location,
+        description: this.event.description,
+        recurring: this.event.recurring
       })
       .then()
       .catch(error =>{
@@ -380,25 +376,25 @@ export default {
 
       this.$nextTick(()=>{
         this.leader = this.dialogm2;
-        this.$delete(this.groupMembers, this.groupMembers.indexOf(this.groupMembers.find(x => x.ID === this.dialogm2.ID)));
+        this.$delete(this.eventMembers, this.eventMembers.indexOf(this.eventMembers.find(x => x.ID === this.dialogm2.ID)));
       })
 
       this.dialog2 = false;
     },
-    removeGroupMember: function(memberID, index){
-      this.possibleAddList.push(this.groupMembers.find(x=>x.ID === memberID));
-      this.$delete(this.groupMembers, index);
-      axios.delete(`${apiBaseUrl}/group_person?group_ID=${this.group.ID}&person_ID=${memberID}`);
+    removeEventMember: function(memberID, index){
+      this.possibleAddList.push(this.eventMembers.find(x=>x.ID === memberID));
+      this.$delete(this.eventMembers, index);
+      axios.delete(`${apiBaseUrl}/event_person?event_ID=${this.event.ID}&person_ID=${memberID}`);
     },
-    addGroupMember () {
+    addEventMember () {
       console.log(this.addList)
       this.addList.forEach(person => {
-        axios.post(`${apiBaseUrl}/group_person`, {
-            group_ID: this.group.ID,
+        axios.post(`${apiBaseUrl}/event_person`, {
+            event_ID: this.event.ID,
             person_ID: person.ID
           })
-        this.groupMembers.push(person);
-        this.$set(this.groupMembers, this.groupMembers.indexOf(person), person);
+        this.eventMembers.push(person);
+        this.$set(this.eventMembers, this.eventMembers.indexOf(person), person);
         this.possibleAddList.splice(this.possibleAddList.indexOf(person), 1);
       })
       this.addList = [];
@@ -413,20 +409,20 @@ export default {
         this.memberAddressesReceived = false;
         this.memberPhonesReceived = false;
         this.renderMembers = false;
-        axios.post(`${apiBaseUrl}/group_person?family_ID=${family.family_ID}&group_ID=${this.$route.params.groupID}`)
+        axios.post(`${apiBaseUrl}/event_person?family_ID=${family.family_ID}&event_ID=${this.$route.params.eventID}`)
         .then(() => {
-          axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`)
+          axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`)
           .then(response => {
             console.log(response.data)
-            this.groupMembers = response.data.filter(x => x.ID != this.group.leader)
+            this.eventMembers = response.data.filter(x => x.ID != this.event.leader)
 
-            // For every group member we need to grab the phones and addresses
-            for(let i = 0; i < this.groupMembers.length; i++)
+            // For every event member we need to grab the phones and addresses
+            for(let i = 0; i < this.eventMembers.length; i++)
             {
-              axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.groupMembers[i].ID}`)
+              axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.eventMembers[i].ID}`)
               .then(memberPhones => {
                 // Initializing phone property like before with leader
-                this.groupMembers[i].phone = [];
+                this.eventMembers[i].phone = [];
                 for(let j = 0; j < memberPhones.data.length; j++)
                 {
                   if(memberPhones.data[j].can_publish){
@@ -435,10 +431,10 @@ export default {
                     let tempPhoneType = this.phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
                     tempPhone.type = tempPhoneType;
                     tempPhone.number = memberPhones.data[j].number;
-                    this.groupMembers[i].phone.push(tempPhone);
-                     console.log("Bagels1", i, this.groupMembers.length, tempPhone)
+                    this.eventMembers[i].phone.push(tempPhone);
+                     console.log("Bagels1", i, this.eventMembers.length, tempPhone)
                   }
-                    if(i === this.groupMembers.length - 1){
+                    if(i === this.eventMembers.length - 1){
                       this.memberPhonesReceived = true;
                       // Tell the page to check if both address and phones are loaded for all members
                       this.finishedLoadingMemberData();
@@ -446,7 +442,7 @@ export default {
                 }          
               })
               .catch((error) => {
-                if(i === this.groupMembers.length - 1){
+                if(i === this.eventMembers.length - 1){
                     this.memberPhonesReceived = true;
                     // Tell the page to check if both address and phones are loaded for all members
                     this.finishedLoadingMemberData();
@@ -454,19 +450,19 @@ export default {
                 console.error(error);
               })
 
-              axios.get(`${apiBaseUrl}/address?person_ID=${this.groupMembers[i].ID}`)
+              axios.get(`${apiBaseUrl}/address?person_ID=${this.eventMembers[i].ID}`)
               .then(memberAddresses => {
                 // Initializing address property like before with leader
-                this.groupMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
-                console.log("Pizza", i, this.groupMembers.length, this.groupMembers[i].address)
-                if(i === this.groupMembers.length - 1){
+                this.eventMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
+                console.log("Pizza", i, this.eventMembers.length, this.eventMembers[i].address)
+                if(i === this.eventMembers.length - 1){
                   this.memberAddressesReceived = true;
                   // Tell the page to check if both address and phones are loaded for all members
                   this.finishedLoadingMemberData();
                 }
               })
               .catch(error => {
-                if(i === this.groupMembers.length - 1){
+                if(i === this.eventMembers.length - 1){
                   this.memberAddressesReceived = true;
                   // Tell the page to check if both address and phones are loaded for all members
                   this.finishedLoadingMemberData();
@@ -491,15 +487,16 @@ export default {
   {
     axios.all([
 
-      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}`),
-      axios.get(`${apiBaseUrl}/group?id=${this.$route.params.groupID}&get_members=1`),
+      axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}`),
+      axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`),
       axios.get(`${apiBaseUrl}/family`)
       ])
-      .then(axios.spread((group, groupMembers, types, churchMembers, families) => {
-      let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "group").ID;
-      axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.groupID})&receipient_type=${messageTypeID}`)
+      .then(axios.spread((event, eventMembers, types, churchMembers, families) => {
+      console.log(event, eventMembers, types, churchMembers, families)
+      let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "event").ID;
+      axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.eventID})&receipient_type=${messageTypeID}`)
         .then(messages => {
           if(messages.data.length > 0)
             this.announcements = messages.data;
@@ -517,17 +514,17 @@ export default {
       // Get the valid values for phone to put the type with the number later.
       this.phoneTypes = types.data;
       
-      // Setting the view's group and groupMembers variables up with data.
-      console.log(group.data);
-      this.group = group.data;
-      this.groupImgSrc = apiBaseUrl + "/images/" + group.data.image;
-      console.log("Img Src: " + this.groupImgSrc)
-      this.groupMembers = groupMembers.data;
+      // Setting the view's event and eventMembers variables up with data.
+      console.log(event.data);
+      this.event = event.data;
+      this.eventImgSrc = apiBaseUrl + "/images/" + event.data.image;
+      console.log("Img Src: " + this.eventImgSrc)
+      this.eventMembers = eventMembers.data;
 
-      console.log(this.groupMembers.find(x => x.ID === this.group.leader))
+      console.log(this.eventMembers.find(x => x.ID === this.event.leader))
 
-      // Setting the view's leader variable with the leader in groupMembers
-      this.leader = this.groupMembers.find(x => x.ID === this.group.leader);
+      // Setting the view's leader variable with the leader in eventMembers
+      this.leader = this.eventMembers.find(x => x.ID === this.event.leader);
 
       let adminRoleID = types.data.find(x => x.value === 'admin').ID;
 
@@ -536,17 +533,17 @@ export default {
           this.userHasPerms = true;
       });
 
-      // Set list of possible members to add to group to everyone, remove current members
+      // Set list of possible members to add to event to everyone, remove current members
       this.possibleAddList = churchMembers.data;
-      this.possibleAddList = this.possibleAddList.filter(member => !this.groupMembers.includes(this.groupMembers.find(x=>x.ID===member.ID)));
+      this.possibleAddList = this.possibleAddList.filter(member => !this.eventMembers.includes(this.eventMembers.find(x=>x.ID===member.ID)));
 
-      // Set list of possible families to add to a group
+      // Set list of possible families to add to a event
       families.data.forEach(family => {
         this.addPossibleFamilyList.push(churchMembers.data.find(x => x.ID === family.head_ID))
       })
 
-      // Remove the leader from the list of group members
-      this.groupMembers.splice(groupMembers.data.indexOf(this.leader), 1);  
+      // Remove the leader from the list of event members
+      this.eventMembers.splice(eventMembers.data.indexOf(this.leader), 1);  
 
       axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.leader.ID}`)
       .then(phones => {
@@ -588,13 +585,13 @@ export default {
         console.error(error);
       })
       
-      // For every group member we need to grab the phones and addresses
-      for(let i = 0; i < this.groupMembers.length; i++)
+      // For every event member we need to grab the phones and addresses
+      for(let i = 0; i < this.eventMembers.length; i++)
       {
-        axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.groupMembers[i].ID}`)
+        axios.get(`${apiBaseUrl}/phone_number?person_ID=${this.eventMembers[i].ID}`)
         .then(memberPhones => {
           // Initializing phone property like before with leader
-          this.groupMembers[i].phone = [];
+          this.eventMembers[i].phone = [];
           for(let j = 0; j < memberPhones.data.length; j++)
           {
             if(memberPhones.data[j].can_publish){
@@ -603,10 +600,10 @@ export default {
               let tempPhoneType = this.phoneTypes.find(x => x.ID === memberPhones.data[j].type).value;
               tempPhone.type = tempPhoneType;
               tempPhone.number = memberPhones.data[j].number;
-              this.groupMembers[i].phone.push(tempPhone);
+              this.eventMembers[i].phone.push(tempPhone);
             }
 
-              if(i === this.groupMembers.length - 1){
+              if(i === this.eventMembers.length - 1){
                 this.memberPhonesReceived = true;
                 // Tell the page to check if both address and phones are loaded for all members
                 this.finishedLoadingMemberData();
@@ -614,7 +611,7 @@ export default {
           }          
         })
         .catch((error) => {
-          if(i === this.groupMembers.length - 1){
+          if(i === this.eventMembers.length - 1){
               this.memberPhonesReceived = true;
               // Tell the page to check if both address and phones are loaded for all members
               this.finishedLoadingMemberData();
@@ -622,18 +619,18 @@ export default {
           console.error(error);
         })
 
-        axios.get(`${apiBaseUrl}/address?person_ID=${this.groupMembers[i].ID}`)
+        axios.get(`${apiBaseUrl}/address?person_ID=${this.eventMembers[i].ID}`)
         .then(memberAddresses => {
           // Initializing address property like before with leader
-          this.groupMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
-          if(i === this.groupMembers.length - 1){
+          this.eventMembers[i].address = memberAddresses.data.find(x => x.type === this.currentAddress).address;
+          if(i === this.eventMembers.length - 1){
             this.memberAddressesReceived = true;
             // Tell the page to check if both address and phones are loaded for all members
             this.finishedLoadingMemberData();
           }
         })
         .catch(error => {
-          if(i === this.groupMembers.length - 1){
+          if(i === this.eventMembers.length - 1){
             this.memberAddressesReceived = true;
             // Tell the page to check if both address and phones are loaded for all members
             this.finishedLoadingMemberData();
