@@ -7,24 +7,25 @@
                 <v-col>
                   <v-sheet 
                   color="transparent">
-                    <v-card elevation="2" v-if="renderLeader" :height="360">
-                      <v-card-title>
+                    <v-card elevation="2" v-if="renderLeader" :height="420">
+                      <v-card-title style="font-size:30px">
                         Event Leader
-                      </v-card-title>
-                      <v-card-subtitle>
+                      </v-card-title >
+                      <br/>
+                      <v-card-subtitle style="font-size:20px">
                         {{leader.f_name + " " + leader.l_name}}
                       </v-card-subtitle>
-                      <v-card-text>
+                      <v-card-text style="font-size:20px">
                         {{leader.address}}
                       </v-card-text>
-                        <v-card-text v-for="phone in leader.phone" :key="phone.ID">
+                        <v-card-text v-for="phone in leader.phone" :key="phone.ID" style="font-size:20px">
                           <v-icon v-if="phone.type === 'mobile'">mdi-cellphone</v-icon> 
                           <v-icon v-else-if="phone.type === 'work'">mdi-toolbox</v-icon>
                           <v-icon v-else>mdi-phone</v-icon>
                           {{phone.number}}
                         </v-card-text>
                         
-                      <v-card-text>
+                      <v-card-text style="font-size:20px">
                         {{this.leader.email}}
                       </v-card-text>
                        <v-card-actions>
@@ -121,12 +122,13 @@
 
                   <v-sheet 
                   color="transparent">
-                    <v-card :height="360">
-                      <v-card-title>Event Information</v-card-title>
-                      <v-card-text> <strong>Name:</strong> {{event.name}}</v-card-text>
-                      <v-card-text> <strong>Description:</strong> {{event.description}}</v-card-text>
-                      <v-card-text> <strong>Date</strong>: {{event.date}}</v-card-text>
-                      <v-card-text> <strong>Location:</strong> {{event.location}}</v-card-text>
+                    <v-card :height="420">
+                      <v-card-title style="font-size:30px">Event Information</v-card-title>
+                      <br/>
+                      <v-card-text style="font-size:20px"> <strong>Name:</strong> {{event.name}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Description:</strong> {{event.description}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Date</strong>: {{event.date}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Location:</strong> {{event.location}}</v-card-text>
                     </v-card>
                   </v-sheet>
 
