@@ -3,9 +3,6 @@
     <div class="groups">
       <v-main class="grey lighten-2">
         <v-container>
-            <v-banner>
-              {{event.name}}
-            </v-banner>
           <v-row>
                 <v-col>
                   <v-sheet 
@@ -35,44 +32,9 @@
                           View Member Page
                         </v-btn>
                       </v-card-actions>
-                    </v-card>
-                    <v-card v-else>
-                      <v-card-subtitle>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-subtitle>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                    </v-card>
-                  </v-sheet>
-                </v-col>
-                <v-col>
-                  <v-sheet 
-                  color="transparent">
-                    <v-card :height="360">
-                      <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
-                        <v-img :src="eventImgSrc">
-                        </v-img>
-                      </v-avatar>
+                      
 
-                      <PhotoUpload v-bind:canEdit="this.userHasPerms" v-bind:eventId="this.event.ID" v-bind:eventImgSrc="this.event.image" @onFileChange="eventImgSrc=$event"/>
-
-                    
-                    <v-row justify="center" v-if="userHasPerms">
+<v-row justify="center" v-if="userHasPerms">
                       <v-dialog
                         v-model="dialog2"
                         scrollable
@@ -127,9 +89,47 @@
                         </v-card>
                       </v-dialog>
                     </v-row>
+
+
                     </v-card>
                     
+                    <v-card v-else>
+                      <v-card-subtitle>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-subtitle>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                    </v-card>
                   </v-sheet>
+                </v-col>
+                <v-col>
+
+                  <v-sheet 
+                  color="transparent">
+                    <v-card :height="360">
+                      <v-card-title>Event Information</v-card-title>
+                      <v-card-text> <strong>Name:</strong> {{event.name}}</v-card-text>
+                      <v-card-text> <strong>Description:</strong> {{event.description}}</v-card-text>
+                      <v-card-text> <strong>Date</strong>: {{event.date}}</v-card-text>
+                      <v-card-text> <strong>Location:</strong> {{event.location}}</v-card-text>
+                    </v-card>
+                  </v-sheet>
+
                 </v-col>
           </v-row>
             <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="userHasPerms" class="mt-5"/>
@@ -307,13 +307,11 @@
 import axios from 'axios'
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import AnnouncementViewer from "@/components/Announcements.vue";
-import PhotoUpload from "../components/PhotoUpload.vue";
 
 export default {
   name: "EventMembers",
     components: {
-      AnnouncementViewer,
-      PhotoUpload
+      AnnouncementViewer
   },
   data() {
     return {
@@ -389,7 +387,7 @@ export default {
     addEventMember () {
       console.log(this.addList)
       this.addList.forEach(person => {
-        axios.post(`${apiBaseUrl}/event_person`, {
+        axios.post(`${apiBaseUrl}/attendee`, {
             event_ID: this.event.ID,
             person_ID: person.ID
           })
@@ -409,11 +407,12 @@ export default {
         this.memberAddressesReceived = false;
         this.memberPhonesReceived = false;
         this.renderMembers = false;
-        axios.post(`${apiBaseUrl}/event_person?family_ID=${family.family_ID}&event_ID=${this.$route.params.eventID}`)
+        axios.post(`${apiBaseUrl}/attendee?family_ID=${family.family_ID}&event_ID=${this.$route.params.eventID}`)
         .then(() => {
-          axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`)
+          axios.get(`${apiBaseUrl}/attendee?event_ID=${this.$route.params.eventID}&isGetPersonObjects=1`)
           .then(response => {
-            console.log(response.data)
+            console.log("TEST")
+            console.log("EventMembers: ", response.data)
             this.eventMembers = response.data.filter(x => x.ID != this.event.leader)
 
             // For every event member we need to grab the phones and addresses
@@ -488,13 +487,14 @@ export default {
     axios.all([
 
       axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}`),
-      axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`),
+      axios.get(`${apiBaseUrl}/attendee?event_ID=${this.$route.params.eventID}&isGetPersonObjects=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`),
-      axios.get(`${apiBaseUrl}/family`)
+      axios.get(`${apiBaseUrl}/family`),
+      axios.get(`${apiBaseUrl}/room`)
       ])
-      .then(axios.spread((event, eventMembers, types, churchMembers, families) => {
-      console.log(event, eventMembers, types, churchMembers, families)
+      .then(axios.spread((event, eventMembers, types, churchMembers, families, rooms) => {
+      console.log(event, eventMembers, types, churchMembers, families, rooms)
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "event").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.eventID})&receipient_type=${messageTypeID}`)
         .then(messages => {
@@ -516,9 +516,10 @@ export default {
       
       // Setting the view's event and eventMembers variables up with data.
       console.log(event.data);
+      
       this.event = event.data;
-      this.eventImgSrc = apiBaseUrl + "/images/" + event.data.image;
-      console.log("Img Src: " + this.eventImgSrc)
+      this.event.date = new Date(this.event.date).toDateString();
+      this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
       this.eventMembers = eventMembers.data;
 
       console.log(this.eventMembers.find(x => x.ID === this.event.leader))
