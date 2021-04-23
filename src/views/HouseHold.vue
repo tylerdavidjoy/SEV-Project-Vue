@@ -176,16 +176,13 @@
                   <v-sheet width="600">
                     <h1>Family Documents</h1>
                     <br />
-                    <v-list class="list">
-                      <a
-                        v-for="document in familyDocuments"
-                        v-bind:key="document.ID" class="list">
-
-                        <!-- <v-list-item-content class="large">
-                          <v-list-item-title class="large">{{ member.f_name }}</v-list-item-title>
-                        </v-list-item-content> -->
+                    <v-list v-for="document in familyDocuments" v-bind:key="document.ID" class="list">                 
+                      <a :href="baseURL + 'api/documents/' + document.doc_name" :alt="document.display_name" :download="document.display_name">
+                        {{ document.display_name }}
                       </a>
                     </v-list>
+                    <FileUpload v-bind:canEdit="isAdmin" v-bind:familyId="this.familyId" @onFileUpload="familyDocuments=$event"/>
+                    <br />
                   </v-sheet>
                 </v-row>
               </v-container>
@@ -202,10 +199,12 @@
 
 import axios from 'axios';
 import PhotoUpload from "../components/PhotoUpload.vue";
+import FileUpload from "../components/FileUpload.vue";
 
   export default {
     components: {
-      PhotoUpload
+      PhotoUpload,
+      FileUpload
     },
     data() { 
       return {
