@@ -75,6 +75,12 @@
                 <v-text-field label="Email"
                 v-model="person.email"/>
               </v-col>
+
+              <v-col cols="12">
+                <v-text-field label="Address"
+                v-model="address.address"/>
+              </v-col>
+
               <v-col
                 cols="12"
                 sm="6"
@@ -106,6 +112,8 @@
             </v-row>
           </v-container>
           <small>*indicates required field</small>
+          <br/>
+          <small>Email required to allow user to login</small>
           <small>{{err}}</small>
         </v-card-text>
         <v-card-actions>
@@ -159,17 +167,47 @@ export default ({
     {
         createPerson()
         {
-            this.person.gender = this.person.gender.toLowerCase();
-            console.log(this.rolesObj);
-            this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
-            
-            axios.post('http://team2.eaglesoftwareteam.com/person', this.person)
-            .then( () =>
-            {
-            this.dialog = false;
-            this.$parent.$parent.$parent.$parent.getData();
+          var myPromise = new Promise((resolve, reject) => { 
+          axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=address")
+            .then(response => {
+              this.address.type = response.data.filter(x => x.value == "current")[0].ID
+              console.log(this.address)
+              resolve()
+            })
+            .catch(error => {
+              console.log(error);
+              reject()
+            })
+          })
+
+            myPromise.then( () => {
+              this.person.gender = this.person.gender.toLowerCase();
+              console.log(this.rolesObj);
+              this.person.role = this.rolesObj.find(item => item.value == this.person.role.toLowerCase()).ID;
+              
+              axios.post('http://team2.eaglesoftwareteam.com/person', this.person)
+              .then( () =>
+              {
+              this.dialog = false;
+              this.$parent.$parent.$parent.$parent.getData();
+              })
             })
 
+          myPromise.then( () => {
+
+            axios.get('http://team2.eaglesoftwareteam.com/person')
+            .then(response => {
+              console.log(response.data[response.data.length - 1])              
+              axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=' + response.data[response.data.length - 1].ID,this.address )
+              .then( () =>
+              {
+
+              })
+
+              })
+              .catch(error => {console.log(error)})
+
+            })
         }
     },
 
@@ -190,7 +228,12 @@ export default ({
                 gender:null,
                 preferred_name:null,
                 role:null,
-                image:"default.jpg"
+                image:"default.jpg",
+            },
+            address:
+            {
+              address:null,
+              type:null
             },
             err: ""
         }

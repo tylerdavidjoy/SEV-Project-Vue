@@ -154,8 +154,8 @@
                         </v-container>
                       </div>
                     </div>
-                    <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
-                    <GroupListReport class="primary" :selected.sync="fileType" :picture.sync="picture"/>
+                    <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture" :groupTypes.sync="groupTypes" :groupType.sync="groupType"/>
+                    <GroupListReport class="primary" :selected.sync="fileType" :picture.sync="picture" :groupType.sync="groupType"/>
                   </v-sheet>
               </v-col>
             </v-row>
@@ -198,7 +198,8 @@ export default {
       },
       isAddValid: false,
       fileType:"PDF",
-      picture:false
+      picture:false,
+      selectedGroupType:null
     }
   },
   beforeCreate(){
