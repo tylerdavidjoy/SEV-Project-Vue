@@ -35,7 +35,10 @@ export default ({
 
         axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
         .then(response => {
-            this.familypdfCreation(response.data);
+        if (this.selected == "CSV")
+            this.familycsvCreation(response.data);
+        else
+            this.familypdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);
@@ -78,6 +81,24 @@ export default ({
         var rows = [];
         for(var i=0; i < people.length; i++){
             rows.push([people[i].f_name + " " + people[i].l_name, people[i].preferred_name, people[i].occupation, people[i].employer, people[i].email, people[i].roleType, people[i].number, people[i].numType, people[i].can_publish, people[i].address, people[i].addType]);
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "directory.csv");
+        document.body.appendChild(link); 
+
+        link.click();
+    },
+
+        familycsvCreation(family)
+    {
+        var rows = [];
+        for(var i=0; i < family.length; i++){
+            rows.push([family[i].l_name, family[i].email, family[i].number, family[i].numType, family[i].can_publish, family[i].address, family[i].addType]);
         }
 
         let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
@@ -240,6 +261,8 @@ export default ({
 
     familypdfCreation: async function(family)
         {
+            if(img)
+            {
                 console.log(family)
                 var promiseList = []
                 family.forEach(async element => {
@@ -363,8 +386,24 @@ export default ({
                 }
                 pdfMake.createPdf(pdfContent).open();
             }
+
+            else
+            {
+                var doc = new jsPDF('l', 'pt');      
+                require('jspdf-autotable');
+            
+                var columns = ["Family Name", "Email", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
+                var rows = [];
+
+                for(var i=0; i < people.length; i++)
+                    {
+                        rows.push([family[i].l_name, family[i].email, family[i].number, family[i].numType, family[i].can_publish, family[i].address, family[i].addType]);
+                    }
+                
+                doc.autoTable(columns, rows);
+                doc.save('Directory.pdf');
+            }
+        }
     }
 })
-
-
 </script>
