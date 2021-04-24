@@ -13,7 +13,7 @@
           <v-tabs
             v-model="tab"
             color="gray"
-            grow
+            center-active
           >
             <v-tab
               v-for="item in items"
@@ -40,10 +40,10 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.account.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="primary">
+                          <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                          <v-card-title>Step {{n}}</v-card-title>
-                          <v-card-text>{{content.account.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.account.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -52,7 +52,7 @@
                 </v-container>
               </v-card>
             </v-tab-item>
-            <!-- The v-tab for the File & Photo Uploading -->
+            <!-- The v-tab for the File Uploading -->
             <v-tab-item>
               <v-card color="dark" flat>
                 <v-container>
@@ -67,10 +67,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
-                        <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card class="mb-12" color="grey darken-3">
+                        <v-img contain :height="300" :src="getImgUrl('fileuploading',n)"/>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -93,10 +93,10 @@
                 
                       <v-stepper-items>
                         <v-stepper-content v-for="n in content.group.steps" :key="`${n}-content`" :step="n">
-                          <v-card class="mb-12" color="primary">
+                          <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('group',n)"/>
-                          <v-card-title>Step {{n}}</v-card-title>
-                          <v-card-text>{{content.group.info[n-1]}}</v-card-text>
+                          <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.group.info[n-1]}}</v-card-text>
                           </v-card>
                         </v-stepper-content>
                       </v-stepper-items>
@@ -119,10 +119,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.fileuploading.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -145,10 +145,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.reports.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('report',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.reports.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.reports.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -171,10 +171,10 @@
               
                     <v-stepper-items>
                       <v-stepper-content v-for="n in content.directory.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
+                        <v-card class="mb-12" color="grey darken-3">
                           <v-img contain :height="300" :src="getImgUrl('directory',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.directory.info[n-1]}}</v-card-text>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.directory.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -188,19 +188,19 @@
                 <v-container>
                   <v-stepper >
                     <v-stepper-header>
-                      <template v-for="n in content.fileuploading.steps">
+                      <template v-for="n in content.administrator.steps">
                         <v-stepper-step :key="`${n}-step`" :step="n" editable>Step {{ n }}</v-stepper-step>
               
-                        <v-divider v-if="n !== content.fileuploading.steps" :key="n"></v-divider>
+                        <v-divider v-if="n !== content.administrator.steps" :key="n"></v-divider>
                       </template>
                     </v-stepper-header>
               
                     <v-stepper-items>
-                      <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
-                        <v-card class="mb-12" color="primary">
-                        <v-img contain :height="300" :src="getImgUrl('account',n)"/>
-                        <v-card-title>Step {{n}}</v-card-title>
-                        <v-card-text>{{content.fileuploading.info[n-1]}}</v-card-text>
+                      <v-stepper-content v-for="n in content.administrator.steps" :key="`${n}-content`" :step="n">
+                        <v-card class="mb-12" color="grey darken-3">
+                        <v-img contain :height="300" :src="getImgUrl('administrator',n)"/>
+                        <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
+                          <v-card-text class="text-h4 white--text">{{content.administrator.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -219,12 +219,11 @@
 <script>
   export default {
     mounted() {
-      console.log(this.content.account.image);
     },
     data: () => ({
       tab: null,
       items: [
-      'Account','Photo & File Uploading', 'Groups', 'Events','Printing Reports','Searching Directory','Administrators'
+      'Account','Photo Uploading', 'Groups', 'Events','Printing Reports','Searching Directory','Administrators'
       ],
       itemText:[
         'The Account page is for a person to view and edit all their information like phone number and Life Events that a congregation might like to keep track of. Here, we will walk through how to Add,Edit and Delete a Life Event. ',
@@ -241,14 +240,12 @@
             'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
           ],
         },
-        fileuploading:{id:0, steps:[1,2,3,4,5,6],
+        fileuploading:{id:0, steps:[1,2,3,4,],
           info:[
-            'Test 1',
-            'Test 2',
-            'Test 3',
-            'Test 4',
-            'Test 5',
-            'Test 6',
+            'When Uploading a Photo or File, you will first need to navigate to a page that contains a section where a photo/file uploading component is located on',
+            'For Photo uploading, once you have located the component, you will need to click the choose file button to select the file/photo that you will want to upload',
+            'After clicking the button, you will need to select the file/photo to upload and then select save in the file explorer to choose this.',
+            'Finally after selecting the file/photo, you will click upload Photo/File to upload it to your profile.',
           ],
         },
         group:{id:0, steps:[1,2,3,4,5],
@@ -312,21 +309,22 @@
             'If you are having trouble with searching the directory or any other feature for the Directory page, then contact your Administrator and ask for help.',
           ],
         },
-        administrator:{id:0, steps:[1,2,3,4,5,6],
+        administrator:{id:0, steps:[1,2,3,4,5,6,7,8,],
           info:[
-            'The first step in creating a Life Event is to navigate to the Account Page for your account.',
-            'After Navigating to the Acconut page, You can look at the Life Events for your account. From here you can Add, Edit, or even remove a Life Event from your Account.',
-            'If you want to Add a Life Event, you can click the Add Event button to add a new Life Event to your account. From there, you will be prompted to select the type of event, give a description of the event, and give a date for the event before submitting it. After you submit the event, you will notice that now the event is added to your Life Events.',
-            'If you want to edit a Life Event, You can click the Pencil next to the Event to edit information about that Life Event. This will update any information for the Life Event after you submit the changes.',
-            'If you want to delete a Life Event, then you can click the Trashcan icon next to the Event. This will prompt you to make sure that you want to delete the Event. If you confirm, then you will notice that the Life Event is no longer showing on your account page.',
-            'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
+            'There are many abilities that are available to Administrators of this system. This will be a guide to show you all the Abilities that you have in the system that normal users do not.',
+            'As an administrator, you may want to create Life Events that are personal notes to you that you may not want the User to see for things like Deaths in the family. As an Administrator, you have the power to check if a Life Event is visible to that user or not. You can do so the Account page when editting or creating a new life event',
+            'As an administrator, you will also be able to add different types of Life Events, Involvements, and Ministry Areas for the Church as the demand fits. You can do so on the Account page as well.',
+            'Admins are able to add new groups and delete groups. Creating a group must specify the name of the group, the type of group, and the name of the group.',
+            'Admins can add individual members or a whole family(ies) to a group. Admins can also remove members individually and change the group leader.',
+            'Admins are able to send announcements to the congregation, any group, or any event. Admins are also able to delete announcements to the system. Sending announcements requires specifying the announcement\'s Subject line and Body. A congregation announcement is sent through the home page announcement box, and an announcement for an event or group is sent through that event/group\'s page.',
+            'Admins are also able to Add and Remove people and families to the System from the Directory Page. Here you will be asked to input the information for that person or family respectively. Required fields will be noted by the * symbol next to a field.',
+            'Admins are able to select a family or individual from the Directory Page and edit their information as well',
           ],
         },
       }
     }),
     methods:{
       getImgUrl(type,n) {
-        // console.log(type + " " + n);
           return require('../assets/HelpPageResources/' + type + n + '.png');
       },
     },

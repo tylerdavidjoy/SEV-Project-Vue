@@ -201,8 +201,7 @@ export default ({
               axios.post('http://team2.eaglesoftwareteam.com/address?person_ID=' + response.data[response.data.length - 1].ID,this.address )
               .then( () =>
               {
-              this.dialog = false;
-              this.$parent.$parent.$parent.$parent.getData();
+
               })
 
               })
