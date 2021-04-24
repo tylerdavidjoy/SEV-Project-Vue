@@ -33,7 +33,7 @@ export default ({
         })
 
 
-        axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
+        axios.get("http://team2.eaglesoftwareteam.com/family?isGetFamilyReport=1")
         .then(response => {
         if (this.selected == "CSV")
             this.familycsvCreation(response.data);
@@ -259,7 +259,7 @@ export default ({
             }
         },
 
-    familypdfCreation: async function(family)
+    familypdfCreation: async function(family, img)
         {
             if(img)
             {
@@ -392,16 +392,16 @@ export default ({
                 var doc = new jsPDF('l', 'pt');      
                 require('jspdf-autotable');
             
-                var columns = ["Family Name", "Email", "Phone Number", "Number Type", "Publish to Directory?", "Address", "Address Type"  ];
+                var columns = ["Family Name", "Email", "Phone Number", "Number Type", "Address"];
                 var rows = [];
 
-                for(var i=0; i < people.length; i++)
+                for( i=0; i < family.length; i++)
                     {
-                        rows.push([family[i].l_name, family[i].email, family[i].number, family[i].numType, family[i].can_publish, family[i].address, family[i].addType]);
+                        rows.push([family[i].l_name, family[i].email, family[i].number, family[i].numType, family[i].address]);
                     }
                 
                 doc.autoTable(columns, rows);
-                doc.save('Directory.pdf');
+                doc.save('FamilyDirectory.pdf');
             }
         }
     }
