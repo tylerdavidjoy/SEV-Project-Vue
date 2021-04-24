@@ -5,6 +5,7 @@
         <v-container>
           <v-row>
                 <v-col>
+
                   <v-sheet 
                   color="transparent">
                     <v-card elevation="2" v-if="renderLeader" :height="420">
@@ -25,17 +26,22 @@
                           {{phone.number}}
                         </v-card-text>
                         
-                      <v-card-text style="font-size:20px">
-                        {{this.leader.email}}
-                      </v-card-text>
-                       <v-card-actions>
-                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
-                          View Member Page
-                        </v-btn>
-                      </v-card-actions>
+
+
+                        <v-card-text style="font-size:20px">
+                          {{this.leader.email}}
+                        </v-card-text>
+
+                        <v-layout row>
+                          <v-spacer/>
+
+                        <v-card-actions>
+                          <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
+                            View Member Page
+                          </v-btn>
+                        </v-card-actions>
                       
 
-<v-row justify="center" v-if="userHasPerms">
                       <v-dialog
                         v-model="dialog2"
                         scrollable
@@ -89,8 +95,9 @@
                           </v-card-actions>
                         </v-card>
                       </v-dialog>
-                    </v-row>
 
+<v-spacer/>
+                      </v-layout>
 
                     </v-card>
                     
@@ -476,7 +483,7 @@ export default {
     removeEventMember: function(memberID, index){
       this.possibleAddList.push(this.eventMembers.find(x=>x.ID === memberID));
       this.$delete(this.eventMembers, index);
-      axios.delete(`${apiBaseUrl}/event_person?event_ID=${this.event.ID}&person_ID=${memberID}`);
+      axios.delete(`${apiBaseUrl}/attendee?event_ID=${this.event.ID}&person_ID=${memberID}`);
     },
     addEventMember () {
       console.log(this.addList)
