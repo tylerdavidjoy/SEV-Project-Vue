@@ -2,6 +2,7 @@
   <v-app id="inspire">
     <div class="events">
       <v-system-bar app>
+        
         <v-spacer></v-spacer>
 
         <v-icon>mdi-logout</v-icon>
@@ -9,6 +10,112 @@
       <v-main :class="'grey lighten-2'">
         <div :class="'mt-n12'">
           <v-container>
+            <v-container fluid>
+              <v-data-iterator
+                :items="events"
+                :items-per-page.sync="itemsPerPage"
+                :page.sync="page"
+                :search="search"
+                :sort-by="sortBy.toLowerCase()"
+                hide-default-footer
+              >
+                <template v-slot:header>
+                  <v-toolbar
+                    dark
+                    color="blue darken-3"
+                    class="mb-1"
+                  >
+                    <v-text-field
+                      v-model="search"
+                      clearable
+                      flat
+                      solo-inverted
+                      hide-details
+                      prepend-inner-icon="mdi-magnify"
+                      label="Search"
+                      hint="Search for an event"
+                    ></v-text-field>
+                  </v-toolbar>
+                </template>
+
+                <template v-slot:default="props">
+                  <v-row>
+                    <v-col
+                      v-for="item in props.items"
+                      :key="item.name"
+                      cols="12"
+                      sm="6"
+                      md="4"
+                      lg="3"
+                    >
+                    
+                      <v-card
+                      color="grey lighten-4"
+                      width="250px"
+                      flat
+                      >
+                        <v-toolbar
+                        :color="item.color"
+                        dark
+                        >
+                          <v-toolbar-title v-html="item.name"></v-toolbar-title>
+                          <v-spacer></v-spacer>
+                          <v-btn icon @click="deleteEvent(item.id, events.indexOf(item))" v-if="isAdmin">
+                            <v-icon>mdi-trash-can</v-icon>
+                          </v-btn>
+                        </v-toolbar>
+                        <v-card-text>
+                          <div v-html="item.details"></div>
+                        </v-card-text>
+                        <v-card-actions>
+                          <v-btn
+                            text
+                            color="secondary"
+                            @click="goToEventPage(item.id, item.leader)"
+                          >
+                            View Event
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </template>
+
+                <template v-slot:footer>
+                  <v-row
+                    class="mt-2"
+                    align="center"
+                    justify="center"
+                  >
+
+                    <span
+                      class="mr-4
+                      grey--text"
+                    >
+                      Page {{ page }} of {{ numberOfPages }}
+                    </span>
+                    <v-btn
+                      fab
+                      dark
+                      color="blue darken-3"
+                      class="mr-1"
+                      @click="formerPage"
+                    >
+                      <v-icon>mdi-chevron-left</v-icon>
+                    </v-btn>
+                    <v-btn
+                      fab
+                      dark
+                      color="blue darken-3"
+                      class="ml-1"
+                      @click="nextPage"
+                    >
+                      <v-icon>mdi-chevron-right</v-icon>
+                    </v-btn>
+                  </v-row>
+                </template>
+              </v-data-iterator>
+            </v-container>
             <v-dialog
               v-model="dialog2"
               scrollable
@@ -29,7 +136,7 @@
                 </v-card-actions>
               </template>
               <v-card>
-                <v-card-title>Create a Event</v-card-title>
+                <v-card-title>Create an Event</v-card-title>
                 <v-divider></v-divider>
                   <v-card-text  style="height: 300px;">
                   <v-form v-model="isAddValid">
@@ -264,8 +371,10 @@ export default {
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       display:[],
       events:[],
+      searchResults: [],
       members:[],
       groups: [],
+      itemsPerPage: 4,
       eventGroup: {},
       eventLocations:[],
       menu: false,
@@ -284,6 +393,8 @@ export default {
       isAddValid: false,
       fileType:"PDF",
       picture:false,
+      page: 1,
+      sortBy: 'name',
       datePicker: null,
       timePicker: null,
       calendarDay: '',
@@ -291,6 +402,11 @@ export default {
       recurChkbx: false,
       groupChkbx: false,
     }
+  },
+  computed: {
+      numberOfPages () {
+        return Math.ceil(this.events.length / this.itemsPerPage)
+      }
   },
   beforeCreate(){
     axios.all([
@@ -472,7 +588,19 @@ export default {
     deleteEvent: function(eventID, index){
       this.$delete(this.events, index);
       axios.delete(`${apiBaseUrl}/event?id=${eventID}`);
-    }
+    },
+
+    nextPage () {
+        if (this.page + 1 <= this.numberOfPages) this.page += 1
+      },
+
+      formerPage () {
+        if (this.page - 1 >= 1) this.page -= 1
+      },
+
+      updateItemsPerPage (number) {
+        this.itemsPerPage = number
+      },
   },
 
 }
