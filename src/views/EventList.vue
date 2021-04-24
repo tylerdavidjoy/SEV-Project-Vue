@@ -190,8 +190,50 @@
                 v-model="calendarDay"
                 color="primary"
                 :events="events"
+                @click:event="showEvent"
+              ></v-calendar>
+              <v-menu
+                v-model="selectedOpen"
+                :close-on-content-click="false"
+                :activator="selectedElement"
+                offset-x
               >
-              </v-calendar>
+                <v-card
+                  color="grey lighten-4"
+                  min-width="350px"
+                  flat
+                >
+                  <v-toolbar
+                    :color="selectedEvent.color"
+                    dark
+                  >
+                    <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="deleteEvent(selectedEvent.id, events.indexOf(selectedEvent)), selectedOpen = false" v-if="isAdmin">
+                      <v-icon>mdi-trash-can</v-icon>
+                    </v-btn>
+                  </v-toolbar>
+                  <v-card-text>
+                    <div v-html="selectedEvent.details"></div>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn
+                      text
+                      color="secondary"
+                      @click="goToEventPage(selectedEvent.id, selectedEvent.leader)"
+                    >
+                      View Event
+                    </v-btn>
+                    <v-btn
+                      text
+                      color="secondary"
+                      @click="selectedOpen = false"
+                    >
+                      Cancel
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-menu>
             </v-sheet>
             <v-sheet class="rounded-lg">                    
               <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
@@ -228,6 +270,9 @@ export default {
       eventLocations:[],
       menu: false,
       menu2: false,
+      selectedEvent: {},
+      selectedElement: null,
+      selectedOpen: false,
       dialogm2leader: null,
       dialogm2desc: '',
       dialogm2room: null,
@@ -265,193 +310,104 @@ export default {
       this.groups = groups.data;
 
       this.$nextTick(()=>{
-        if(this.user.role != this.adminRoleID){
-          axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
-          .then(response =>{
-            //this.events = response.data;
-            response.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
-                color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
-            
-              this.events.push(tempEvent);
-
-            })
-            
-          })
-          .catch(error =>{
-            this.events = [];
-            console.error(error)
-          })
-        }
-        else{
+        
           //this.events = events.data;
           events.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
+              const {f_name, l_name} = this.members.find(x => x.ID === event.leader)
+
+              this.events.push({
+                name: event.name?event.name:"Unnamed Event",
+                id: event.ID,
+                leader: event.leader,
+                start: new Date(event.date),
                 color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
-            
-              this.events.push(tempEvent);
+                timed: true,
+                details: event.description + `<br/>Event Leader: ${f_name} ${l_name}` 
+              });
 
             })
           this.isAdmin = true;
         }
 
-        this.viewMode()
-      })
+      )
     }))
     .catch(error =>{
       console.error(error)
     })
   },
   methods:{
-    ClearAPI(){
-      this.search = "";
-      this.SearchAPI();
-    },
     rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a
       },
-    //Function for loading in the events based on given API Search Parameters
-    SearchAPI()
-    {
 
-      if(this.search.length > 0)
-      {
-        var temp = [];
-        temp = JSON.parse(JSON.stringify(this.events));        
+    showEvent ({ nativeEvent, event }) {
+        const open = () => {
+          this.selectedEvent = event
+          this.selectedElement = nativeEvent.target
+          setTimeout(() => {
+            this.selectedOpen = true
+          }, 10)
+        }
 
-        temp.forEach(x => x.name = x.name.toLowerCase());
-        temp = temp.filter(item => item.name.includes(this.search.toLowerCase()));
+        if (this.selectedOpen) {
+          this.selectedOpen = false
+          setTimeout(open, 10)
+        } else {
+          open()
+        }
 
-        temp.forEach(x => 
-          {
-            var split = x.name.split(" ");
-            for(var y = 0; y < split.length; y++)
-            {
-              split[y] = split[y][0].toUpperCase() + split[y].substr(1);
-            }
-            
-            x.name = split[0];
-
-            split.forEach((word) => {
-              if(word != split[0])
-                x.name += " " + word;
-            })
-          })
-          
-
-        console.log(temp);
-        if(temp.length > 20)
-          this.display = temp.slice(0,19);
-  
-        else
-          this.display = temp;
-
-        if(this.temp.length == 20)
-          this.pageLength = 1;
-        
-        else
-          this.pageLength = (temp.length / 20) + 1;
-      }
-
-      else
-      {
-        console.log("People:",this.people);
-        this.viewMode(this.displayMode);
-      }
-        
-    },
-
-    viewMode()
-    {
-        if(this.events.length > 20)
-          this.display = this.events.slice(0,19);
-      
-        else
-          this.display = this.events;
-
-        if(this.events.length == 20)
-          this.pageLength = 1;
-        
-        else
-          this.pageLength = (this.events.length / 20) + 1;
-      
-    },
+        nativeEvent.stopPropagation()
+      },
 
     goToEventPage(eID, eLID){
       this.$router.push({name: 'Event', params: {eventID:eID, eventLeaderID:eLID}})
     },
 
-    addEvent: function(){   
+    addEvent: function(){ 
       this.events = [];
       let tempEvent = {
         date: this.datePicker + "T" + this.timePicker + ":00.000Z",
         location: this.dialogm2room.ID,
         leader: this.dialogm2leader.ID,
         description: this.dialogm2desc,
-        recurring: this.recurChkbx ? 1 : 0
+        recurring: this.recurChkbx ? 1 : 0,
+        name: this.dialogm2name
       }
-      
       if(!this.groupChkbx){
         axios.post(`${apiBaseUrl}/event`, {
           date: tempEvent.date,
           leader: tempEvent.leader,
           location: tempEvent.location,
           description: tempEvent.description,
-          recurring: tempEvent.recurring
+          recurring: tempEvent.recurring,
+          name: tempEvent.name
         })
         .then(() => {
           axios.get(`${apiBaseUrl}/event`)
           .then(events => {
             
             this.$nextTick(()=>{
-        if(this.user.role != this.adminRoleID){
-          axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
-          .then(response =>{
-            //this.events = response.data;
-            response.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
-                color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
-            
-              this.events.push(tempEvent);
-
-            })
-            
-          })
-          .catch(error =>{
-            this.events = [];
-            console.error(error)
-          })
-        }
-        else{
+        
           //this.events = events.data;
           events.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
-                color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
+                
             
-              this.events.push(tempEvent);
+              const {f_name, l_name} = this.members.find(x => x.ID === event.leader)
+
+              this.events.push({
+                name: event.name?event.name:"Unnamed Event",
+                id: event.ID,
+                leader: event.leader,
+                start: new Date(event.date),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+                timed: true,
+                details: event.description + `<br/>Event Leader: ${f_name} ${l_name}` 
+              });
 
             })
           this.isAdmin = true;
         }
-
-        this.viewMode()
-      })
+      )
 
             this.dialog2 = false;
           })
@@ -464,59 +420,41 @@ export default {
         })
       }
       else{
-        console.log(this.eventGroup)
         axios.post(`${apiBaseUrl}/event?group_ID=${this.eventGroup.ID}`, {
           date: tempEvent.date,
           leader: tempEvent.leader,
           location: tempEvent.location,
           description: tempEvent.description,
-          recurring: tempEvent.recurring
+          recurring: tempEvent.recurring,
+          name: tempEvent.name
         })
         .then(() => {
           axios.get(`${apiBaseUrl}/event`)
           .then(events => {
             
             this.$nextTick(()=>{
-        if(this.user.role != this.adminRoleID){
-          axios.get(`${apiBaseUrl}/event?person_ID=${this.$person.ID}`)
-          .then(response =>{
-            //this.events = response.data;
-            response.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
-                color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
-            
-              this.events.push(tempEvent);
-
-            })
-            
-          })
-          .catch(error =>{
-            this.events = [];
-            console.error(error)
-          })
-        }
-        else{
+        
           //this.events = events.data;
           events.data.forEach(event =>{
-                let tempEvent = {
-                name: event.name,
-                start: Date.parse(event.date),
+                
+              
+              const {f_name, l_name} = this.members.find(x => x.ID === event.leader)
+
+              this.events.push({
+                name: event.name?event.name:"Unnamed Event",
+                id: event.ID,
+                leader: event.leader,
+                start: new Date(event.date),
                 color: this.colors[this.rnd(0, this.colors.length - 1)],
-                timed: false
-              }
-            
-              this.events.push(tempEvent);
+                timed: true,
+                details: event.description + `<br/>Event Leader: ${f_name} ${l_name}` 
+              });
 
             })
           this.isAdmin = true;
         }
 
-        this.viewMode()
-      })
+      )
 
             this.dialog2 = false;
           })
