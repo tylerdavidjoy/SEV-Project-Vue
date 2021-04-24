@@ -520,7 +520,9 @@ export default {
       console.log(event.data);
       
       this.event = event.data;
-      this.event.date = new Date(this.event.date).toDateString();
+      var temp = new Date(this.event.date)
+      //temp.setDate(temp.getDate() + 1)
+      this.event.date = temp.toDateString()
       this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
       this.eventMembers = eventMembers.data;
 
