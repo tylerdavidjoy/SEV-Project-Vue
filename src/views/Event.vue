@@ -129,8 +129,78 @@
                       <v-card-text style="font-size:20px"> <strong>Description:</strong> {{event.description}}</v-card-text>
                       <v-card-text style="font-size:20px"> <strong>Date</strong>: {{event.date}}</v-card-text>
                       <v-card-text style="font-size:20px"> <strong>Location:</strong> {{event.location}}</v-card-text>
+
+                    <v-row justify="center" v-if="userHasPerms">
+                      <v-dialog
+                        v-model="dialog4"
+                        scrollable
+                        max-width="330px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-card-actions>
+                          <v-btn
+                            color="primary"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            
+                          >
+                            Edit Event
+                          </v-btn>
+                          </v-card-actions>
+                        </template>
+
+                        <v-card>
+                          <v-card-title>Edit Event:</v-card-title>
+                          <v-divider></v-divider>
+                          <v-card-text style="height: 400px;">
+                             <v-text-field
+                              label="Name"
+                              v-model="event.name"
+                              />
+
+                              <v-text-field
+                              label="Description"
+                              v-model="event.description"
+                              />
+
+                              <v-date-picker v-model="date"/>
+
+                              <v-select
+                                :items="room_list"
+                                label="Location"
+                                item-text="room_number"
+                                item-value = "room_number"
+                                v-model="event.location"
+                              />
+
+                            
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-btn
+                              color="blue darken-1"
+                              text
+                              @click="dialog4 = false"
+                            >
+                              Cancel
+                            </v-btn>
+                            <v-btn
+                              color="blue darken-1"
+                              text
+                              @click="updateEvent()"
+                            >
+                              Save
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </v-row>
+
                     </v-card>
                   </v-sheet>
+
+                  
 
                 </v-col>
           </v-row>
@@ -325,6 +395,7 @@ export default {
         user: this.$person,
         userHasPerms: false,
         event: {},
+        date: null,
         eventImgSrc: "",
         leader: {},
         eventMembers: [],
@@ -339,14 +410,35 @@ export default {
         dialog: false,
         dialog2: false,
         dialog3: false,
+        dialog4: false,
         fileType:"PDF",
         picture:false,
         phoneTypes: [],
         currentAddress: null,
+        room_list: []
       }
   },
   methods:
   {
+    updateEvent()
+    {
+      var data = this.event;
+      data.location = this.room_list.find(x => x.room_number == data.location).ID;
+      data.date = new Date(this.date);
+
+      axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`,data)
+      .then(response => {
+        console.log(response)
+        this.event.date = new Date(this.date).toDateString();
+        this.event.location = this.room_list.find(x => x.ID == data.location).room_number
+        this.dialog4 = false;
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    },
+
     finishedLoadingMemberData: function(){
       this.$nextTick(()=>{
         if(this.memberAddressesReceived && this.memberPhonesReceived)
@@ -497,6 +589,7 @@ export default {
       ])
       .then(axios.spread((event, eventMembers, types, churchMembers, families, rooms) => {
       console.log(event, eventMembers, types, churchMembers, families, rooms)
+      this.room_list = rooms.data;
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "event").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.eventID})&receipient_type=${messageTypeID}`)
         .then(messages => {
@@ -520,8 +613,8 @@ export default {
       console.log(event.data);
       
       this.event = event.data;
+      this.date = new Date(this.event.date).toISOString().substr(0, 10)
       var temp = new Date(this.event.date)
-      //temp.setDate(temp.getDate() + 1)
       this.event.date = temp.toDateString()
       this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
       this.eventMembers = eventMembers.data;
