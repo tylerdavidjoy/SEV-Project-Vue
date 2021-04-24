@@ -54,7 +54,7 @@
                             dark
                             v-bind="attrs"
                             v-on="on"
-                            
+                            v-if="userHasPerms"
                           >
                             Change Leader
                           </v-btn>
@@ -213,6 +213,31 @@
           </v-row>
             <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="userHasPerms" class="mt-5"/>
           <v-row>
+
+            <v-btn
+            style="margin:auto; margin-top:2%"
+            v-if="!attending"
+              color="primary"
+              dark
+              @click="toggleAttending(true)"
+              >
+              Plan to attend
+            </v-btn>
+
+            <v-btn
+            style="margin:auto; margin-top:2%"
+            v-if="attending"
+              color="primary"
+              dark
+              @click="toggleAttending(false)"
+              >
+              No longer attending
+            </v-btn>
+
+          </v-row>
+
+          <v-row>
+
             <v-col>
               <v-container>
                 <v-list color="transparent">
@@ -422,11 +447,36 @@ export default {
         picture:false,
         phoneTypes: [],
         currentAddress: null,
-        room_list: []
+        room_list: [],
+        attending: null
       }
   },
   methods:
   {
+    toggleAttending(attending)
+    {
+      if(attending)
+      {
+        axios.post(`${apiBaseUrl}/attendee`, {
+            event_ID: this.event.ID,
+            person_ID: this.user.id
+          })
+          .then(() => {
+            this.eventMembers.push(this.user);
+            this.$set(this.eventMembers, this.eventMembers.indexOf(this.user), this.user);
+            this.possibleAddList.splice(this.possibleAddList.indexOf(this.user), 1);
+
+            this.attending = true;
+          })
+      }
+
+      else
+      {
+        this.removeEventMember(this.user.id, this.eventMembers.indexOf(this.user)) 
+        this.attending = false;
+      }
+    },
+
     updateEvent()
     {
       var data = this.event;
@@ -625,6 +675,8 @@ export default {
       this.event.date = temp.toDateString()
       this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
       this.eventMembers = eventMembers.data;
+
+      this.attending = this.eventMembers.some(x => x.ID == this.user.id);
 
       console.log(this.eventMembers.find(x => x.ID === this.event.leader))
 
