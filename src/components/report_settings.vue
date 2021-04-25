@@ -16,6 +16,7 @@
         
             <v-col>
                 <v-checkbox
+                v-if="this.$route.name != 'Event List'"
                 v-model="picture"
                 label="Include Pictures ?"
                 @change="$emit('update:picture', picture);"

@@ -401,6 +401,7 @@
             </v-dialog>
           </v-row>
         </v-container>
+        
       </v-main>
 
     </div>
@@ -411,6 +412,7 @@
 import axios from 'axios'
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import AnnouncementViewer from "@/components/Announcements.vue";
+
 
 export default {
   name: "EventMembers",
