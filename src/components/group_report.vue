@@ -112,7 +112,7 @@ export default ({
                 var rows = [];
 
                 for(var i=0; i < group_members.length; i++){
-                    rows.push([group_members[i].name, group_members[i].f_name + " " + group_members[i].l_name, group_members[i].value]);
+                    rows.push([group_members[i].f_name + " " + group_members[i].l_name, group_members[i].phone_number, group_members[i].email]);
                 }
                 var doc = new jsPDF('p', 'pt');
                 doc.autoTable(columns, rows);
