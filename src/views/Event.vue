@@ -3,76 +3,45 @@
     <div class="groups">
       <v-main class="grey lighten-2">
         <v-container>
-            <v-banner>
-              {{event.name}}
-            </v-banner>
           <v-row>
                 <v-col>
+
                   <v-sheet 
                   color="transparent">
-                    <v-card elevation="2" v-if="renderLeader" :height="360">
-                      <v-card-title>
+                    <v-card elevation="2" v-if="renderLeader" :height="420">
+                      <v-card-title style="font-size:30px">
                         Event Leader
-                      </v-card-title>
-                      <v-card-subtitle>
+                      </v-card-title >
+                      <br/>
+                      <v-card-subtitle style="font-size:20px">
                         {{leader.f_name + " " + leader.l_name}}
                       </v-card-subtitle>
-                      <v-card-text>
+                      <v-card-text style="font-size:20px">
                         {{leader.address}}
                       </v-card-text>
-                        <v-card-text v-for="phone in leader.phone" :key="phone.ID">
+                        <v-card-text v-for="phone in leader.phone" :key="phone.ID" style="font-size:20px">
                           <v-icon v-if="phone.type === 'mobile'">mdi-cellphone</v-icon> 
                           <v-icon v-else-if="phone.type === 'work'">mdi-toolbox</v-icon>
                           <v-icon v-else>mdi-phone</v-icon>
                           {{phone.number}}
                         </v-card-text>
                         
-                      <v-card-text>
-                        {{this.leader.email}}
-                      </v-card-text>
-                       <v-card-actions>
-                        <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
-                          View Member Page
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                    <v-card v-else>
-                      <v-card-subtitle>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-subtitle>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                        <v-card-text>
-                          <v-progress-circular
-                          indeterminate
-                          ></v-progress-circular>
-                        </v-card-text>
-                    </v-card>
-                  </v-sheet>
-                </v-col>
-                <v-col>
-                  <v-sheet 
-                  color="transparent">
-                    <v-card :height="360">
-                      <v-avatar size="auto" :tile="true" min-height="230" max-height="300" min-width="230" max-width="300">
-                        <v-img :src="eventImgSrc">
-                        </v-img>
-                      </v-avatar>
 
-                      <PhotoUpload v-bind:canEdit="this.userHasPerms" v-bind:eventId="this.event.ID" v-bind:eventImgSrc="this.event.image" @onFileChange="eventImgSrc=$event"/>
 
-                    
-                    <v-row justify="center" v-if="userHasPerms">
+                        <v-card-text style="font-size:20px">
+                          {{this.leader.email}}
+                        </v-card-text>
+
+                        <v-layout row>
+                          <v-spacer/>
+
+                        <v-card-actions>
+                          <v-btn v-on:click="$router.push({name: 'Account', params:{personID: leader.ID}})">
+                            View Member Page
+                          </v-btn>
+                        </v-card-actions>
+                      
+
                       <v-dialog
                         v-model="dialog2"
                         scrollable
@@ -85,7 +54,7 @@
                             dark
                             v-bind="attrs"
                             v-on="on"
-                            
+                            v-if="userHasPerms"
                           >
                             Change Leader
                           </v-btn>
@@ -126,14 +95,149 @@
                           </v-card-actions>
                         </v-card>
                       </v-dialog>
-                    </v-row>
+
+<v-spacer/>
+                      </v-layout>
+
                     </v-card>
                     
+                    <v-card v-else>
+                      <v-card-subtitle>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-subtitle>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                        <v-card-text>
+                          <v-progress-circular
+                          indeterminate
+                          ></v-progress-circular>
+                        </v-card-text>
+                    </v-card>
                   </v-sheet>
+                </v-col>
+                <v-col>
+
+                  <v-sheet 
+                  color="transparent">
+                    <v-card :height="420">
+                      <v-card-title style="font-size:30px">Event Information</v-card-title>
+                      <br/>
+                      <v-card-text style="font-size:20px"> <strong>Name:</strong> {{event.name}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Description:</strong> {{event.description}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Date</strong>: {{event.date}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Location:</strong> {{event.location}}</v-card-text>
+
+                    <v-row justify="center" v-if="userHasPerms">
+                      <v-dialog
+                        v-model="dialog4"
+                        scrollable
+                        max-width="330px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-card-actions>
+                          <v-btn
+                            color="primary"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            
+                          >
+                            Edit Event
+                          </v-btn>
+                          </v-card-actions>
+                        </template>
+
+                        <v-card>
+                          <v-card-title>Edit Event:</v-card-title>
+                          <v-divider></v-divider>
+                          <v-card-text style="height: 400px;">
+                             <v-text-field
+                              label="Name"
+                              v-model="event.name"
+                              />
+
+                              <v-text-field
+                              label="Description"
+                              v-model="event.description"
+                              />
+
+                              <v-date-picker v-model="date"/>
+
+                              <v-select
+                                :items="room_list"
+                                label="Location"
+                                item-text="room_number"
+                                item-value = "room_number"
+                                v-model="event.location"
+                              />
+
+                            
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-btn
+                              color="blue darken-1"
+                              text
+                              @click="dialog4 = false"
+                            >
+                              Cancel
+                            </v-btn>
+                            <v-btn
+                              color="blue darken-1"
+                              text
+                              @click="updateEvent()"
+                            >
+                              Save
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </v-row>
+
+                    </v-card>
+                  </v-sheet>
+
+                  
+
                 </v-col>
           </v-row>
             <AnnouncementViewer v-if="announcements.length > 0" :announcements="announcements" :hasPerms="userHasPerms" class="mt-5"/>
           <v-row>
+
+            <v-btn
+            style="margin:auto; margin-top:2%"
+            v-if="!attending"
+              color="primary"
+              dark
+              @click="toggleAttending(true)"
+              >
+              Plan to attend
+            </v-btn>
+
+            <v-btn
+            style="margin:auto; margin-top:2%"
+            v-if="attending"
+              color="primary"
+              dark
+              @click="toggleAttending(false)"
+              >
+              No longer attending
+            </v-btn>
+
+          </v-row>
+
+          <v-row>
+
             <v-col>
               <v-container>
                 <v-list color="transparent">
@@ -307,13 +411,11 @@
 import axios from 'axios'
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import AnnouncementViewer from "@/components/Announcements.vue";
-import PhotoUpload from "../components/PhotoUpload.vue";
 
 export default {
   name: "EventMembers",
     components: {
-      AnnouncementViewer,
-      PhotoUpload
+      AnnouncementViewer
   },
   data() {
     return {
@@ -325,6 +427,7 @@ export default {
         user: this.$person,
         userHasPerms: false,
         event: {},
+        date: null,
         eventImgSrc: "",
         leader: {},
         eventMembers: [],
@@ -339,14 +442,62 @@ export default {
         dialog: false,
         dialog2: false,
         dialog3: false,
+        dialog4: false,
         fileType:"PDF",
         picture:false,
         phoneTypes: [],
         currentAddress: null,
+        room_list: [],
+        attending: null
       }
   },
   methods:
   {
+    toggleAttending(attending)
+    {
+      if(attending)
+      {
+        axios.post(`${apiBaseUrl}/attendee`, {
+            event_ID: this.event.ID,
+            person_ID: this.user.id
+          })
+          .then(() => {
+            this.eventMembers.push(this.user);
+            this.$set(this.eventMembers, this.eventMembers.indexOf(this.user), this.user);
+            this.possibleAddList.splice(this.possibleAddList.indexOf(this.user), 1);
+
+            this.attending = true;
+            this.renderMembers = true;
+          })
+      }
+
+      else
+      {
+        console.log(this.eventMembers.find( x => x.ID == this.user.id))
+        this.removeEventMember(this.user.id, this.eventMembers.indexOf(this.eventMembers.find( x => x.ID == this.user.id))) 
+        this.attending = false;
+      }
+    },
+
+    updateEvent()
+    {
+      var data = this.event;
+      data.location = this.room_list.find(x => x.room_number == data.location).ID;
+      data.date = new Date(this.date);
+
+      axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`,data)
+      .then(response => {
+        console.log(response)
+        this.event.date = new Date(this.date).toDateString();
+        this.event.location = this.room_list.find(x => x.ID == data.location).room_number
+        this.dialog4 = false;
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    },
+
     finishedLoadingMemberData: function(){
       this.$nextTick(()=>{
         if(this.memberAddressesReceived && this.memberPhonesReceived)
@@ -361,17 +512,29 @@ export default {
     },
     changeLeader: function(){
       this.eventMembers.push(this.leader);
+              console.log({
+        date: new Date(this.date).toISOString(),
+        leader: this.dialogm2.ID,
+        location: this.room_list.find(x => x.room_number == this.event.location).ID,
+        description: this.event.description,
+        recurring: this.event.recurring,
+        name: this.event.name
+      })
+
       
       axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`, {
-        date: this.event.date,
+        date: new Date(this.date).toISOString(),
         leader: this.dialogm2.ID,
-        location: this.event.location,
+        location: this.room_list.find(x => x.room_number == this.event.location).ID,
         description: this.event.description,
-        recurring: this.event.recurring
+        recurring: this.event.recurring,
+        name: this.event.name
       })
       .then()
       .catch(error =>{
         console.error(error);
+
+
       })
 
       this.$nextTick(()=>{
@@ -384,12 +547,12 @@ export default {
     removeEventMember: function(memberID, index){
       this.possibleAddList.push(this.eventMembers.find(x=>x.ID === memberID));
       this.$delete(this.eventMembers, index);
-      axios.delete(`${apiBaseUrl}/event_person?event_ID=${this.event.ID}&person_ID=${memberID}`);
+      axios.delete(`${apiBaseUrl}/attendee?event_ID=${this.event.ID}&person_ID=${memberID}`);
     },
     addEventMember () {
       console.log(this.addList)
       this.addList.forEach(person => {
-        axios.post(`${apiBaseUrl}/event_person`, {
+        axios.post(`${apiBaseUrl}/attendee`, {
             event_ID: this.event.ID,
             person_ID: person.ID
           })
@@ -409,11 +572,12 @@ export default {
         this.memberAddressesReceived = false;
         this.memberPhonesReceived = false;
         this.renderMembers = false;
-        axios.post(`${apiBaseUrl}/event_person?family_ID=${family.family_ID}&event_ID=${this.$route.params.eventID}`)
+        axios.post(`${apiBaseUrl}/attendee?family_ID=${family.family_ID}&event_ID=${this.$route.params.eventID}`)
         .then(() => {
-          axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`)
+          axios.get(`${apiBaseUrl}/attendee?event_ID=${this.$route.params.eventID}&isGetPersonObjects=1`)
           .then(response => {
-            console.log(response.data)
+            console.log("TEST")
+            console.log("EventMembers: ", response.data)
             this.eventMembers = response.data.filter(x => x.ID != this.event.leader)
 
             // For every event member we need to grab the phones and addresses
@@ -488,13 +652,15 @@ export default {
     axios.all([
 
       axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}`),
-      axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}&get_members=1`),
+      axios.get(`${apiBaseUrl}/attendee?event_ID=${this.$route.params.eventID}&isGetPersonObjects=1`),
       axios.get(`${apiBaseUrl}/valid_value`),
       axios.get(`${apiBaseUrl}/person`),
-      axios.get(`${apiBaseUrl}/family`)
+      axios.get(`${apiBaseUrl}/family`),
+      axios.get(`${apiBaseUrl}/room`)
       ])
-      .then(axios.spread((event, eventMembers, types, churchMembers, families) => {
-      console.log(event, eventMembers, types, churchMembers, families)
+      .then(axios.spread((event, eventMembers, types, churchMembers, families, rooms) => {
+      console.log(event, eventMembers, types, churchMembers, families, rooms)
+      this.room_list = rooms.data;
       let messageTypeID = types.data.find(x => x.value_group === "message" && x.value === "event").ID;
       axios.get(`${apiBaseUrl}/message?receipient=(${this.$route.params.eventID})&receipient_type=${messageTypeID}`)
         .then(messages => {
@@ -516,10 +682,15 @@ export default {
       
       // Setting the view's event and eventMembers variables up with data.
       console.log(event.data);
+      
       this.event = event.data;
-      this.eventImgSrc = apiBaseUrl + "/images/" + event.data.image;
-      console.log("Img Src: " + this.eventImgSrc)
+      this.date = new Date(this.event.date).toISOString().substr(0, 10)
+      var temp = new Date(this.event.date)
+      this.event.date = temp.toDateString()
+      this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
       this.eventMembers = eventMembers.data;
+
+      this.attending = this.eventMembers.some(x => x.ID == this.user.id);
 
       console.log(this.eventMembers.find(x => x.ID === this.event.leader))
 
