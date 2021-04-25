@@ -343,7 +343,8 @@
               </v-menu>
             </v-sheet>
             <v-sheet class="rounded-lg">                    
-              <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+              <ReportSettings style="margin:auto" :selected.sync="fileType"/>
+              <EventListReport class="primary" :selected.sync="fileType"/>
             </v-sheet>
           </v-container>
         </div>
@@ -357,10 +358,12 @@
 import axios from "axios";
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import ReportSettings from "@/components/report_settings.vue";
+import EventListReport from "@/components/event_list_report.vue";
 
 export default {
   components: {
     ReportSettings,
+    EventListReport
   },
   data() {
     return {
