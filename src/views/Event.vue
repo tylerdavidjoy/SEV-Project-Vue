@@ -467,6 +467,7 @@ export default {
             this.possibleAddList.splice(this.possibleAddList.indexOf(this.user), 1);
 
             this.attending = true;
+            this.renderMembers = true;
           })
       }
 
