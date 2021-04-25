@@ -511,17 +511,29 @@ export default {
     },
     changeLeader: function(){
       this.eventMembers.push(this.leader);
+              console.log({
+        date: new Date(this.date).toISOString(),
+        leader: this.dialogm2.ID,
+        location: this.room_list.find(x => x.room_number == this.event.location).ID,
+        description: this.event.description,
+        recurring: this.event.recurring,
+        name: this.event.name
+      })
+
       
       axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`, {
-        date: this.event.date,
+        date: new Date(this.date).toISOString(),
         leader: this.dialogm2.ID,
-        location: this.event.location,
+        location: this.room_list.find(x => x.room_number == this.event.location).ID,
         description: this.event.description,
-        recurring: this.event.recurring
+        recurring: this.event.recurring,
+        name: this.event.name
       })
       .then()
       .catch(error =>{
         console.error(error);
+
+
       })
 
       this.$nextTick(()=>{
