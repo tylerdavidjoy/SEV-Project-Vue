@@ -569,6 +569,21 @@
                       </v-card>
                     </v-sheet>
                   </v-col>
+                  <v-col cols="12">
+                    <v-sheet width="500" class="rounded-lg">
+                      <v-card>
+                        <h1>Person Documents</h1>
+                        <br />
+                        <v-list v-for="document in personDocuments" v-bind:key="document.ID" class="list">                 
+                          <a :href="baseURL + 'api/documents/' + document.doc_name" :alt="document.display_name" :download="document.display_name">
+                            {{ document.display_name }}
+                          </a>
+                        </v-list>
+                        <FileUpload v-bind:canEdit="isAdmin" v-bind:userId="this.user.id" @onFileUpload="personDocuments=$event"/>
+                        <br />
+                      </v-card>
+                    </v-sheet>
+                  </v-col>
                 </v-row>
               </v-container>
             </v-col>
@@ -1274,10 +1289,12 @@
 <script>
 import axios from "axios";
 import PhotoUpload from "../components/PhotoUpload.vue";
+import FileUpload from "../components/FileUpload.vue";
 var baseURL = 'http://team2.eaglesoftwareteam.com/';
 export default {
   components: {
-      PhotoUpload
+      PhotoUpload,
+      FileUpload
     },
   mounted() {
     console.log("Params: ", this.$route.params);
@@ -1337,6 +1354,16 @@ export default {
           console.log("Valid Values: " + temp.ID + " " + temp.value_group + " " + temp.value);
           }
         }
+
+        axios
+        .get(`${baseURL}person_doc?person_ID=${this.user.id}`)
+        .then(personDocs => {
+          console.log(personDocs.data);
+          this.personDocuments = personDocs.data;
+        })
+        .catch(err => {
+          console.log(err);
+        })
 
         //Do a For loop to iterate through the list and then create an Object for all the information of the person with the added variable of the FullName
         console.log("Loading Congregation Members...");
@@ -1650,6 +1677,7 @@ export default {
       image:
         "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.wKCOPiWXFnsPQdoYbNlZowHaHi%26pid%3DApi&f=1",
     },
+    personDocuments: [],
     //Test Data for searching for People
     people: [],
     newFile: {},

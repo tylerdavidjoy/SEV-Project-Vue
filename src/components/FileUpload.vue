@@ -1,9 +1,6 @@
 <template>
-    <div class="file-upload">
+    <div  v-if="canEdit">
         <input type="file" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx"/>
-        <div v-if="progress" class="progress-bar" :style="{'width': progress}">
-            {{progress}}
-        </div>
         <v-btn @click="onUploadFile" class="upload-button"
         :disabled="!this.selectedFile">Upload File</v-btn>
     </div>
@@ -23,6 +20,9 @@ export default {
     },
 
     props: {
+        canEdit: {
+            type: Boolean
+        },
         familyId: {
             type: Number
         },
@@ -64,16 +64,15 @@ export default {
             {
                 console.log("Uploading file for household page")
                 axios
-                .post(this.baseURL + "upload?family_ID=" + this.familyId, formData, {
-                    onUploadProgress: ProgressEvent => {
-                        let progress = 
-                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-                            +"%";
-                            this.progress = progress;
-                    }
+                .post(this.baseURL + "document?family_ID=" + this.familyId, formData, {
                 })
                 .then(response => {
                     console.log(response);
+                    axios
+                    .get(this.baseURL + "family_doc?family_ID=" + this.familyId)
+                    .then(familyDocs => {
+                        this.$emit("onFileUpload", familyDocs.data)
+                    })
                 })
                 .catch(error => {
                     console.log(error);
@@ -84,16 +83,15 @@ export default {
             {
                 console.log("Uploading file for the account page")
                 axios
-                .post(this.baseURL + "upload?person_ID=" + this.userId, formData, {
-                    onUploadProgress: ProgressEvent => {
-                        let progress = 
-                            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-                            +"%";
-                            this.progress = progress;
-                    }
+                .post(this.baseURL + "document?person_ID=" + this.userId, formData, {
                 })
                 .then(response => {
                     console.log(response);
+                    axios
+                    .get(this.baseURL + "person_doc?person_ID=" + this.userId)
+                    .then(personDocs => {
+                        this.$emit("onFileUpload", personDocs.data)
+                    })
                 })
                 .catch(error => {
                     console.log(error);
