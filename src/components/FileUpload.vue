@@ -87,6 +87,11 @@ export default {
                 })
                 .then(response => {
                     console.log(response);
+                    axios
+                    .get(this.baseURL + "person_doc?person_ID=" + this.userId)
+                    .then(personDocs => {
+                        this.$emit("onFileUpload", personDocs.data)
+                    })
                 })
                 .catch(error => {
                     console.log(error);
