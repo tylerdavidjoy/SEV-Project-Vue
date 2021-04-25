@@ -44,8 +44,8 @@ export default {
     drawer: null,
     tabs:[
       {icon:'mdi-home',text:'Home', name:'Home',params:{}},
-      {icon:'mdi-account',text:'Account', name:'Account', params:{}},
-      {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params:{}},
+      {icon:'mdi-account',text:'Account', name:'Account', params: { personID:window.person.id}},
+      {icon:'mdi-home-group',text:'HouseHold', name:'HouseHold', params: { familyID:window.person.family_ID}},
       {icon:'mdi-account-group',text:'Groups', name:'Group List', params:{}},
       {icon:'mdi-calendar',text:'Events', name:'Event List',params:{}},
       {icon:'mdi-church',text:'Directory', name:'Directory', params:{}},
