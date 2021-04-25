@@ -25,12 +25,30 @@
             <v-col>
                 
                 <v-select
+                    v-model="eventType"
                     v-if="life_event_types"
-                    :items="life_event_list"
+                    :items="life_event_types"
+                    item-text="value"
+                    item-value = "id"
                     label="Type of Life Event"
                     style=" margin:auto;"
+                    @change="$emit('update:eventType', eventType);"
                 />
             </v-col>
+
+            <v-col>
+                <v-select
+                    v-model="selectedGroupType"
+                    v-if="groupTypes"
+                    :items="groupTypes"
+                    item-text="value"
+                    item-value = "id"
+                    label="Type of Group"
+                    style=" margin:auto;"
+                    @change="$emit('update:groupType', groupType);"
+                />
+            </v-col>
+
             
         </v-row>
 
@@ -52,12 +70,12 @@
               v-bind="attrs"
               v-on="on"
               @click:clear="start = null"
-
+              
             ></v-text-field>
           </template>
           <v-date-picker
             v-model="start"
-            @change="menu1 = false"
+            @change="menu1 = false; $emit('update:start', start);"
             :max="end"
             
           ></v-date-picker>
@@ -88,7 +106,7 @@
             v-model="end"
             class="mt-4"
             :min="start"
-            @change="menu2 = false"
+            @change="menu2 = false; $emit('update:end', end);"
           ></v-date-picker>
         </v-menu>
       </v-col>
@@ -110,24 +128,20 @@ export default ({
         picture: Boolean,
         start: String,
         end: String,
-        life_event_types: []
+        life_event_types: [],
+        groupTypes:[],
+        eventType: Number,
+        groupType: Number
     },
     methods: 
     {
-        life_event_filter()
-        {
-            for(var i=0; i < this.life_event_types.length; i++)
-            {
-                this.life_event_list = this.life_event_types[i].value
-            }
-        }
+
     },
     data() {
         return {
             items: ["PDF","CSV"],
             menu1: false,
-            menu2: false,
-            life_event_list:[]
+            menu2: false
         }
     }
 })

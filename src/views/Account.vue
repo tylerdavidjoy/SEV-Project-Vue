@@ -1286,7 +1286,7 @@ export default {
       this.user.id = window.person.id;
     else
       this.user.id = this.$route.params.personID;//Figure out some way to set this value before loading page
-    if(this.user.id != window.person.id)
+    if(this.user.id != window.person.personID)
       this.isViewing = true;
     //call Axios all for the Valid_Values, the Congregation, the Relationships, Life Events, and the Person for this person
     axios.all([
