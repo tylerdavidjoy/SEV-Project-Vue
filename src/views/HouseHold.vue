@@ -299,7 +299,8 @@ import FileUpload from "../components/FileUpload.vue";
           axios
           .get(`${this.baseURL}family?id=${family.data.ID}&isGetSpouse=1`)
           .then(spouse => {
-            console.log(spouse.data);
+            console.log("Spouse: " + spouse.data[0].ID);
+            this.headOfFamilySpouseID = spouse.data[0].ID;
             this.isHeadOfHouseholdSpouse();
           })
           .catch(err => {
