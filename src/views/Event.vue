@@ -401,9 +401,9 @@
             </v-dialog>
           </v-row>
         </v-container>
-        
+        <ReportSettings style="margin:auto" :selected.sync="fileType" :picture.sync="picture"/>
+        <EventReport class="primary" :selected.sync="fileType" :picture.sync="picture" :reportid.sync="event.ID"/>
       </v-main>
-
     </div>
   </v-app>
 </template>
@@ -412,12 +412,15 @@
 import axios from 'axios'
 const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
 import AnnouncementViewer from "@/components/Announcements.vue";
-
+import ReportSettings from "@/components/report_settings.vue";
+import EventReport from "@/components/event_report.vue";
 
 export default {
   name: "EventMembers",
     components: {
-      AnnouncementViewer
+      AnnouncementViewer,
+      ReportSettings,
+      EventReport
   },
   data() {
     return {

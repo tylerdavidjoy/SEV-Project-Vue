@@ -1,6 +1,6 @@
 
 <template>
-  <v-btn color="green" @click.native="generateReport()">Generate <br/> Group Memeber Report</v-btn>
+  <v-btn color="green" @click.native="generateReport()">Generate <br/> Event Memeber Report</v-btn>
 </template>
 
 <script>
@@ -10,15 +10,16 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export default ({
-    name: "GroupReportNoImg",
+    name: "EventReportNoImg",
     props:
     {
         selected: String,
-        picture: Boolean,
-        reportid: Number
+        reportid: Number,
+        picture: Boolean
     },
     methods: 
     {
+    
     getBase64ImageFromURL(url) {
         return new Promise((resolve, reject) => {
         var img = new Image();
@@ -52,7 +53,7 @@ export default ({
 
     generateReport: function()
     {
-        axios.get("http://team2.eaglesoftwareteam.com/group?id="+ this.reportid +"&get_members=1")
+        axios.get("http://team2.eaglesoftwareteam.com/attendee?event_ID="+ this.reportid +"&isGetPersonObjects=1")
         .then(response => {
             var callList = []
             response.data.forEach(element => {
@@ -82,11 +83,11 @@ export default ({
         })
     },
 
-    csvCreation(group)
+    csvCreation(event)
     {
         var rows = [];
-        for(var i=0; i < group.length; i++){
-            rows.push([group[i].f_name + " " + group[i].l_name, group[i].occupation, group[i].employer, group[i].email]);
+        for(var i=0; i < event.length; i++){
+            rows.push([event[i].f_name + " " + event[i].l_name, event[i].email, event[i].phone_number]);
         }
 
         let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
@@ -94,14 +95,14 @@ export default ({
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "group.csv");
+        link.setAttribute("download", "event.csv");
         document.body.appendChild(link); 
 
         link.click();
     },
 
 
-        pdfCreation: async function(group_members, img)
+        pdfCreation: async function(attendees, img)
         {
 
             if(!img)
@@ -111,8 +112,8 @@ export default ({
                 var columns = ["Name", "Phone Number", "Email" ];
                 var rows = [];
 
-                for(var i=0; i < group_members.length; i++){
-                    rows.push([group_members[i].name, group_members[i].f_name + " " + group_members[i].l_name, group_members[i].value]);
+                for(var i=0; i < attendees.length; i++){
+                    rows.push([attendees[i].name, attendees[i].f_name + " " + attendees[i].l_name, attendees[i].value]);
                 }
                 var doc = new jsPDF('p', 'pt');
                 doc.autoTable(columns, rows);
@@ -121,11 +122,11 @@ export default ({
 
             else
             {
-                console.log(group_members);
+                console.log(attendees);
                 //var picture = new Image();
                 //picture.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/1200px-Vue.js_Logo_2.svg.png";
                 var promiseList = []
-                group_members.forEach(async element => {
+                attendees.forEach(async element => {
                     var temp = await this.getBase64ImageFromURL("http://team2.eaglesoftwareteam.com/images/" + element.image)
                     var item =
                     {
@@ -148,8 +149,8 @@ export default ({
 
                 //var imgData = 'data:image/jpeg;base64,' + window.btoa("../assets/dog.jpg");
                 var contentTemp = [];
-                contentTemp.push({text: 'List of Group Members\n\n', fontSize:30, alignment: 'center', style:'header'})
-                for (i = 0; i < group_members.length; i++)
+                contentTemp.push({text: 'List of Atendees\n\n', fontSize:30, alignment: 'center', style:'header'})
+                for (i = 0; i < attendees.length; i++)
                 {
 
                     var columnsImg = [
@@ -160,7 +161,7 @@ export default ({
                         }]
 
 
-                    if ((i + 1) < group_members.length)
+                    if ((i + 1) < attendees.length)
                     {
                         columnsImg.push({}) //Spacing
                         columnsImg.push(                            
@@ -171,7 +172,7 @@ export default ({
                             })
                     }
 
-                    if ((i + 2) < group_members.length)
+                    if ((i + 2) < attendees.length)
                     {
                         columnsImg.push({}) //Spacing
                         columnsImg.push(                            
@@ -182,7 +183,7 @@ export default ({
                             })
                     }
 
-                    if(i == group_members.length - 2)
+                    if(i == attendees.length - 2)
                     {
                         columnsImg.push({}) //Spacing
                         columnsImg.push(    //Transparent image for spacing               
@@ -202,33 +203,33 @@ export default ({
 
                 var columnsName = [
                     {
-                        text:group_members[i].f_name + " " + group_members[i].l_name
+                        text:attendees[i].f_name + " " + attendees[i].l_name
                     }
                 ]
 
-                if ((i + 1) < group_members.length)
+                if ((i + 1) < attendees.length)
                     {
                         columnsName.push(                            
                             {
-                                text:group_members[i + 1].f_name + " " + group_members[i + 1].l_name
+                                text:attendees[i + 1].f_name + " " + attendees[i + 1].l_name
                             })
                     }
 
-                    if ((i + 2) < group_members.length)
+                    if ((i + 2) < attendees.length)
                     {
                         columnsName.push(                            
                             {
-                                text:group_members[i + 2].f_name + " " + group_members[i + 2].l_name
+                                text:attendees[i + 2].f_name + " " + attendees[i + 2].l_name
                             })
                     }
 
-                    if(i == group_members.length - 1)
+                    if(i == attendees.length - 1)
                     {
                         columnsName.push({}) //Spacing
                         columnsName.push({}) //Spacing
                     }
 
-                    if(i == group_members.length - 2)
+                    if(i == attendees.length - 2)
                     {
                         columnsName.push({}) //Spacing
                     }
