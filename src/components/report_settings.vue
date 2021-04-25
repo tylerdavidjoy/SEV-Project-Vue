@@ -39,11 +39,11 @@
 
             <v-col>
                 <v-select
-                    v-model="selectedGroupType"
+                    v-model="groupType"
                     v-if="groupTypes"
                     :items="groupTypes"
                     item-text="value"
-                    item-value = "id"
+                    item-value = "ID"
                     label="Type of Group"
                     style=" margin:auto;"
                     @change="$emit('update:groupType', groupType);"

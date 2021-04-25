@@ -88,7 +88,7 @@ export default ({
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "directory.csv");
+        link.setAttribute("download", "person directory.csv");
         document.body.appendChild(link); 
 
         link.click();
@@ -106,7 +106,7 @@ export default ({
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "directory.csv");
+        link.setAttribute("download", "family directory.csv");
         document.body.appendChild(link); 
 
         link.click();
