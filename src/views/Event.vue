@@ -472,7 +472,8 @@ export default {
 
       else
       {
-        this.removeEventMember(this.user.id, this.eventMembers.indexOf(this.user)) 
+        console.log(this.eventMembers.find( x => x.ID == this.user.id))
+        this.removeEventMember(this.user.id, this.eventMembers.indexOf(this.eventMembers.find( x => x.ID == this.user.id))) 
         this.attending = false;
       }
     },
