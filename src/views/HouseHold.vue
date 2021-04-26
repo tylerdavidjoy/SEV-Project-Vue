@@ -259,16 +259,22 @@ import FileUpload from "../components/FileUpload.vue";
     
     },
     created() {
+      if(this.$route.params.familyID == null) {
+        this.familyId = window.person.family_ID;
+      }
+      else {
+        this.familyId = this.$route.params.familyID;
+      }
       console.log(this.$route.params.familyID)
       console.log("Logged in user ID: " + this.userId)
         axios.all([
-          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=0`), // gets family object
-          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=1&isGetHeadOfFamily=0`), // this gets all persons of family
-          axios.get(`${this.baseURL}family?id=${this.$route.params.familyID}&isGetPersons=0&isGetHeadOfFamily=1`), // this gets the person of head of family
+          axios.get(`${this.baseURL}family?id=${this.familyId}&isGetPersons=0&isGetHeadOfFamily=0`), // gets family object
+          axios.get(`${this.baseURL}family?id=${this.familyId}&isGetPersons=1&isGetHeadOfFamily=0`), // this gets all persons of family
+          axios.get(`${this.baseURL}family?id=${this.familyId}&isGetPersons=0&isGetHeadOfFamily=1`), // this gets the person of head of family
         ])
         .then(axios.spread((family, familyMembers, headOfFamily) => {
 
-          this.familyId = family.data.ID;
+          // this.familyId = family.data.ID;
           this.address_ID = family.data.address_ID;
           this.familyImgSrc = this.baseURL + "images/" + family.data.image;
 
@@ -312,7 +318,7 @@ import FileUpload from "../components/FileUpload.vue";
         }))
 
         axios
-        .get(`${this.baseURL}family_doc?family_ID=${this.$route.params.familyID}`)
+        .get(`${this.baseURL}family_doc?family_ID=${this.familyId}`)
         .then(familyDocs => {
           console.log(familyDocs.data);
           this.familyDocuments = familyDocs.data;
