@@ -110,19 +110,19 @@
                 <v-container>
                   <v-stepper >
                     <v-stepper-header>
-                      <template v-for="n in content.fileuploading.steps">
+                      <template v-for="n in content.event.steps">
                         <v-stepper-step :key="`${n}-step`" :step="n" editable>Step {{ n }}</v-stepper-step>
               
-                        <v-divider v-if="n !== content.fileuploading.steps" :key="n"></v-divider>
+                        <v-divider v-if="n !== content.event.steps" :key="n"></v-divider>
                       </template>
                     </v-stepper-header>
               
                     <v-stepper-items>
-                      <v-stepper-content v-for="n in content.fileuploading.steps" :key="`${n}-content`" :step="n">
+                      <v-stepper-content v-for="n in content.event.steps" :key="`${n}-content`" :step="n">
                         <v-card class="mb-12" color="grey darken-3">
-                          <v-img contain :height="300" :src="getImgUrl('account',n)"/>
+                          <v-img contain :height="300" :src="getImgUrl('help',n)"/>
                         <v-card-title class="text-h2 white--text">Step {{n}}</v-card-title>
-                          <v-card-text class="text-h4 white--text">{{content.fileuploading.info[n-1]}}</v-card-text>
+                          <v-card-text class="text-h4 white--text">{{content.event.info[n-1]}}</v-card-text>
                         </v-card>
                       </v-stepper-content>
                     </v-stepper-items>
@@ -268,12 +268,12 @@
         },
         event:{id:0, steps:[1,2,3,4,5,6],
           info:[
-            'The first step in creating a Life Event is to navigate to the Account Page for your account.',
-            'After Navigating to the Acconut page, You can look at the Life Events for your account. From here you can Add, Edit, or even remove a Life Event from your Account.',
-            'If you want to Add a Life Event, you can click the Add Event button to add a new Life Event to your account. From there, you will be prompted to select the type of event, give a description of the event, and give a date for the event before submitting it. After you submit the event, you will notice that now the event is added to your Life Events.',
-            'If you want to edit a Life Event, You can click the Pencil next to the Event to edit information about that Life Event. This will update any information for the Life Event after you submit the changes.',
-            'If you want to delete a Life Event, then you can click the Trashcan icon next to the Event. This will prompt you to make sure that you want to delete the Event. If you confirm, then you will notice that the Life Event is no longer showing on your account page.',
-            'If you are having trouble with Life Events or any other feature for the Account page, then contact your Administrator and ask for help.',
+            'The Events page is a way for the system to keep track or all of the retreats and weekend youth lock-ins that would be hosted during the year, as well as allow people to sign up for these events through the application. To view possible events for the church, you must first navigate to the Events page.',
+            'After navigating to the Events page, you will be able to do various things for events, like search up a specific event.',
+            'Once you have found an event that you would like to view, you will be able to click on View Event to be navigated to that event',
+            'From here, you will be able to view information about that event, and even see announcements for the event.',
+            'If you want to attend an event, then click the plan to attend button and you will be signed up for the event.',
+            'If you are having trouble with Groups Selection or any other feature for the Groups page, then contact your Administrator and ask for help.',
           ],
         },
         reports:{id:0, steps:[1,2,3,4,5,6],
