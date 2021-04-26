@@ -185,6 +185,9 @@
                         <a :href="baseURL + 'api/documents/' + document.doc_name" :alt="document.display_name" :download="document.display_name">
                           {{ document.display_name }}
                         </a>
+                        <v-btn @click="deleteDocument(document)" class="ma-2" outlined large fab color="red darken-4" v-if="isAdmin">
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
                       </v-list>
                       <FileUpload v-bind:canEdit="isAdmin" v-bind:familyId="this.familyId" @onFileUpload="familyDocuments=$event"/>
                       <br />
@@ -483,6 +486,19 @@ import FileUpload from "../components/FileUpload.vue";
             this.$delete(this.familyMembers, this.familyMembers.indexOf(member), member);
             this.$delete(this.deletableMembers, this.deletableMembers.indexOf(member), member);
           }
+        })
+      },
+
+      deleteDocument: function(document) {
+        console.log("Delete document: " + document);
+        axios
+        .delete(`${this.baseURL}document?id=${document.ID}&is_person=0`)
+        .then(response => {
+          console.log(response)
+          this.$delete(this.familyDocuments, this.familyDocuments.indexOf(document), document);
+        })
+        .catch(err => {
+          console.log(err);
         })
       },
 

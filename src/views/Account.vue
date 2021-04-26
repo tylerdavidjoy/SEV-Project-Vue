@@ -578,6 +578,15 @@
                           <a :href="baseURL + 'api/documents/' + document.doc_name" :alt="document.display_name" :download="document.display_name">
                             {{ document.display_name }}
                           </a>
+                          <v-btn
+                            @click="deleteDocument(document)"
+                            color="primary"
+                            dark
+                            class="mb-2"
+                            v-if="isAdmin"
+                          >
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
                         </v-list>
                         <FileUpload v-bind:canEdit="isAdmin" v-bind:userId="this.user.id" @onFileUpload="personDocuments=$event"/>
                         <br />
@@ -2560,6 +2569,19 @@ export default {
           });
         }
       }
+    },
+
+    deleteDocument: function(document) {
+      console.log("Delete document: " + document);
+      axios
+      .delete(`${baseURL}document?id=${document.ID}&is_person=1`)
+      .then(response => {
+        console.log(response)
+        this.$delete(this.personDocuments, this.personDocuments.indexOf(document), document);
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
     //Get Functions
     async GetValidValues()
