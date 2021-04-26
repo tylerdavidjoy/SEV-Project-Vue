@@ -19,7 +19,7 @@
                 align="center"
                 justify="center"
                 >
-                    <div class="ma-6" style="font-size:24px">
+                    <div class="ma-6" style="font-size:30px">
                         {{announcement.message}}
                     </div>
                 </v-row>
