@@ -199,7 +199,7 @@ export default {
       isAddValid: false,
       fileType:"PDF",
       picture:false,
-      selectedGroupType:null
+      groupType:null
     }
   },
   beforeCreate(){

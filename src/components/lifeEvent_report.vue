@@ -23,12 +23,35 @@ export default ({
         console.log(date_start, date_end, type)
         axios.get("http://team2.eaglesoftwareteam.com/life_event?date_start=" + date_start + "&date_end=" + date_end + "&type=" + type + "&report=1")
         .then(response => {
-        this.pdfCreation(response.data,this.picture);
+           if (this.selected == "CSV")
+                this.csvCreation(response.data);
+            else
+                this.pdfCreation(response.data,this.picture);
         })
         .catch(error => {
         console.log(error);
         })
     },
+
+     csvCreation(life_event)
+        {
+            console.log(life_event)
+            var rows = [];
+            for(var i=0; i < life_event.length; i++){
+                rows.push([life_event[i].f_name + " " + life_event[i].l_name , life_event[i].description, new Date(life_event[i].date).toLocaleDateString()]);
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+            
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "life events.csv");
+            document.body.appendChild(link); 
+
+            link.click();
+        },
+
 
     pdfCreation: function(life_event, img)
         {
