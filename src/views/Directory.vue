@@ -167,7 +167,7 @@ export default {
       this.family = []
       this.display = []
     //People
-        axios.get("http://team2.eaglesoftwareteam.com/person")
+        axios.get("localhost:3000/person")
         .then(response => {
           console.log("people Res:", response.data);
           for(var i = 0; i < response.data.length; i++)
@@ -175,7 +175,7 @@ export default {
             this.people.push({
               id: response.data[i].ID,
               name: response.data[i].f_name + " " + response.data[i].l_name,
-              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+              image: "localhost:3000/images/" + response.data[i].image
             })
           }
           this.autoPagination(this.people);
@@ -184,7 +184,7 @@ export default {
           console.log(error);
         })
 
-        axios.get("http://team2.eaglesoftwareteam.com/family?isGetNameList=1")
+        axios.get("localhost:3000/family?isGetNameList=1")
         .then(response => {
           console.log(response.data);
           for(var i = 0; i < response.data.length; i++)
@@ -192,7 +192,7 @@ export default {
             this.family.push({
               id: response.data[i].ID,
               name: response.data[i].l_name,
-              image: "http://team2.eaglesoftwareteam.com/images/" + response.data[i].image
+              image: "localhost:3000/images/" + response.data[i].image
             })
           }
         })
@@ -200,7 +200,7 @@ export default {
           console.log(error);
         })
 
-        axios.get("http://team2.eaglesoftwareteam.com/valid_value?value_group=life_event")
+        axios.get("localhost:3000/valid_value?value_group=life_event")
         .then(response => {
           console.log(response.data);
           this.life_event_types = []
@@ -341,7 +341,7 @@ export default {
       else
         endpoint = "family"
 
-      axios.delete("http://team2.eaglesoftwareteam.com/" + endpoint + "?id=" + id)
+      axios.delete("localhost:3000/" + endpoint + "?id=" + id)
       .then( () => {
         console.log("Item deleted successfully")
         this.deleteFlag = false

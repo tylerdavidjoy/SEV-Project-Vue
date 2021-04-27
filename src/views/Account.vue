@@ -1299,7 +1299,7 @@
 import axios from "axios";
 import PhotoUpload from "../components/PhotoUpload.vue";
 import FileUpload from "../components/FileUpload.vue";
-var baseURL = 'http://team2.eaglesoftwareteam.com/';
+var baseURL = 'http://localhost:3000/';
 export default {
   components: {
       PhotoUpload,

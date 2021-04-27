@@ -410,7 +410,7 @@
 
 <script>
 import axios from 'axios'
-const apiBaseUrl = "http://team2.eaglesoftwareteam.com";
+const apiBaseUrl = "http://localhost:3000";
 import AnnouncementViewer from "@/components/Announcements.vue";
 import ReportSettings from "@/components/report_settings.vue";
 import EventReport from "@/components/event_report.vue";
