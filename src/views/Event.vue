@@ -135,6 +135,7 @@
                       <v-card-text style="font-size:20px"> <strong>Name:</strong> {{event.name}}</v-card-text>
                       <v-card-text style="font-size:20px"> <strong>Description:</strong> {{event.description}}</v-card-text>
                       <v-card-text style="font-size:20px"> <strong>Date</strong>: {{event.date}}</v-card-text>
+                      <v-card-text style="font-size:20px"> <strong>Time</strong>: {{event.time}}</v-card-text>
                       <v-card-text style="font-size:20px"> <strong>Location:</strong> {{event.location}}</v-card-text>
 
                     <v-row justify="center" v-if="userHasPerms">
@@ -160,7 +161,7 @@
                         <v-card>
                           <v-card-title>Edit Event:</v-card-title>
                           <v-divider></v-divider>
-                          <v-card-text style="height: 400px;">
+                          <v-card-text style="height: 900px;">
                              <v-text-field
                               label="Name"
                               v-model="event.name"
@@ -180,8 +181,15 @@
                                 item-value = "room_number"
                                 v-model="event.location"
                               />
+                                <v-time-picker
+                                  scrollable
+                                  format="ampm"
+                                  ampm-in-title
+                                  v-model="time"
+                                  full-width
+                                  @click:minute="$refs.menu.save(time)"
+                                ></v-time-picker>
 
-                            
                           </v-card-text>
                           <v-divider></v-divider>
                           <v-card-actions>
@@ -453,7 +461,8 @@ export default {
         phoneTypes: [],
         currentAddress: null,
         room_list: [],
-        attending: null
+        attending: null,
+        time: null
       }
   },
   methods:
@@ -489,11 +498,18 @@ export default {
       var data = this.event;
       data.location = this.room_list.find(x => x.room_number == data.location).ID;
       data.date = new Date(this.date);
+      data.date.setTime(this.time);
+      console.log("DATE:",this.date)
+      console.log("TIME:",this.time)
+
+      data.date = this.date + "T" + this.time + ":00.000Z"
+      console.log(data)
 
       axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`,data)
       .then(response => {
         console.log(response)
-        this.event.date = new Date(this.date).toDateString();
+        this.event.date = new Date(this.date + "T" + this.time + ":00.000Z").toDateString();
+        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toLocaleTimeString();
         this.event.location = this.room_list.find(x => x.ID == data.location).room_number
         this.dialog4 = false;
       })
@@ -689,7 +705,10 @@ export default {
       console.log(event.data);
       
       this.event = event.data;
-      this.date = new Date(this.event.date).toISOString().substr(0, 10)
+      var tempDate = new Date(this.event.date)
+      this.date = tempDate.toISOString().substr(0, 10)
+      this.event.time = tempDate.toLocaleTimeString();
+      this.time = tempDate.toTimeString().substr(0,5)
       var temp = new Date(this.event.date)
       this.event.date = temp.toDateString()
       this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
