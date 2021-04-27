@@ -703,7 +703,7 @@ export default {
       var tempDate = new Date(this.event.date)
       this.date = tempDate.toISOString().substr(0, 10)
       this.event.time = tempDate.toLocaleTimeString();
-      this.time = this.event.time
+      this.time = tempDate.toTimeString().substr(0,5)
       var temp = new Date(this.event.date)
       this.event.date = temp.toDateString()
       this.event.location = rooms.data.find(x => x.ID === this.event.location).room_number;
