@@ -26,7 +26,7 @@
                       </div>
                       <v-spacer></v-spacer>
                       <div :class="'px-6'">
-                        <PhotoUpload v-bind:canEdit="this.isAdmin" v-bind:userId="this.user.id" v-bind:personImgSrc="this.user.image" @onFileChange="user.image=$event"/>
+                        <PhotoUpload v-bind:canEdit="!isViewing" v-bind:userId="this.user.id" v-bind:personImgSrc="this.user.image" @onFileChange="user.image=$event"/>
 
                         <!-- <v-file-input
                           color="primary"
@@ -1464,7 +1464,7 @@ export default {
           this.user.preferred_name = user.data[0].preferred_name;
           this.user.occupation = user.data[0].occupation;
           this.user.employer = user.data[0].employer;
-          // this.user.role = user.data[0].role
+          this.user.role = user.data[0].role
           this.user.family_ID = user.data[0].family_ID;
           this.user.image = baseURL + "images/" + user.data[0].image;
           //iterate through valid_values to get the Role

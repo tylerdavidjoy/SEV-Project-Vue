@@ -283,6 +283,7 @@ import FileUpload from "../components/FileUpload.vue";
 
           this.email = headOfFamily.data[0].email;
           this.headOfFamilyID = headOfFamily.data[0].ID;
+          console.log("HOF",this.headOfFamilyID)
 
           axios
           .get(`${this.baseURL}address?id=${family.data.address_ID}`) // Address object from family address ID
@@ -315,6 +316,9 @@ import FileUpload from "../components/FileUpload.vue";
           .catch(err => {
             console.log(err);
           })
+
+                   this.isHeadOfHousehold();
+         this.isAdminFunction();
         }))
 
         axios
@@ -327,8 +331,7 @@ import FileUpload from "../components/FileUpload.vue";
           console.log(err);
         })
 
-         this.isHeadOfHousehold();
-         this.isAdminFunction();
+
           
     },
 
@@ -382,15 +385,17 @@ import FileUpload from "../components/FileUpload.vue";
 
       isHeadOfHousehold: function() {
         this.$nextTick(() => {
-          if(this.userId === this.headOfFamilyID) {
+          if(this.userId == this.headOfFamilyID) {
             this.isHeadOfFamily = true;
           }
+          else
+            console.log("THIS" + this.userId + this.headOfFamilyID)
         })
       },
 
       isHeadOfHouseholdSpouse: function() {
         this.$nextTick(() => {
-          if(this.userId === this.headOfFamilySpouseID) {
+          if(this.userId == this.headOfFamilySpouseID) {
             this.isSpouse = true;
           }
         })
