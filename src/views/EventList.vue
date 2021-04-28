@@ -427,9 +427,12 @@ export default {
       this.rooms = rooms.data;
 
       this.groups = groups.data;
-
+      
       this.$nextTick(()=>{
         
+          if(window.person.role === this.adminRoleID)
+            this.isAdmin = true;
+
           //this.events = events.data;
           events.data.forEach(event =>{
               const {f_name, l_name} = this.members.find(x => x.ID === event.leader)
@@ -445,7 +448,7 @@ export default {
               });
 
             })
-          this.isAdmin = true;
+
         }
 
       )
