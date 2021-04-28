@@ -508,8 +508,21 @@ export default {
       axios.put(`${apiBaseUrl}/event?id=${this.event.ID}`,data)
       .then(response => {
         console.log(response)
+        axios.get(`${apiBaseUrl}/event?id=${this.$route.params.eventID}`)
+        .then((event) => {
+        console.log(event.data);
+          this.event = event.data;
+          var tempDate = new Date(this.event.date)
+          this.date = tempDate.toISOString().substr(0, 10)
+          this.event.time = tempDate.toLocaleTimeString();
+          this.time = tempDate.toTimeString().substr(0,5)
+          var temp = new Date(this.event.date)
+          this.event.date = temp.toDateString()
+          this.event.location = this.rooms.data.find(x => x.ID === this.event.location).room_number;
+        })
+
         this.event.date = new Date(this.date + "T" + this.time + ":00.000Z").toDateString();
-        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toTimeString();
+        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toLocaleTimeString();
         this.event.location = this.room_list.find(x => x.ID == data.location).room_number
         this.dialog4 = false;
       })
