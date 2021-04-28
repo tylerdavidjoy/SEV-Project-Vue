@@ -504,7 +504,7 @@ export default {
       .then(response => {
         console.log(response)
         this.event.date = new Date(this.date + "T" + this.time + ":00.000Z").toDateString();
-        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toLocaleTimeString();
+        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toTimeString();
         this.event.location = this.room_list.find(x => x.ID == data.location).room_number
         this.dialog4 = false;
       })
