@@ -518,12 +518,8 @@ export default {
           this.time = tempDate.toTimeString().substr(0,5)
           var temp = new Date(this.event.date)
           this.event.date = temp.toDateString()
-          this.event.location = this.rooms.data.find(x => x.ID === this.event.location).room_number;
+          this.event.location = this.room_list.find(x => x.ID === this.event.location).room_number;
         })
-
-        this.event.date = new Date(this.date + "T" + this.time + ":00.000Z").toDateString();
-        this.event.time = new Date(this.date + "T" + this.time + ":00.000Z").toLocaleTimeString();
-        this.event.location = this.room_list.find(x => x.ID == data.location).room_number
         this.dialog4 = false;
       })
       .catch(error => {
