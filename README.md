@@ -1,24 +1,7 @@
-# church_sys
+# Software Engineering V - Frontend
 
-## Project setup
-```
-npm install
-```
+This project holds the front created using Vue.js for a senior level software engineering course.
+The main features of the system include managing multiple different church congregations, their members, groups within the congregation and events they want to hold. Other smaller features include announcements and tracking information useful for the clergy for helping members of the congregation.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+This project was to design, develop and deploy a church management system to an AWS instance.
+This project was one of our team's first real full run through the software development lifecycle and we have learned much since then.
